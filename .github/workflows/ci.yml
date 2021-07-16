@@ -18,6 +18,5 @@ jobs:
         with:
           node-version: '14'
           cache: yarn
-
-      - name: Lint
-        run: yarn lint
+      - run: yarn install
+      - run: yarn lint
