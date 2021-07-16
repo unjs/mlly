@@ -4,17 +4,19 @@
 
 ## Usage
 
+### Install
+
 Install npm package:
 
 ```sh
 # using yarn
-yarn add --dev mlly
+yarn add mlly
 
 # using npm
-npm install -D mlly
+npm install mlly
 ```
 
-## CommonJS Context
+### CommonJS Context
 
 This utility creates a compatible context that we loose when migrating to ECMA modules.
 
