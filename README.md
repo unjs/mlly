@@ -109,7 +109,7 @@ import { loadModule } from 'mlly'
 await loadModule('./hello.mjs', { from: import.meta.url })
 ```
 
-Options are same as for `evalModule`
+Options are same as `evalModule`.
 
 ### `evalModule`
 
@@ -128,8 +128,8 @@ await evalModule(`
 
 **Options:**
 
-- [ resolve options ]
-- `url`: If provided, all `import.meta.url` usages within module will be rewritten. Also used as default `from` for relative import resolution
+- [all `resolve` options]
+- `url`: File URL
 
 ### `readModule`
 
@@ -143,6 +143,8 @@ const indexPath = await resolve('./index.mjs', { from: import.meta.url })
 // { code: '...", url: '...' }
 console.log(await readModule(indexPath))
 ```
+
+Options are same as `resolve`.
 
 ### `toDataURL`
 
@@ -160,6 +162,8 @@ console.log(await toDataURL(`
   console.log('Hello world')
 `))
 ```
+
+Options are same as `evalModule`.
 
 ## Other utils
 
