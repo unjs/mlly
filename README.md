@@ -109,6 +109,8 @@ import { loadModule } from 'mlly'
 await loadModule('./hello.mjs', { from: import.meta.url })
 ```
 
+Options are same as for `evalModule`
+
 ### `evalModule`
 
 Evaluates JavaScript module code using dynamic imports with [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) using `toDataURL`.
@@ -124,14 +126,22 @@ await evalModule(`
 `, { from: import.meta.url })
 ```
 
+**Options:**
+
+- [ resolve options ]
+- `url`: If provided, all `import.meta.url` usages within module will be rewritten. Also used as default `from` for relative import resolution
+
 ### `readModule`
 
-Resolves id using `resolve` and reads sourcecode.
+Resolve module path and read source contents. (currently only file protocol supported)
 
 ```js
-import { readModule } from 'mlly'
+import { resolve, readModule } from 'mlly'
 
-console.log(await readModule('./index.mjs', { from: import.meta.url }))
+const indexPath = await resolve('./index.mjs', { from: import.meta.url })
+
+// { code: '...", url: '...' }
+console.log(await readModule(indexPath))
 ```
 
 ### `toDataURL`
@@ -139,6 +149,8 @@ console.log(await readModule('./index.mjs', { from: import.meta.url }))
 Convert code to [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) URL using base64 encoding.
 
 All relative imports will be automatically resolved with `from` param using `resolveImports`.
+
+If `url` option is provided, all usages of `import.meta.url` will be rewritten too.
 
 ```js
 import { toDataURL } from 'mlly'

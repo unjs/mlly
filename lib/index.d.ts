@@ -24,12 +24,14 @@ export function resolveImports (code: string, opts: ResolveOptions) : Promise<st
 
 // Evaluate
 
-export interface EvaluateOptions extends ResolveOptions {}
+export interface EvaluateOptions extends ResolveOptions {
+  url?: string
+}
+
 export function loadModule (id: string, opts?: EvaluateOptions) : Promise<any>
 export function evalModule (code: string, opts?: EvaluateOptions) : Promise<any>
-
-export function readModule (id: string, opts?: ResolveOptions) : Promise<any>
-export function toDataURL(code: string, opts?: ResolveOptions) : Promise<string>
+export function readModule (id: string, opts?: EvaluateOptions) : Promise<{ url: string, code: string}>
+export function toDataURL(code: string, opts?: EvaluateOptions) : Promise<string>
 
 // Utils
 
