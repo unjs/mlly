@@ -29,7 +29,7 @@ There are several utils exposed allow resolving another module URL or Path. (int
 
 - **`resolve(specifier, parent?, conditions?)`**
 - **`resolvePath(specifier, parent?, conditions?)`**
-- **`createResolve(import.meta)`**
+- **`createResolve(import.meta)`** | **`createResolve(base)`**
 - `resolveSync(specifier, parent?, conditions?)`
 - `resolvePathSync(specifier, parent?, conditions?)`
 
