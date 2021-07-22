@@ -31,6 +31,7 @@ export function evalModule (code: string, opts?: EvaluateOptions) : Promise<any>
 export function readModule (id: string, opts?: ResolveOptions) : Promise<any>
 export function toDataURL(code: string, opts?: ResolveOptions) : Promise<string>
 
-// Path Utils
+// Utils
 
 export function fileURLToPath (id: URL | string) : string
+export function normalizeid (id: URL | string) : string

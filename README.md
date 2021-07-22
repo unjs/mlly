@@ -149,11 +149,11 @@ console.log(await toDataURL(`
 `))
 ```
 
-## Path utils
+## Other utils
 
 ### `fileURLToPath`
 
-Similar to [url.fileURLToPath](https://nodejs.org/api/url.html#url_url_fileurltopath_url) but also converts windows backslash `\` to unix slash `/`
+Similar to [url.fileURLToPath](https://nodejs.org/api/url.html#url_url_fileurltopath_url) but also converts windows backslash `\` to unix slash `/` and handles if input is already a path.
 
 ```js
 import { fileURLToPath } from 'mlly'
@@ -163,6 +163,17 @@ console.log(fileURLToPath('file:///foo/bar.js'))
 
 // C:/path
 console.log(fileURLToPath('file:///C:/path/'))
+```
+
+### `normalizeid`
+
+Ensures id has either of `node:`, `data:`, `http:`, `https:` or `file:` protocols.
+
+```js
+import { ensureProtocol } from 'mlly'
+
+// file:///foo/bar.js
+console.log(normalizeid('/foo/bar.js'))
 ```
 
 ## License
