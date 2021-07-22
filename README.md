@@ -20,25 +20,34 @@ npm install mlly
 Import utils:
 
 ```js
-import { resolve } from 'mlly'
+import { } from 'mlly'
 ```
 
 ## Resolving Modules
 
 There are several utils exposed allow resolving another module URL or Path. (internally using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve) that re-exports Node.js code).
 
-- **`resolve(specifier, opts)`**
-- **`resolvePath(specifier, opts)`**
+- **`resolve(specifier, parent?, conditions?)`**
+- **`resolvePath(specifier, parent?, conditions?)`**
 - **`createResolve(import.meta)`**
-- `resolveSync(specifier, opts)`
-- `resolvePathSync(specifier, opts)`
+- `resolveSync(specifier, parent?, conditions?)`
+- `resolvePathSync(specifier, parent?, conditions?)`
 
 It is recommended to use `resolve` and `createResolve` since module resolution spec allows aync resolution.
 
-**Options:**
+```js
+import { resolve, resolvePath, createResolve } from 'mlly'
 
-- `parent`: (required) Parent module to resolve relative from
-- `conditions`: Default is `['node', 'import']`
+// //home/user/project/module.mjs
+console.log(await resolvePath('./module.mjs', import.meta.url))
+
+// file:///home/user/project/module.mjs
+console.log(await resolve('./module.mjs', import.meta.url))
+
+// file:///home/user/project/module.mjs
+const importResolve = createResolve(import.meta)
+console.log(await importResolve('./module.mjs'))
+```
 
 ## CommonJS Context
 

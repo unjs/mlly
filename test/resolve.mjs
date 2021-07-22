@@ -1,5 +1,6 @@
-import { createResolve } from 'mlly'
+import { resolvePath, createResolve } from 'mlly'
 
-const _resolve = createResolve(import.meta)
+const importResolve = createResolve(import.meta)
+console.log(await importResolve('./cjs.mjs'))
 
-console.log(await _resolve('./cjs.mjs'))
+console.log(await resolvePath('./cjs.mjs', import.meta.url))
