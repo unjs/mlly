@@ -1,7 +1,7 @@
 {
   "name": "mlly",
   "version": "0.1.0",
-  "description": "ECMAScript module utils for Node.js",
+  "description": "ECMAScript module helpers for Node.js",
   "repository": "unjs/mlly",
   "license": "MIT",
   "sideEffects": false,
@@ -13,12 +13,13 @@
     "lib"
   ],
   "scripts": {
-    "dev": "node ./test/test.mjs",
     "lint": "eslint --ext .mjs lib",
     "release": "yarn test && standard-version && npm publish && git push --follow-tags",
     "test": "yarn lint"
   },
-  "dependencies": {},
+  "dependencies": {
+    "import-meta-resolve": "^1.1.1"
+  },
   "devDependencies": {
     "@nuxtjs/eslint-config": "latest",
     "@types/node": "latest",
