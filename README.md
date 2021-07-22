@@ -27,7 +27,7 @@ import {} from 'mlly'
 
 ### `createCommonJS`
 
-This utility creates a compatible context that we loose when migrating to ECMA modules.
+This utility creates a compatible CommonJS context that is missing in ECMAScript modules.
 
 ```js
 import { createCommonJS } from 'mlly'
@@ -37,29 +37,16 @@ const { __dirname, __filename, require } = createCommonJS(import.meta)
 
 ## Resolving Modules
 
-There are several utils exposed allow resolving another module URL or Path. (internally using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve) that re-exports Node.js code).
+### `resolve`
 
-- **`resolve(id, resolveOptions?)`**
-- **`resolvePath(id, resolveOptions?)`**
-- **`createResolve(import.meta)`** | **`createResolve(base)`**
-- `resolveSync(id, resolveOptions?)`
-- `resolvePathSync(id, resolveOptions?)`
-
-It is recommended to use `resolve` and `createResolve` since module resolution spec allows aync resolution.
+Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
+(internally using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve) that exposes Node.js implementation).
 
 ```js
-import { resolve, resolvePath, createResolve } from 'mlly'
-
-// //home/user/project/module.mjs
-console.log(await resolvePath('./module.mjs', { from: import.meta.url }))
+import { resolve } from 'mlly'
 
 // file:///home/user/project/module.mjs
 console.log(await resolve('./module.mjs', { from: import.meta.url }))
-
-// file:///home/user/project/module.mjs
-const _resolve = createResolve(import.meta)
-
-console.log(await _resolve('./module.mjs'))
 ```
 
 **Resolve options:**
@@ -67,12 +54,54 @@ console.log(await _resolve('./module.mjs'))
 - `from`: URL or string (default is `pwd()`)
 - `conditions`: Array of conditions used for resolution algorithm (default is `['node', 'import']`)
 
+### `resolvePath`
+
+Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
+
+```js
+import { resolvePath } from 'mlly'
+
+// //home/user/project/module.mjs
+console.log(await resolvePath('./module.mjs', { from: import.meta.url }))
+```
+
+### `createResolve`
+
+Create a `resolve` function with defaults.
+
+```js
+import { createResolve } from 'mlly'
+
+const importResolve = createResolve({ from: import.meta.url })
+
+// file:///home/user/project/module.mjs
+console.log(await importResolve('./module.mjs'))
+```
+
+**Example:** Ponyfill [import.meta.resolve](https://nodejs.org/api/esm.html#esm_import_meta_resolve_specifier_parent):
+
+```js
+import { createResolve } from 'mlly'
+
+import.meta.resolve = createResolve({ from: import.meta.url })
+```
+
+### `resolveImports`
+
+Resolve all static and dynamic imports with relative paths to full resolved path.
+
+```js
+import { resolveImports } from 'mlly'
+
+// import foo from 'file:///home/user/project/bar.mjs'
+console.log(await resolveImports(`import foo from './bar.mjs'`, { from: import.meta.url }))
+```
 
 ## Evaluating Moduls
 
 ### `loadModule`
 
-Dynamically loads a module by evaluating source code. (useful to bypass import cache)
+Dynamically loads a module by evaluating source code.
 
 ```js
 import { loadModule } from 'mlly'
@@ -84,6 +113,8 @@ await loadModule('./hello.mjs', { from: import.meta.url })
 
 Evaluates JavaScript module code using dynamic [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) import.
 
+All relative imports will be automatically resolved with `from` param.
+
 ```js
 import { evalModule } from 'mlly'
 
@@ -92,19 +123,17 @@ await evalModule(`console.log("Hello World!")`)
 await evalModule(`
   import { reverse } from './utils.mjs'
   console.log(reverse('!emosewa si sj'))
-`, {
-  from: import.meta.url
-})
+`, { from: import.meta.url })
 ```
 
 ### `readModule`
 
-Resolves id using `resolve` and reads source code.
+Resolves id using `resolve` and reads sourcecode.
 
 ```js
 import { readModule } from 'mlly'
 
-console.log(await readModule('./index.mjs', import.meta.url))
+console.log(await readModule('./index.mjs', { from: import.meta.url }))
 ```
 
 ### `toDataURL`
