@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/unjs/mlly/compare/v0.1.4...v0.1.5) (2021-07-22)
+
+
+### Features
+
+* support extensions and index resolution ([8f4c080](https://github.com/unjs/mlly/commit/8f4c08005a6056cc14d9d9d63e3b921cb879ec1d))
+* support url option for evaluation ([0a78f45](https://github.com/unjs/mlly/commit/0a78f451a3d3163541079f213eeb3a5898fba964))
+
 ### [0.1.4](https://github.com/unjs/mlly/compare/v0.1.3...v0.1.4) (2021-07-22)
 
 
