@@ -13,12 +13,11 @@ export interface ResolveOptions {
   conditions?: string[]
 }
 
-export type ResolveFn<T> = (id: string, opts: ResolveOptions) => T
-export type resolve = ResolveFn<Promise<string>>
-export type resolvePath = ResolveFn<Promise<string>>
-export type resolveSync = ResolveFn<string>
-export type resolvePathSync = ResolveFn<string>
-export type createResolve = (defaults: ResolveOptions) => ResolveFn<Promise<string>>
+export type resolve = (id: string, opts: ResolveOptions) => Promise<string>
+export type resolvePath = (id: string, opts: ResolveOptions) => Promise<string>
+export type resolveSync = (id: string, opts: ResolveOptions) => string
+export type resolvePathSync = (id: string, opts: ResolveOptions) => string
+export type createResolve = (defaults: ResolveOptions) => (id: string, from: string | URL) => Promise<string>
 export type resolveImports = (code: string, opts: ResolveOptions) => Promise<string>
 
 
@@ -29,7 +28,7 @@ export interface EvaluateOptions extends ResolveOptions {}
 export type loadModule = (id: string, opts?: EvaluateOptions) => Promise<any>
 export type evalModule = (code: string, opts?: EvaluateOptions) => Promise<any>
 export type readModule = (id: string, opts?: ResolveOptions) => Promise<any>
-export type toDataURL = (code: string) => string
+export type toDataURL = (code: string) => Promise<string>
 
 // Path Utils
 

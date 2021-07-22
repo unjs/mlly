@@ -72,10 +72,10 @@ Create a `resolve` function with defaults.
 ```js
 import { createResolve } from 'mlly'
 
-const importResolve = createResolve({ from: import.meta.url })
+const _resolve = createResolve({ from: import.meta.url })
 
 // file:///home/user/project/module.mjs
-console.log(await importResolve('./module.mjs'))
+console.log(await _resolve('./module.mjs'))
 ```
 
 **Example:** Ponyfill [import.meta.resolve](https://nodejs.org/api/esm.html#esm_import_meta_resolve_specifier_parent):
@@ -111,9 +111,7 @@ await loadModule('./hello.mjs', { from: import.meta.url })
 
 ### `evalModule`
 
-Evaluates JavaScript module code using dynamic [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) import.
-
-All relative imports will be automatically resolved with `from` param.
+Evaluates JavaScript module code using dynamic imports with [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) using `toDataURL`.
 
 ```js
 import { evalModule } from 'mlly'
@@ -139,6 +137,8 @@ console.log(await readModule('./index.mjs', { from: import.meta.url }))
 ### `toDataURL`
 
 Convert code to [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) URL using base64 encoding.
+
+All relative imports will be automatically resolved with `from` param using `resolveImports`.
 
 ```js
 import { toDataURL } from 'mlly'
