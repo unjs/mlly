@@ -42,6 +42,8 @@ const { __dirname, __filename, require } = createCommonJS(import.meta)
 Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
 (internally using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve) that exposes Node.js implementation).
 
+Additionally supports resolving without extension and `/index` similar to CommonJS.
+
 ```js
 import { resolve } from 'mlly'
 
@@ -53,6 +55,7 @@ console.log(await resolve('./module.mjs', { from: import.meta.url }))
 
 - `from`: URL or string (default is `pwd()`)
 - `conditions`: Array of conditions used for resolution algorithm (default is `['node', 'import']`)
+- `extensions`: Array of additional extensions to check if import failed (default is `['.mjs', '.cjs', '.js', '.json']`)
 
 ### `resolvePath`
 
