@@ -31,7 +31,8 @@ export interface EvaluateOptions extends ResolveOptions {
 export function loadModule (id: string, opts?: EvaluateOptions) : Promise<any>
 export function evalModule (code: string, opts?: EvaluateOptions) : Promise<any>
 export function readModule (id: string, opts?: EvaluateOptions) : Promise<{ url: string, code: string}>
-export function toDataURL(code: string, opts?: EvaluateOptions) : Promise<string>
+export function transformModule(code: string, opts?: EvaluateOptions) : Promise<string>
+export function toDataURL(code: string) : string
 
 // Utils
 

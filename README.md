@@ -102,21 +102,9 @@ console.log(await resolveImports(`import foo from './bar.mjs'`, { from: import.m
 
 ## Evaluating Moduls
 
-### `loadModule`
-
-Dynamically loads a module by evaluating source code.
-
-```js
-import { loadModule } from 'mlly'
-
-await loadModule('./hello.mjs', { from: import.meta.url })
-```
-
-Options are same as `evalModule`.
-
 ### `evalModule`
 
-Evaluates JavaScript module code using dynamic imports with [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) using `toDataURL`.
+Transform and evaluates module code using dynamic imports.
 
 ```js
 import { evalModule } from 'mlly'
@@ -131,8 +119,20 @@ await evalModule(`
 
 **Options:**
 
-- [all `resolve` options]
+- all `resolve` options
 - `url`: File URL
+
+### `loadModule`
+
+Dynamically loads a module by evaluating source code.
+
+```js
+import { loadModule } from 'mlly'
+
+await loadModule('./hello.mjs', { from: import.meta.url })
+```
+
+Options are same as `evalModule`.
 
 ### `readModule`
 
@@ -149,24 +149,30 @@ console.log(await readModule(indexPath))
 
 Options are same as `resolve`.
 
+### `transformModule`
+
+- Resolves all relative imports will be resolved
+- All usages of `import.meta.url` will be replaced with `url` or `from` option
+
+```js
+import { toDataURL } from 'mlly'
+console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' })
+```
+
+Options are same as `evalModule`.
+
 ### `toDataURL`
 
 Convert code to [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) URL using base64 encoding.
 
-All relative imports will be automatically resolved with `from` param using `resolveImports`.
-
-If `url` option is provided, all usages of `import.meta.url` will be rewritten too.
-
 ```js
 import { toDataURL } from 'mlly'
 
-console.log(await toDataURL(`
+console.log(toDataURL(`
   // This is an example
   console.log('Hello world')
 `))
 ```
-
-Options are same as `evalModule`.
 
 ## Other utils
 
