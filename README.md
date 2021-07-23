@@ -134,21 +134,6 @@ await loadModule('./hello.mjs', { from: import.meta.url })
 
 Options are same as `evalModule`.
 
-### `readModule`
-
-Resolve module path and read source contents. (currently only file protocol supported)
-
-```js
-import { resolve, readModule } from 'mlly'
-
-const indexPath = await resolve('./index.mjs', { from: import.meta.url })
-
-// { code: '...", url: '...' }
-console.log(await readModule(indexPath))
-```
-
-Options are same as `resolve`.
-
 ### `transformModule`
 
 - Resolves all relative imports will be resolved
@@ -161,20 +146,8 @@ console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' }
 
 Options are same as `evalModule`.
 
-### `toDataURL`
 
-Convert code to [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) URL using base64 encoding.
-
-```js
-import { toDataURL } from 'mlly'
-
-console.log(toDataURL(`
-  // This is an example
-  console.log('Hello world')
-`))
-```
-
-## Other utils
+## Other Utils
 
 ### `fileURLToPath`
 
@@ -199,6 +172,30 @@ import { ensureProtocol } from 'mlly'
 
 // file:///foo/bar.js
 console.log(normalizeid('/foo/bar.js'))
+```
+
+### `loadURL`
+
+Read source contents of a URL. (currently only file protocol supported)
+
+```js
+import { resolve, loadURL } from 'mlly'
+
+const url = await resolve('./index.mjs', { from: import.meta.url })
+console.log(await loadURL(url))
+```
+
+### `toDataURL`
+
+Convert code to [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) URL using base64 encoding.
+
+```js
+import { toDataURL } from 'mlly'
+
+console.log(toDataURL(`
+  // This is an example
+  console.log('Hello world')
+`))
 ```
 
 ## License

@@ -10,3 +10,5 @@ await evalModule(`
 })
 
 await loadModule('./hello.mjs', { from: import.meta.url })
+
+console.log(await loadModule('../package.json', { from: import.meta.url }).then(r => r.default.name))
