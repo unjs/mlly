@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/unjs/mlly/compare/v0.1.5...v0.1.6) (2021-07-23)
+
+
+### Features
+
+* json support ([81c12af](https://github.com/unjs/mlly/commit/81c12af219abc7b86cc551605e8eace96debb497))
+
+
+### Bug Fixes
+
+* resolve bug fixes ([e5946df](https://github.com/unjs/mlly/commit/e5946df14ebdcc994a2f464c07a5439b67359559))
+
 ### [0.1.5](https://github.com/unjs/mlly/compare/v0.1.4...v0.1.5) (2021-07-22)
 
 
