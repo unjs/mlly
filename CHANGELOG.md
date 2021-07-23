@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/unjs/mlly/compare/v0.1.7...v0.2.0) (2021-07-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* directly use a url to create cjs context
+
+### Features
+
+* rewrite error stack for inline scripts ([7357aeb](https://github.com/unjs/mlly/commit/7357aeb4b7b6eca234f8622fd8d2d833c1129518))
+
+
+* directly use a url to create cjs context ([e7012fb](https://github.com/unjs/mlly/commit/e7012fb38015fd3a0d38f40829b3e8042c8e7f1f))
+
 ### [0.1.7](https://github.com/unjs/mlly/compare/v0.1.6...v0.1.7) (2021-07-23)
 
 ### [0.1.6](https://github.com/unjs/mlly/compare/v0.1.5...v0.1.6) (2021-07-23)
