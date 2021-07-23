@@ -3,7 +3,7 @@
 > Missing [ECMAScript module](https://nodejs.org/api/esm.html) utils for Node.js
 
 
-## Install
+## Usage
 
 > This package is ESM only. Node.js 12+ is needed to use it and it must be imported instead of required.
 
@@ -20,8 +20,26 @@ npm install mlly
 Import utils:
 
 ```js
-import {} from 'mlly'
+import { } from 'mlly'
 ```
+
+## At a glance
+
+While ESM Modules are evolving in Node.js ecosystem, there are still many required features that are still experimental or missing. This package tries to fill in the gap for them.
+
+- Utils to create compatible CommonJS context
+- Resolve Utils
+  - Exposed from native Node.js implementation
+  - Windows paths normalized
+  - Supporting custom `extensions` and `/index` resolution
+  - Supporting custom `conditions`
+- Module Evaluation
+  - Allow evaluating modules using `data:` imports
+  - Automatic import rewrite to resolved path using static analyzes
+  - Allow bypass ESM Cache
+  - Stack-trace support
+  - `.json` loader
+- Multiple composable module utils exposed
 
 ## CommonJS Context
 
