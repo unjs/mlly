@@ -48,7 +48,7 @@ Additionally supports resolving without extension and `/index` similar to Common
 import { resolve } from 'mlly'
 
 // file:///home/user/project/module.mjs
-console.log(await resolve('./module.mjs', { from: import.meta.url }))
+console.log(await resolve('./module.mjs', { url: import.meta.url }))
 ```
 
 **Resolve options:**
@@ -65,7 +65,7 @@ Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
 import { resolvePath } from 'mlly'
 
 // //home/user/project/module.mjs
-console.log(await resolvePath('./module.mjs', { from: import.meta.url }))
+console.log(await resolvePath('./module.mjs', { url: import.meta.url }))
 ```
 
 ### `createResolve`
@@ -75,7 +75,7 @@ Create a `resolve` function with defaults.
 ```js
 import { createResolve } from 'mlly'
 
-const _resolve = createResolve({ from: import.meta.url })
+const _resolve = createResolve({ url: import.meta.url })
 
 // file:///home/user/project/module.mjs
 console.log(await _resolve('./module.mjs'))
@@ -86,7 +86,7 @@ console.log(await _resolve('./module.mjs'))
 ```js
 import { createResolve } from 'mlly'
 
-import.meta.resolve = createResolve({ from: import.meta.url })
+import.meta.resolve = createResolve({ url: import.meta.url })
 ```
 
 ### `resolveImports`
@@ -97,7 +97,7 @@ Resolve all static and dynamic imports with relative paths to full resolved path
 import { resolveImports } from 'mlly'
 
 // import foo from 'file:///home/user/project/bar.mjs'
-console.log(await resolveImports(`import foo from './bar.mjs'`, { from: import.meta.url }))
+console.log(await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }))
 ```
 
 ## Evaluating Moduls
@@ -114,7 +114,7 @@ await evalModule(`console.log("Hello World!")`)
 await evalModule(`
   import { reverse } from './utils.mjs'
   console.log(reverse('!emosewa si sj'))
-`, { from: import.meta.url })
+`, { url: import.meta.url })
 ```
 
 **Options:**
@@ -129,7 +129,7 @@ Dynamically loads a module by evaluating source code.
 ```js
 import { loadModule } from 'mlly'
 
-await loadModule('./hello.mjs', { from: import.meta.url })
+await loadModule('./hello.mjs', { url: import.meta.url })
 ```
 
 Options are same as `evalModule`.
@@ -181,7 +181,7 @@ Read source contents of a URL. (currently only file protocol supported)
 ```js
 import { resolve, loadURL } from 'mlly'
 
-const url = await resolve('./index.mjs', { from: import.meta.url })
+const url = await resolve('./index.mjs', { url: import.meta.url })
 console.log(await loadURL(url))
 ```
 
