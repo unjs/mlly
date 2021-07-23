@@ -5,7 +5,7 @@ export interface CommonjsContext {
   __dirname: string
 }
 
-export function createCommonJS (importMeta: ImportMeta) : CommonjsContext
+export function createCommonJS (url: string) : CommonjsContext
 
 // Resolve
 

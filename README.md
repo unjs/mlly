@@ -50,8 +50,10 @@ This utility creates a compatible CommonJS context that is missing in ECMAScript
 ```js
 import { createCommonJS } from 'mlly'
 
-const { __dirname, __filename, require } = createCommonJS(import.meta)
+const { __dirname, __filename, require } = createCommonJS(import.meta.url)
 ```
+
+Note: `require` and `require.resolve` implementation are lazy functions. [`createRequire`](https://nodejs.org/api/module.html#module_module_createrequire_filename) will be called on first usage.
 
 ## Resolving Modules
 
