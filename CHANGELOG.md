@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/unjs/mlly/compare/v0.2.1...v0.2.2) (2021-09-20)
+
+
+### Bug Fixes
+
+* add missing require to cjs interface ([9bdffc3](https://github.com/unjs/mlly/commit/9bdffc3991c53335f34ce64d51a839e3e0c0cd2c))
+
 ### [0.2.1](https://github.com/unjs/mlly/compare/v0.2.0...v0.2.1) (2021-09-20)
 
 
