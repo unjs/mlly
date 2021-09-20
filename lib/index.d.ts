@@ -3,6 +3,7 @@
 export interface CommonjsContext {
   __filename: string
   __dirname: string
+  require: NodeRequire
 }
 
 export function createCommonJS (url: string) : CommonjsContext
