@@ -18,7 +18,7 @@ export function resolve (id: string, opts: ResolveOptions) : Promise<string>
 export function resolvePath (id: string, opts: ResolveOptions) : Promise<string>
 export function resolveSync (id: string, opts: ResolveOptions) : string
 export function resolvePathSync (id: string, opts: ResolveOptions) : string
-export function createResolve (defaults: ResolveOptions) : (id: string, url: string | URL) => Promise<string>
+export function createResolve (defaults: ResolveOptions) : (id: string, url?: string | URL) => Promise<string>
 export function resolveImports (code: string, opts: ResolveOptions) : Promise<string>
 
 
