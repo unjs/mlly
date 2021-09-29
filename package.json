@@ -15,7 +15,7 @@
   "scripts": {
     "lint": "eslint --ext .mjs lib",
     "release": "yarn test && standard-version && npm publish && git push --follow-tags",
-    "test": "yarn lint"
+    "test": "mocha ./tests/**/*.test.mjs"
   },
   "dependencies": {
     "import-meta-resolve": "^1.1.1"
@@ -23,7 +23,10 @@
   "devDependencies": {
     "@nuxtjs/eslint-config": "latest",
     "@types/node": "latest",
+    "chai": "^4.3.4",
     "eslint": "latest",
+    "jiti": "^1.12.5",
+    "mocha": "^9.1.2",
     "standard-version": "latest"
   }
 }
