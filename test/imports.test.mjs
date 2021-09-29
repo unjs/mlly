@@ -18,17 +18,17 @@ tests[`import {
   member1,
   // test
   member2
-} from "module-name";`] = { from: '', imports: [] }
+} from "module-name";`] = { from: 'module-name', imports: [] }
 
 tests[`import {
   member1,
 
   member2
-} from "module-name";`] = { from: '', imports: [] }
+} from "module-name";`] = { from: 'module-name', imports: [] }
 
 tests[`import {
   Component
-} from '@angular2/core';`] = { from: '', imports: [] }
+} from '@angular2/core';`] = { from: '@angular2/core', imports: [] }
 
 describe('matchESMImports', () => {
   for (const test in tests) {
