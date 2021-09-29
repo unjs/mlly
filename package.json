@@ -15,7 +15,7 @@
   "scripts": {
     "lint": "eslint --ext .mjs lib",
     "release": "yarn test && standard-version && npm publish && git push --follow-tags",
-    "test": "mocha ./tests/**/*.test.mjs"
+    "test": "mocha ./test/**/*.test.mjs"
   },
   "dependencies": {
     "import-meta-resolve": "^1.1.1"
