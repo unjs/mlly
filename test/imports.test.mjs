@@ -80,14 +80,10 @@ const dynamicTests = {
     expression: '"module-name"'
   },
   'var promise = import ( "module-name" );': {
-    expression: '"module-name"',
-    type: 'dynamic',
-    defaultImport: 'promise'
+    expression: '"module-name"'
   },
   'import ( "module-name" );': {
-    expression: '"module-name"',
-    type: 'dynamic',
-    defaultImport: 'promise'
+    expression: '"module-name"'
   }
 }
 
