@@ -84,6 +84,12 @@ const dynamicTests = {
   },
   'import ( "module-name" );': {
     expression: '"module-name"'
+  },
+  'import(foo("123"))': {
+    expression: 'foo("123")'
+  },
+  'import("abc").then(r => r.default)': {
+    expression: '"abc"'
   }
 }
 
