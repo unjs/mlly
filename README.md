@@ -40,6 +40,13 @@ While ESM Modules are evolving in Node.js ecosystem, there are still many requir
   - Stack-trace support
   - `.json` loader
 - Multiple composable module utils exposed
+- Static import analyzes
+ - Super fast Regex based implementation
+ - Handle most of edge cases
+ - Find all static ESM imports
+ - Find all dynamic ESM imports
+ - Parse static import statement
+
 
 ## CommonJS Context
 
@@ -165,6 +172,97 @@ console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' }
 ```
 
 Options are same as `evalModule`.
+
+## Import analyzes
+
+### `findStaticImports`
+
+Find all static ESM imports.
+
+Example:
+
+```js
+import { findStaticImports } from 'mlly'
+
+console.log(findStaticImports(`
+// Empty line
+import foo, { bar /* foo */ } from 'baz'
+`))
+```
+
+Outputs:
+
+```js
+[
+  {
+    type: 'static',
+    imports: 'foo, { bar /* foo */ } ',
+    specifier: 'baz',
+    code: "import foo, { bar /* foo */ } from 'baz'",
+    start: 15,
+    end: 55
+  }
+]
+```
+
+### `parseStaticImport`
+
+Parse a dynamic ESM import statement previusly matched by `findStaticImports`.
+
+Example:
+
+```js
+import { findStaticImports, parseStaticImport } from 'mlly'
+
+const [match0] = findStaticImports(`import baz, { x, y as z } from 'baz'`)
+console.log(parseStaticImport(match0))
+```
+
+Outputs:
+
+
+```js
+{
+  type: 'static',
+  imports: 'baz, { x, y as z } ',
+  specifier: 'baz',
+  code: "import baz, { x, y as z } from 'baz'",
+  start: 0,
+  end: 36,
+  defaultImport: 'baz',
+  namespacedImport: undefined,
+  namedImports: { x: 'x', y: 'z' }
+}
+```
+
+
+### `findDynamicImports`
+
+Find all dynamic ESM imports.
+
+Example:
+
+```js
+import { findStaticImports } from 'mlly'
+
+console.log(findDynamicImports(`
+const foo = await import('bar')
+`))
+```
+
+Outputs:
+
+```js
+[
+  {
+    type: 'dynamic',
+    expression: "'bar'",
+    code: "import('bar')",
+    start: 19,
+    end: 32
+  }
+]
+```
 
 
 ## Other Utils
