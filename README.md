@@ -243,7 +243,7 @@ Find all dynamic ESM imports.
 Example:
 
 ```js
-import { findStaticImports } from 'mlly'
+import { findDynamicImports } from 'mlly'
 
 console.log(findDynamicImports(`
 const foo = await import('bar')
