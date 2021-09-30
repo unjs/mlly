@@ -41,11 +41,11 @@ While ESM Modules are evolving in Node.js ecosystem, there are still many requir
   - `.json` loader
 - Multiple composable module utils exposed
 - Static import analyzes
- - Super fast Regex based implementation
- - Handle most of edge cases
- - Find all static ESM imports
- - Find all dynamic ESM imports
- - Parse static import statement
+  - Super fast Regex based implementation
+  - Handle most of edge cases
+  - Find all static ESM imports
+  - Find all dynamic ESM imports
+  - Parse static import statement
 
 
 ## CommonJS Context
