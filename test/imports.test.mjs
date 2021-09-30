@@ -81,6 +81,14 @@ const tests = {
       namespacedImport: undefined,
       namedImports: {}
     }
+  },
+  'import Foo, { type Baz, bar, type Type as RenamedType } from "module-name";': {
+    from: 'module-name',
+    imports: {
+      defaultImport: 'Foo',
+      namespacedImport: undefined,
+      namedImports: { bar: 'bar' }
+    }
   }
 }
 
@@ -118,6 +126,18 @@ tests[`import {
     defaultImport: undefined,
     namespacedImport: undefined,
     namedImports: { Component: 'Component' }
+  }
+}
+
+tests[`
+  import type { Type } from "module-name";
+  import Foo, type { Type } from "module-name";
+`] = {
+  from: 'module-name',
+  imports: {
+    defaultImport: 'Foo',
+    namespacedImport: undefined,
+    namedImports: {}
   }
 }
 
