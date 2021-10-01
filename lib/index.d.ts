@@ -23,6 +23,36 @@ export function createResolve (defaults: ResolveOptions) : (id: string, url?: st
 export function resolveImports (code: string, opts: ResolveOptions) : Promise<string>
 
 
+// Import analyzes
+
+export interface ESMImport {
+  type: 'static' | 'dynamic'
+  code: string
+  start: number
+  end: number
+}
+
+export interface StaticImport extends ESMImport {
+  type: 'static'
+  imports: string
+  specifier: string
+}
+
+export interface ParsedStaticImport extends StaticImport {
+  defaultImport?: string
+  namespacedImport?: string
+  namedImports?: { [name: string]: string }
+}
+
+export interface DynamicImport extends ESMImport {
+  type: 'dynamic'
+  expression: string
+}
+
+export function findStaticImports (code: string) : StaticImport[]
+export function findDynamicImports (code: string) : DynamicImport[]
+export function parseStaticImport (staticImport: StaticImport) : ParsedStaticImport
+
 // Evaluate
 
 export interface EvaluateOptions extends ResolveOptions {
