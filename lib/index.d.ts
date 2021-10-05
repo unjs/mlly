@@ -69,3 +69,4 @@ export function fileURLToPath (id: URL | string) : string
 export function normalizeid (id: URL | string) : string
 export function loadURL (id: string) : Promise<string>
 export function toDataURL(code: string) : string
+export function interopDefault<T> (sourceModule: T): 'default' extends keyof T ? T['default'] : T

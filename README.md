@@ -316,6 +316,18 @@ console.log(toDataURL(`
 `))
 ```
 
+### `interopDefault`
+
+Return the default export of a module at the top-level, alongside any other named exports.
+
+```js
+// Assuming the shape { default: { foo: 'bar' }, baz: 'qux' }
+import myModule from 'my-module'
+  
+// Returns { foo: 'bar', baz: 'qux' }
+console.log(interopDefault(myModule))
+```
+
 ## License
 
 MIT
