@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/unjs/mlly/compare/v0.2.4...v0.2.5) (2021-10-05)
+
+
+### Features
+
+* add `interopDefault` util ([#6](https://github.com/unjs/mlly/issues/6)) ([0c49451](https://github.com/unjs/mlly/commit/0c494516e463956e3ab8f4dede9d22bda2518272))
+
 ### [0.2.4](https://github.com/unjs/mlly/compare/v0.2.3...v0.2.4) (2021-10-01)
 
 
