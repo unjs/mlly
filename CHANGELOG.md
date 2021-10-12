@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/unjs/mlly/compare/v0.2.5...v0.2.6) (2021-10-12)
+
+
+### Bug Fixes
+
+* **interopDefault:** do not override existing props ([#7](https://github.com/unjs/mlly/issues/7)) ([9429606](https://github.com/unjs/mlly/commit/9429606cd03b17d9e0a1f67a0f4c43977828ec4c))
+
 ### [0.2.5](https://github.com/unjs/mlly/compare/v0.2.4...v0.2.5) (2021-10-05)
 
 
