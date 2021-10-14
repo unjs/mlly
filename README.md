@@ -46,6 +46,7 @@ While ESM Modules are evolving in Node.js ecosystem, there are still many requir
   - Find all static ESM imports
   - Find all dynamic ESM imports
   - Parse static import statement
+  - Find all named, declared and default exports
 
 
 ## CommonJS Context
