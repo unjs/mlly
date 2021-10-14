@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/unjs/mlly/compare/v0.2.6...v0.2.7) (2021-10-14)
+
+
+### Features
+
+* export analyzes with `findExports` ([#8](https://github.com/unjs/mlly/issues/8)) ([2eebbd5](https://github.com/unjs/mlly/commit/2eebbd50262992cd500935ba530d5f99e8ad8dcf))
+
 ### [0.2.6](https://github.com/unjs/mlly/compare/v0.2.5...v0.2.6) (2021-10-12)
 
 
