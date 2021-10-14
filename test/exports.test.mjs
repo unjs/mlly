@@ -5,7 +5,8 @@ describe('findExports', () => {
   const tests = {
     'export function useA () { return \'a\' }': { name: 'useA', type: 'declaration' },
     'export const useD = () => { return \'d\' }': { name: 'useD', type: 'declaration' },
-    'export { useB, _useC as useC }': { names: ['useB', 'useC'], type: 'named' }
+    'export { useB, _useC as useC }': { names: ['useB', 'useC'], type: 'named' },
+    'export default foo': { type: 'default' }
   }
 
   describe('findExports', () => {
@@ -14,7 +15,9 @@ describe('findExports', () => {
         const matches = findExports(input)
         expect(matches.length).to.equal(1)
         const match = matches[0]
-
+        if (test.type) {
+          expect(match.type).to.eql(test.type)
+        }
         if (test.name) {
           expect(match.name).to.eql(test.name)
         }
