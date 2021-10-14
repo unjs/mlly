@@ -258,6 +258,7 @@ import { findExports } from 'mlly'
 console.log(findExports(`
 export const foo = 'bar'
 export { bar, baz }
+export default something
 `))
 ```
 
@@ -266,12 +267,22 @@ Outputs:
 ```js
 [
   {
-    type: 'dynamic',
-    expression: "'bar'",
-    code: "import('bar')",
-    start: 19,
-    end: 32
-  }
+    type: 'declaration',
+    declaration: 'const',
+    name: 'foo',
+    code: 'export const foo',
+    start: 1,
+    end: 17
+  },
+  {
+    type: 'named',
+    exports: ' bar, baz ',
+    code: 'export { bar, baz }',
+    start: 26,
+    end: 45,
+    names: [ 'bar', 'baz' ]
+  },
+  { type: 'default', code: 'export default ', start: 46, end: 61 }
 ]
 ```
 
