@@ -40,7 +40,7 @@ While ESM Modules are evolving in Node.js ecosystem, there are still many requir
   - Stack-trace support
   - `.json` loader
 - Multiple composable module utils exposed
-- Static import analyzes
+- Static import and export analyzes
   - Super fast Regex based implementation
   - Handle most of edge cases
   - Find all static ESM imports
@@ -250,6 +250,17 @@ const foo = await import('bar')
 `))
 ```
 
+### `findExports`
+
+```js
+import { findExports } from 'mlly'
+
+console.log(findExports(`
+export const foo = 'bar'
+export { bar, baz }
+`))
+```
+
 Outputs:
 
 ```js
@@ -323,7 +334,7 @@ Return the default export of a module at the top-level, alongside any other name
 ```js
 // Assuming the shape { default: { foo: 'bar' }, baz: 'qux' }
 import myModule from 'my-module'
-  
+
 // Returns { foo: 'bar', baz: 'qux' }
 console.log(interopDefault(myModule))
 ```

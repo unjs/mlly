@@ -1,23 +1,27 @@
 import { expect } from 'chai'
-import { findNamedExports } from '../lib/index.mjs'
+import { findExports } from '../lib/index.mjs'
 
-describe('findNamedExports', () => {
-  const fixture = `
-export function useA () {
-  return 'a'
-}
-function useB () {
-  return 'b'
-}
-function _useC () {
-  return 'c'
-}
-export const useD = () => {
-  return 'd'
-}
-export { useB, _useC as useC }
-`
-  it('should extract name exports', () => {
-    expect(findNamedExports(fixture).sort()).to.eql(['useA', 'useB', 'useC', 'useD'])
+describe('findExports', () => {
+  const tests = {
+    'export function useA () { return \'a\' }': { name: 'useA', type: 'declaration' },
+    'export const useD = () => { return \'d\' }': { name: 'useD', type: 'declaration' },
+    'export { useB, _useC as useC }': { names: ['useB', 'useC'], type: 'named' }
+  }
+
+  describe('findExports', () => {
+    for (const [input, test] of Object.entries(tests)) {
+      it(input.replace(/\n/g, '\\n'), () => {
+        const matches = findExports(input)
+        expect(matches.length).to.equal(1)
+        const match = matches[0]
+
+        if (test.name) {
+          expect(match.name).to.eql(test.name)
+        }
+        if (test.names) {
+          expect(match.names).to.deep.eql(test.names)
+        }
+      })
+    }
   })
 })
