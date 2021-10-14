@@ -252,6 +252,8 @@ const foo = await import('bar')
 
 ### `findExports`
 
+**Note:** API Of this function might be broken in a breaking change for code matcher
+
 ```js
 import { findExports } from 'mlly'
 
