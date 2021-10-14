@@ -51,6 +51,7 @@ export interface DynamicImport extends ESMImport {
 
 export function findStaticImports (code: string) : StaticImport[]
 export function findDynamicImports (code: string) : DynamicImport[]
+export function findNamedExports (code:string): string[]
 export function parseStaticImport (staticImport: StaticImport) : ParsedStaticImport
 
 // Evaluate

@@ -40,12 +40,13 @@ While ESM Modules are evolving in Node.js ecosystem, there are still many requir
   - Stack-trace support
   - `.json` loader
 - Multiple composable module utils exposed
-- Static import analyzes
+- Static import and export analyzes
   - Super fast Regex based implementation
   - Handle most of edge cases
   - Find all static ESM imports
   - Find all dynamic ESM imports
   - Parse static import statement
+  - Find all named, declared and default exports
 
 
 ## CommonJS Context
@@ -250,17 +251,41 @@ const foo = await import('bar')
 `))
 ```
 
+### `findExports`
+
+**Note:** API Of this function might be broken in a breaking change for code matcher
+
+```js
+import { findExports } from 'mlly'
+
+console.log(findExports(`
+export const foo = 'bar'
+export { bar, baz }
+export default something
+`))
+```
+
 Outputs:
 
 ```js
 [
   {
-    type: 'dynamic',
-    expression: "'bar'",
-    code: "import('bar')",
-    start: 19,
-    end: 32
-  }
+    type: 'declaration',
+    declaration: 'const',
+    name: 'foo',
+    code: 'export const foo',
+    start: 1,
+    end: 17
+  },
+  {
+    type: 'named',
+    exports: ' bar, baz ',
+    code: 'export { bar, baz }',
+    start: 26,
+    end: 45,
+    names: [ 'bar', 'baz' ]
+  },
+  { type: 'default', code: 'export default ', start: 46, end: 61 }
 ]
 ```
 
@@ -323,7 +348,7 @@ Return the default export of a module at the top-level, alongside any other name
 ```js
 // Assuming the shape { default: { foo: 'bar' }, baz: 'qux' }
 import myModule from 'my-module'
-  
+
 // Returns { foo: 'bar', baz: 'qux' }
 console.log(interopDefault(myModule))
 ```
