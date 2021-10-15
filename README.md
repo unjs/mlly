@@ -128,7 +128,7 @@ import { resolveImports } from 'mlly'
 console.log(await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }))
 ```
 
-## Evaluating Moduls
+## Evaluating Modules
 
 ### `evalModule`
 
