@@ -49,9 +49,28 @@ export interface DynamicImport extends ESMImport {
   expression: string
 }
 
+export interface ESMExport {
+  type: 'declaration' | 'named' | 'default',
+  code: string
+  start: number
+  end: number
+}
+
+export interface DeclarationExport extends ESMExport {
+  type: 'declaration'
+  declaration: string
+  name: string
+}
+
+export interface NamedExport extends ESMExport {
+  type: 'named'
+  exports: string
+  names: string[]
+}
+
 export function findStaticImports (code: string) : StaticImport[]
 export function findDynamicImports (code: string) : DynamicImport[]
-export function findNamedExports (code:string): string[]
+export function findExports (code: string): (NamedExport | DeclarationExport | ESMExport)[]
 export function parseStaticImport (staticImport: StaticImport) : ParsedStaticImport
 
 // Evaluate
