@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.10](https://github.com/unjs/mlly/compare/v0.2.9...v0.2.10) (2021-10-18)
+
+
+### Bug Fixes
+
+* **interopDefault:** handle non-object inputs ([0d73a44](https://github.com/unjs/mlly/commit/0d73a444e42897b6ecaaf435a7ddd8a17c5afbfa))
+
 ### [0.2.9](https://github.com/unjs/mlly/compare/v0.2.8...v0.2.9) (2021-10-18)
 
 
