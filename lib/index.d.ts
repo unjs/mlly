@@ -68,9 +68,13 @@ export interface NamedExport extends ESMExport {
   names: string[]
 }
 
+export interface DefaultExport extends ESMExport {
+  type: 'default'
+}
+
 export function findStaticImports (code: string) : StaticImport[]
 export function findDynamicImports (code: string) : DynamicImport[]
-export function findExports (code: string): (NamedExport | DeclarationExport | ESMExport)[]
+export function findExports (code: string): (NamedExport | DeclarationExport | DefaultExport)[]
 export function parseStaticImport (staticImport: StaticImport) : ParsedStaticImport
 
 // Evaluate
