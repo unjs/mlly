@@ -4,6 +4,8 @@ import { interopDefault } from '../lib/index.mjs'
 const tests = [
   [{}, {}],
   [{ default: {} }, {}],
+  [true, true],
+  [[1, 2, 3], [1, 2, 3]],
   [{ default: { x: 2 } }, { x: 2 }],
   [{ named: 2 }, { named: 2 }],
   [{ named: 2, default: {} }, { named: 2 }],
@@ -15,8 +17,10 @@ describe('interopDefault', () => {
     it(JSON.stringify(input), () => {
       const interop = interopDefault(input)
       expect(interop).to.deep.equal(result)
-      if ('default' in input) {
+      if (typeof input === 'object' && 'default' in input) {
         expect(interop.default).to.deep.equal(result)
+      } else {
+        expect(interop).to.deep.equal(result)
       }
     })
   }
