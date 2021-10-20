@@ -8,13 +8,13 @@ export interface EvaluateOptions extends ResolveOptions {
 
 const EVAL_ESM_IMPORT_RE = /(?<=import .* from ['"])([^'"]+)(?=['"])|(?<=export .* from ['"])([^'"]+)(?=['"])|(?<=import\s*['"])([^'"]+)(?=['"])|(?<=import\s*\(['"])([^'"]+)(?=['"]\))/g
 
-export async function loadModule(id: string, opts: EvaluateOptions = {}): Promise<any> {
+export async function loadModule (id: string, opts: EvaluateOptions = {}): Promise<any> {
   const url = await resolve(id, opts)
   const code = await loadURL(url)
   return evalModule(code, { ...opts, url })
 }
 
-export async function evalModule(code: string, opts: EvaluateOptions = {}): Promise<any> {
+export async function evalModule (code: string, opts: EvaluateOptions = {}): Promise<any> {
   const transformed = await transformModule(code, opts)
   const dataURL = toDataURL(transformed)
   return import(dataURL).catch((err) => {
@@ -23,22 +23,21 @@ export async function evalModule(code: string, opts: EvaluateOptions = {}): Prom
   })
 }
 
-export async function transformModule(code: string, opts: EvaluateOptions): Promise<string> {
+export function transformModule (code: string, opts: EvaluateOptions): Promise<string> {
   // Convert JSON to module
   if (opts.url && opts.url.endsWith('.json')) {
-    return 'export default ' + code
+    return Promise.resolve('export default ' + code)
   }
-
 
   // Rewrite import.meta.url
   if (opts.url) {
     code = code.replace(/import\.meta\.url/g, `'${opts.url}'`)
   }
 
-  return code
+  return Promise.resolve(code)
 }
 
-export async function resolveImports(code: string, opts: EvaluateOptions): Promise<string> {
+export async function resolveImports (code: string, opts: EvaluateOptions): Promise<string> {
   const imports = Array.from(code.matchAll(EVAL_ESM_IMPORT_RE)).map(m => m[0])
   if (!imports.length) {
     return code

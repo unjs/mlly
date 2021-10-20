@@ -3,14 +3,14 @@ import { fileURLToPath as _fileURLToPath } from 'url'
 import { promises as fsp } from 'fs'
 import { normalizeSlash, BUILTIN_MODULES } from './_utils'
 
-export function fileURLToPath(id: string): string {
+export function fileURLToPath (id: string): string {
   if (typeof id === 'string' && !id.startsWith('file://')) {
     return normalizeSlash(id)
   }
   return normalizeSlash(_fileURLToPath(id))
 }
 
-export function normalizeid(id: string): string {
+export function normalizeid (id: string): string {
   if (typeof id !== 'string') {
     // @ts-ignore
     id = id.toString()
@@ -24,12 +24,12 @@ export function normalizeid(id: string): string {
   return 'file://' + normalizeSlash(id)
 }
 
-export async function loadURL(url: string): Promise<string> {
+export async function loadURL (url: string): Promise<string> {
   const code = await fsp.readFile(fileURLToPath(url), 'utf-8')
   return code
 }
 
-export function toDataURL(code: string): string {
+export function toDataURL (code: string): string {
   const base64 = Buffer.from(code).toString('base64')
   return `data:text/javascript;base64,${base64}`
 }

@@ -18,12 +18,12 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "lint": "eslint --ext .mjs lib",
+    "lint": "eslint --ext .ts src",
     "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "test": "yarn build && mocha ./test/**/*.test.mjs"
   },
   "devDependencies": {
-    "@nuxtjs/eslint-config": "latest",
+    "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
     "import-meta-resolve": "^1.1.1",
     "chai": "^4.3.4",

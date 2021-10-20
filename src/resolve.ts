@@ -15,7 +15,7 @@ export interface ResolveOptions {
   conditions?: string[]
 }
 
-function _tryModuleResolve(id: string, url: URL, conditions: any): any | null {
+function _tryModuleResolve (id: string, url: URL, conditions: any): any | null {
   try {
     return moduleResolve(id, url, conditions)
   } catch (err) {
@@ -26,7 +26,7 @@ function _tryModuleResolve(id: string, url: URL, conditions: any): any | null {
   }
 }
 
-function _resolve(id: string, opts: ResolveOptions = {}): string {
+function _resolve (id: string, opts: ResolveOptions = {}): string {
   // Skip if already has a protocol
   if (/(node|data|http|https):/.test(id)) {
     return id
@@ -71,26 +71,26 @@ function _resolve(id: string, opts: ResolveOptions = {}): string {
 /**
  * @deprecated please use `resolve` instead of `resolveSync`
  */
-export function resolveSync(id: string, opts: ResolveOptions): string {
+export function resolveSync (id: string, opts: ResolveOptions): string {
   return _resolve(id, opts)
 }
 
-export function resolve(id: string, opts: ResolveOptions): Promise<string> {
+export function resolve (id: string, opts: ResolveOptions): Promise<string> {
   return pcall(resolveSync, id, opts)
 }
 
 /**
  * @deprecated please use `resolvePath` instead of `resolvePathSync`
  */
-export function resolvePathSync(id: string, opts: ResolveOptions) {
+export function resolvePathSync (id: string, opts: ResolveOptions) {
   return fileURLToPath(resolveSync(id, opts))
 }
 
-export function resolvePath(id: string, opts: ResolveOptions) {
+export function resolvePath (id: string, opts: ResolveOptions) {
   return pcall(resolvePathSync, id, opts)
 }
 
-export function createResolve(defaults: ResolveOptions) {
+export function createResolve (defaults: ResolveOptions) {
   return (id, url) => {
     return resolve(id, { url, ...defaults })
   }

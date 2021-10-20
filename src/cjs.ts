@@ -10,14 +10,14 @@ export interface CommonjsContext {
   require: NodeRequire
 }
 
-export function createCommonJS(url: string): CommonjsContext {
+export function createCommonJS (url: string): CommonjsContext {
   const __filename = fileURLToPath(url)
   const __dirname = dirname(__filename)
 
   // Lazy require
   let _nativeRequire
   const getNativeRequire = () => _nativeRequire || (_nativeRequire = createRequire(url))
-  function require(id) { return getNativeRequire()(id) }
+  function require (id) { return getNativeRequire()(id) }
   require.resolve = (id, options) => getNativeRequire().resolve(id, options)
 
   return {
@@ -27,7 +27,7 @@ export function createCommonJS(url: string): CommonjsContext {
   } as CommonjsContext
 }
 
-export function interopDefault(sourceModule: any): any {
+export function interopDefault (sourceModule: any): any {
   if (!isObject(sourceModule) || !('default' in sourceModule)) {
     return sourceModule
   }
@@ -39,7 +39,7 @@ export function interopDefault(sourceModule: any): any {
           Object.defineProperty(newModule, key, {
             enumerable: false,
             configurable: false,
-            get() { return newModule }
+            get () { return newModule }
           })
         }
       } catch (_err) { }
@@ -49,7 +49,7 @@ export function interopDefault(sourceModule: any): any {
           Object.defineProperty(newModule, key, {
             enumerable: true,
             configurable: true,
-            get() { return sourceModule[key] }
+            get () { return sourceModule[key] }
           })
         }
       } catch (_err) { }
