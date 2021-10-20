@@ -22,12 +22,10 @@
     "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "test": "yarn build && mocha ./test/**/*.test.mjs"
   },
-  "dependencies": {
-    "import-meta-resolve": "^1.1.1"
-  },
   "devDependencies": {
     "@nuxtjs/eslint-config": "latest",
     "@types/node": "latest",
+    "import-meta-resolve": "^1.1.1",
     "chai": "^4.3.4",
     "eslint": "latest",
     "jiti": "^1.12.5",
