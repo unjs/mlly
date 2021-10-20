@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { findDynamicImports, findStaticImports, parseStaticImport } from '../lib/index.mjs'
+import { findDynamicImports, findStaticImports, parseStaticImport } from 'mlly'
 
 // -- Static import --
 

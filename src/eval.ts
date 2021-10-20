@@ -1,31 +1,34 @@
-import { resolve } from './resolve.mjs'
-import { loadURL, toDataURL } from './utils.mjs'
+import { resolve } from './resolve'
+import { loadURL, toDataURL } from './utils'
+import type { ResolveOptions } from './resolve'
+
+export interface EvaluateOptions extends ResolveOptions {
+  url?: string
+}
 
 const EVAL_ESM_IMPORT_RE = /(?<=import .* from ['"])([^'"]+)(?=['"])|(?<=export .* from ['"])([^'"]+)(?=['"])|(?<=import\s*['"])([^'"]+)(?=['"])|(?<=import\s*\(['"])([^'"]+)(?=['"]\))/g
 
-export async function loadModule (id, opts = {}) {
+export async function loadModule(id: string, opts: EvaluateOptions = {}): Promise<any> {
   const url = await resolve(id, opts)
   const code = await loadURL(url)
   return evalModule(code, { ...opts, url })
 }
 
-export async function evalModule (code, opts = {}) {
+export async function evalModule(code: string, opts: EvaluateOptions = {}): Promise<any> {
   const transformed = await transformModule(code, opts)
-  const dataURL = toDataURL(transformed, opts)
+  const dataURL = toDataURL(transformed)
   return import(dataURL).catch((err) => {
-    err.stack = err.stack.replace(new RegExp(dataURL, 'g'), opts.url || '_mlly_eval_.mjs')
+    err.stack = err.stack.replace(new RegExp(dataURL, 'g'), opts.url || '_mlly_eval_')
     throw err
   })
 }
 
-export async function transformModule (code, opts) {
+export async function transformModule(code: string, opts: EvaluateOptions): Promise<string> {
   // Convert JSON to module
   if (opts.url && opts.url.endsWith('.json')) {
     return 'export default ' + code
   }
 
-  // Resolve relative imports
-  code = await resolveImports(code, opts)
 
   // Rewrite import.meta.url
   if (opts.url) {
@@ -35,7 +38,7 @@ export async function transformModule (code, opts) {
   return code
 }
 
-export async function resolveImports (code, opts) {
+export async function resolveImports(code: string, opts: EvaluateOptions): Promise<string> {
   const imports = Array.from(code.matchAll(EVAL_ESM_IMPORT_RE)).map(m => m[0])
   if (!imports.length) {
     return code

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { findExports } from '../lib/index.mjs'
+import { findExports } from 'mlly'
 
 describe('findExports', () => {
   const tests = {

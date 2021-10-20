@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { interopDefault } from '../lib/index.mjs'
+import { interopDefault } from 'mlly'
 
 const tests = [
   [{}, {}],

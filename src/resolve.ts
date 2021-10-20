@@ -1,15 +1,21 @@
-import { realpathSync } from 'node:fs'
-import { pathToFileURL } from 'node:url'
+import { realpathSync } from 'fs'
+import { pathToFileURL } from 'url'
 import { moduleResolve } from 'import-meta-resolve'
-import { fileURLToPath, normalizeid } from './utils.mjs'
-import { pcall, BUILTIN_MODULES } from './_utils.mjs'
+import { fileURLToPath, normalizeid } from './utils'
+import { pcall, BUILTIN_MODULES } from './_utils'
 
 const DEFAULT_CONDITIONS_SET = new Set(['node', 'import'])
 const DEFAULT_URL = pathToFileURL(process.cwd())
 const DEFAULT_EXTENSIONS = ['.mjs', '.cjs', '.js', '.json']
 const NOT_FOUND_ERRORS = new Set(['ERR_MODULE_NOT_FOUND', 'ERR_UNSUPPORTED_DIR_IMPORT', 'MODULE_NOT_FOUND'])
 
-function _tryModuleResolve (id, url, conditions) {
+export interface ResolveOptions {
+  url?: string | URL
+  extensions?: string[]
+  conditions?: string[]
+}
+
+function _tryModuleResolve(id: string, url: URL, conditions: any): any | null {
   try {
     return moduleResolve(id, url, conditions)
   } catch (err) {
@@ -20,9 +26,7 @@ function _tryModuleResolve (id, url, conditions) {
   }
 }
 
-function _resolve (id, opts = {}) {
-  // console.log('> resolve ', id, 'from', opts.url)
-
+function _resolve(id: string, opts: ResolveOptions = {}): string {
   // Skip if already has a protocol
   if (/(node|data|http|https):/.test(id)) {
     return id
@@ -35,7 +39,7 @@ function _resolve (id, opts = {}) {
 
   // Defaults
   const conditionsSet = opts.conditions ? new Set(opts.conditions) : DEFAULT_CONDITIONS_SET
-  const url = opts.url ? normalizeid(opts.url) : DEFAULT_URL
+  const url = opts.url ? new URL(normalizeid(opts.url.toString())) : DEFAULT_URL
 
   // Try simple resolve
   let resolved = _tryModuleResolve(id, url, conditionsSet)
@@ -54,6 +58,7 @@ function _resolve (id, opts = {}) {
   // Throw error if not found
   if (!resolved) {
     const err = new Error(`Cannot find module ${id} imported from ${url}`)
+    // @ts-ignore
     err.code = 'ERR_MODULE_NOT_FOUND'
     throw err
   }
@@ -63,23 +68,29 @@ function _resolve (id, opts = {}) {
   return pathToFileURL(realPath).toString()
 }
 
-export function resolveSync (id, opts) {
+/**
+ * @deprecated please use `resolve` instead of `resolveSync`
+ */
+export function resolveSync(id: string, opts: ResolveOptions): string {
   return _resolve(id, opts)
 }
 
-export function resolve (id, opts) {
+export function resolve(id: string, opts: ResolveOptions): Promise<string> {
   return pcall(resolveSync, id, opts)
 }
 
-export function resolvePathSync (id, opts) {
+/**
+ * @deprecated please use `resolvePath` instead of `resolvePathSync`
+ */
+export function resolvePathSync(id: string, opts: ResolveOptions) {
   return fileURLToPath(resolveSync(id, opts))
 }
 
-export function resolvePath (id, opts) {
+export function resolvePath(id: string, opts: ResolveOptions) {
   return pcall(resolvePathSync, id, opts)
 }
 
-export function createResolve (defaults) {
+export function createResolve(defaults: ResolveOptions) {
   return (id, url) => {
     return resolve(id, { url, ...defaults })
   }
