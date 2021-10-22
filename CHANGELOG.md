@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/unjs/mlly/compare/v0.3.0...v0.3.1) (2021-10-22)
+
+
+### Bug Fixes
+
+* add missing `name` and `names` to `ESMExport` interface ([#13](https://github.com/unjs/mlly/issues/13)) ([c5eacfb](https://github.com/unjs/mlly/commit/c5eacfb6b392395d6d568daaeaea80d322b90a36))
+
 ## [0.3.0](https://github.com/unjs/mlly/compare/v0.2.10...v0.3.0) (2021-10-20)
 
 
