@@ -28,7 +28,9 @@ export interface ESMExport {
   type: 'declaration' | 'named' | 'default',
   code: string
   start: number
-  end: number
+  end: number,
+  name?: string,
+  names?: string[]
 }
 
 export interface DeclarationExport extends ESMExport {
