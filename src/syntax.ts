@@ -3,7 +3,7 @@ import { extname } from 'pathe'
 import { readPackageJSON } from 'pkg-types'
 import { ResolveOptions, resolvePath } from './resolve'
 
-const ESM_RE = /([\s;]|^)(import[\s'"*{]|export\b|import\.meta\b)/m
+const ESM_RE = /([\s;]|^)(import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
 
 const BUILTIN_EXTENSIONS = new Set(['.mjs', '.cjs', '.node', '.wasm'])
 
@@ -48,5 +48,5 @@ export async function isValidNodeImport (id: string, opts: ResolveOptions & { co
 
   const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null)
 
-  return !hasESMSyntax(code)
+  return hasCJSSyntax(code) || !hasESMSyntax(code)
 }
