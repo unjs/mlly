@@ -26,7 +26,7 @@ export function detectSyntax (code: string) {
 
 export async function isValidNodeImport (id: string, code?: string): Promise<boolean> {
   const extension = extname(id)
-  if (['.mjs', '.cjs'].includes(extension)) { return true }
+  if (['.mjs', '.cjs', '.node', '.wasm'].includes(extension)) { return true }
 
   if (extension !== '.js') { return false }
 
