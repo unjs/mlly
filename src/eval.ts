@@ -23,7 +23,7 @@ export async function evalModule (code: string, opts: EvaluateOptions = {}): Pro
   })
 }
 
-export function transformModule (code: string, opts: EvaluateOptions): Promise<string> {
+export function transformModule (code: string, opts?: EvaluateOptions): Promise<string> {
   // Convert JSON to module
   if (opts.url && opts.url.endsWith('.json')) {
     return Promise.resolve('export default ' + code)
@@ -37,7 +37,7 @@ export function transformModule (code: string, opts: EvaluateOptions): Promise<s
   return Promise.resolve(code)
 }
 
-export async function resolveImports (code: string, opts: EvaluateOptions): Promise<string> {
+export async function resolveImports (code: string, opts?: EvaluateOptions): Promise<string> {
   const imports = Array.from(code.matchAll(EVAL_ESM_IMPORT_RE)).map(m => m[0])
   if (!imports.length) {
     return code
