@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/unjs/mlly/compare/v0.3.4...v0.3.5) (2021-10-27)
+
+
+### Features
+
+* detect esm/cjs syntax ([#12](https://github.com/unjs/mlly/issues/12)) ([477d76e](https://github.com/unjs/mlly/commit/477d76ebcd2f01478ce5a2e01bb6b253454f2587))
+
+
+### Bug Fixes
+
+* **resolve:** don't normalize falsy urls ([9fdf8f6](https://github.com/unjs/mlly/commit/9fdf8f64b72c9efd1f9535e79ecfeec6780939ec))
+* **types:** make options optional ([9240f07](https://github.com/unjs/mlly/commit/9240f07c49df0591e00f83a7998a5158a898983a))
+
 ### [0.3.4](https://github.com/unjs/mlly/compare/v0.3.3...v0.3.4) (2021-10-27)
 
 
