@@ -10,7 +10,7 @@ const DEFAULT_EXTENSIONS = ['.mjs', '.cjs', '.js', '.json']
 const NOT_FOUND_ERRORS = new Set(['ERR_MODULE_NOT_FOUND', 'ERR_UNSUPPORTED_DIR_IMPORT', 'MODULE_NOT_FOUND'])
 
 export interface ResolveOptions {
-  url?: string | URL | string[] | URL[]
+  url?: string | URL | (string | URL)[]
   extensions?: string[]
   conditions?: string[]
 }
