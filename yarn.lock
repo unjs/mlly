@@ -2485,6 +2485,11 @@ mlly@^0.2.6:
   dependencies:
     import-meta-resolve "^1.1.1"
 
+mlly@^0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/mlly/-/mlly-0.3.6.tgz#639867d616569d12a4aa1dff99f18a5e63126941"
+  integrity sha512-mSEVMwiNEjppuRmhfzWQgzZtC/N2eWiDAhIfTM1U4fO0zJjacJRDnaT//qNlmNbeWQn3fzDSA5UC6jsvAfL4AA==
+
 mocha@^9.1.2:
   version "9.1.2"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-9.1.2.tgz#93f53175b0f0dc4014bd2d612218fccfcf3534d3"
@@ -2800,6 +2805,15 @@ pkg-dir@^2.0.0:
   integrity sha1-9tXREJ4Z1j7fQo4L1X4Sd3YVM0s=
   dependencies:
     find-up "^2.1.0"
+
+pkg-types@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/pkg-types/-/pkg-types-0.3.1.tgz#d7a8b69efb8777a05afc5aabfc259a29a5d6d159"
+  integrity sha512-BjECNgz/tsyqg0/T4Z/U7WbFQXUT24nfkxPbALcrk/uHVeZf9MrGG4tfvYtu+jsrHCFMseLQ6woQddDEBATw3A==
+  dependencies:
+    jsonc-parser "^3.0.0"
+    mlly "^0.3.6"
+    pathe "^0.2.0"
 
 pkg-up@^2.0.0:
   version "2.0.0"

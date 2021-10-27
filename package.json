@@ -30,8 +30,9 @@
     "import-meta-resolve": "^1.1.1",
     "jiti": "^1.12.5",
     "mocha": "^9.1.2",
+    "pathe": "^0.2.0",
+    "pkg-types": "^0.3.1",
     "standard-version": "latest",
-    "unbuild": "^0.5.7",
-    "pathe": "^0.2.0"
+    "unbuild": "^0.5.7"
   }
 }
