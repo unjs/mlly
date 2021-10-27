@@ -9,19 +9,13 @@ export function hasCJSSyntax (code: string): boolean {
   return CJS_RE.test(code)
 }
 
-export function detectSyntax (code: string): 'esm' | 'cjs' | 'mixed' | 'unknown' {
-  const isESM = hasESMSyntax(code)
-  const isCJS = hasCJSSyntax(code)
+export function detectSyntax (code: string) {
+  const hasESM = hasESMSyntax(code)
+  const hasCJS = hasCJSSyntax(code)
 
-  if (isESM && isCJS) {
-    return 'mixed'
+  return {
+    hasESM,
+    hasCJS,
+    isMixed: hasESM && hasCJS
   }
-  if (isESM) {
-    return 'esm'
-  }
-  if (isCJS) {
-    return 'cjs'
-  }
-
-  return 'unknown'
 }
