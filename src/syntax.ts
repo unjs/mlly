@@ -29,6 +29,7 @@ export async function isValidNodeImport (id: string, code?: string): Promise<boo
   if (['.mjs', '.cjs', '.node', '.wasm'].includes(extension)) { return true }
 
   if (extension !== '.js') { return false }
+  if (id.match(/\.(\w+-)?esm(-\w+)?\.js$/)) { return false }
 
   const pkg = await readPackageJSON(id)
   if (pkg?.type === 'module') { return true }
