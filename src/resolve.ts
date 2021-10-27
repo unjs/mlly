@@ -48,6 +48,7 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
 
   // Search paths
   const urls: URL[] = (Array.isArray(opts.url) ? opts.url : [opts.url])
+    .filter(Boolean)
     .map(u => new URL(normalizeid(u.toString())))
   if (!urls.length) {
     urls.push(DEFAULT_URL)
