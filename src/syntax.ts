@@ -24,7 +24,7 @@ export function detectSyntax (code: string) {
   }
 }
 
-export async function isValidNativeESM (id: string, code?: string): Promise<boolean> {
+export async function isValidNodeImport (id: string, code?: string): Promise<boolean> {
   const extension = extname(id)
   if (['.mjs', '.cjs'].includes(extension)) { return true }
 
