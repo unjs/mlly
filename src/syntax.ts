@@ -1,8 +1,11 @@
 import { promises as fsp } from 'fs'
 import { extname } from 'pathe'
 import { readPackageJSON } from 'pkg-types'
+import { ResolveOptions, resolvePath } from './resolve'
 
 const ESM_RE = /([\s;]|^)(import[\s'"*{]|export\b|import\.meta\b)/m
+
+const BUILTIN_EXTENSIONS = new Set(['.mjs', '.cjs', '.node', '.wasm'])
 
 export function hasESMSyntax (code: string): boolean {
   return ESM_RE.test(code)
@@ -24,17 +27,26 @@ export function detectSyntax (code: string) {
   }
 }
 
-export async function isValidNodeImport (id: string, code?: string): Promise<boolean> {
-  const extension = extname(id)
-  if (['.mjs', '.cjs', '.node', '.wasm'].includes(extension)) { return true }
+export async function isValidNodeImport (id: string, opts: ResolveOptions & { code?: string } = {}): Promise<boolean> {
+  const resolvedPath = await resolvePath(id, opts)
+  const extension = extname(resolvedPath)
 
-  if (extension !== '.js') { return false }
-  if (id.match(/\.(\w+-)?esm?(-\w+)?\.js$/)) { return false }
+  if (BUILTIN_EXTENSIONS.has) {
+    return true
+  }
 
-  const pkg = await readPackageJSON(id)
+  if (extension !== '.js') {
+    return false
+  }
+
+  if (resolvedPath.match(/\.(\w+-)?esm?(-\w+)?\.js$/)) {
+    return false
+  }
+
+  const pkg = await readPackageJSON(resolvedPath).catch(() => null)
   if (pkg?.type === 'module') { return true }
 
-  code = code || await fsp.readFile(id, 'utf-8').catch(() => null)
+  const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null)
 
   return !hasESMSyntax(code)
 }
