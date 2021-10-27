@@ -33,6 +33,7 @@ While ESM Modules are evolving in Node.js ecosystem, there are still many requir
   - Windows paths normalized
   - Supporting custom `extensions` and `/index` resolution
   - Supporting custom `conditions`
+  - Support resolving from multiple paths or urls
 - Module Evaluation
   - Allow evaluating modules using `data:` imports
   - Automatic import rewrite to resolved path using static analyzes

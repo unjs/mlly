@@ -10,7 +10,7 @@ const DEFAULT_EXTENSIONS = ['.mjs', '.cjs', '.js', '.json']
 const NOT_FOUND_ERRORS = new Set(['ERR_MODULE_NOT_FOUND', 'ERR_UNSUPPORTED_DIR_IMPORT', 'MODULE_NOT_FOUND'])
 
 export interface ResolveOptions {
-  url?: string | URL
+  url?: string | URL | string[] | URL[]
   extensions?: string[]
   conditions?: string[]
 }
@@ -37,15 +37,24 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     return 'node:' + id
   }
 
-  // Defaults
+  // Condition set
   const conditionsSet = opts.conditions ? new Set(opts.conditions) : DEFAULT_CONDITIONS_SET
-  const url = opts.url ? new URL(normalizeid(opts.url.toString())) : DEFAULT_URL
 
-  // Try simple resolve
-  let resolved = _tryModuleResolve(id, url, conditionsSet)
+  // Search paths
+  const urls: URL[] = (Array.isArray(opts.url) ? opts.url : [opts.url])
+    .map(u => new URL(normalizeid(u.toString())))
+  if (!urls.length) {
+    urls.push(DEFAULT_URL)
+  }
 
-  // Try other extensions if not found
-  if (!resolved) {
+  let resolved
+  for (const url of urls) {
+    // Try simple resolve
+    resolved = _tryModuleResolve(id, url, conditionsSet)
+    if (resolved) {
+      break
+    }
+    // Try other extensions if not found
     for (const prefix of ['', '/index']) {
       for (const ext of opts.extensions || DEFAULT_EXTENSIONS) {
         resolved = _tryModuleResolve(id + prefix + ext, url, conditionsSet)
@@ -57,7 +66,7 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
 
   // Throw error if not found
   if (!resolved) {
-    const err = new Error(`Cannot find module ${id} imported from ${url}`)
+    const err = new Error(`Cannot find module ${id} imported from ${urls.join(', ')}`)
     // @ts-ignore
     err.code = 'ERR_MODULE_NOT_FOUND'
     throw err
