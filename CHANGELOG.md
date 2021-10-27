@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/unjs/mlly/compare/v0.3.1...v0.3.2) (2021-10-27)
+
+
+### Features
+
+* **resolve:** support resolving from multiple paths or urls ([8d51348](https://github.com/unjs/mlly/commit/8d5134807b44ea92c14785343a38486fc155957c))
+
 ### [0.3.1](https://github.com/unjs/mlly/compare/v0.3.0...v0.3.1) (2021-10-22)
 
 
