@@ -33,7 +33,7 @@ export async function isValidNodeImport (id: string, code?: string): Promise<boo
   const pkg = await readPackageJSON(id)
   if (pkg?.type === 'module') { return true }
 
-  code = code || await fsp.readFile(id, 'utf-8')
+  code = code || await fsp.readFile(id, 'utf-8').catch(() => null)
 
   return !hasESMSyntax(code)
 }
