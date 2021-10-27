@@ -47,11 +47,20 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
   const conditionsSet = opts.conditions ? new Set(opts.conditions) : DEFAULT_CONDITIONS_SET
 
   // Search paths
-  const urls: URL[] = (Array.isArray(opts.url) ? opts.url : [opts.url])
+  const _urls: URL[] = (Array.isArray(opts.url) ? opts.url : [opts.url])
     .filter(Boolean)
     .map(u => new URL(normalizeid(u.toString())))
-  if (!urls.length) {
-    urls.push(DEFAULT_URL)
+  if (!_urls.length) {
+    _urls.push(DEFAULT_URL)
+  }
+  const urls = [..._urls]
+  // TODO: Consider pnp
+  for (const url of _urls) {
+    if (url.protocol === 'file:' && !url.pathname.includes('node_modules')) {
+      const newURL = new URL(url)
+      newURL.pathname += '/node_modules'
+      urls.push(newURL)
+    }
   }
 
   let resolved
