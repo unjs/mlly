@@ -31,7 +31,7 @@ export async function isValidNodeImport (id: string, opts: ResolveOptions & { co
   const resolvedPath = await resolvePath(id, opts)
   const extension = extname(resolvedPath)
 
-  if (BUILTIN_EXTENSIONS.has) {
+  if (BUILTIN_EXTENSIONS.has(extension)) {
     return true
   }
 
