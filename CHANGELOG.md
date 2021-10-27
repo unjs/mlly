@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/unjs/mlly/compare/v0.3.6...v0.3.7) (2021-10-27)
+
+
+### Features
+
+* add `isValidNodeImport` utility ([#16](https://github.com/unjs/mlly/issues/16)) ([32ef24a](https://github.com/unjs/mlly/commit/32ef24a86371b50019c07417e90e05aef5d4bb44))
+
 ### [0.3.6](https://github.com/unjs/mlly/compare/v0.3.5...v0.3.6) (2021-10-27)
 
 
