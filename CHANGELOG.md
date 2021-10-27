@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/unjs/mlly/compare/v0.3.5...v0.3.6) (2021-10-27)
+
+
+### Features
+
+* **resolve:** automatically add `node_modules` to search path ([7b03715](https://github.com/unjs/mlly/commit/7b03715485bf421a4aef1b2010c9a24599deeedd))
+
 ### [0.3.5](https://github.com/unjs/mlly/compare/v0.3.4...v0.3.5) (2021-10-27)
 
 
