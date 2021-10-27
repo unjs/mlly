@@ -3,7 +3,7 @@ import { extname } from 'pathe'
 import { readPackageJSON } from 'pkg-types'
 import { ResolveOptions, resolvePath } from './resolve'
 
-const ESM_RE = /([\s;]|^)(import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
+const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
 
 const BUILTIN_EXTENSIONS = new Set(['.mjs', '.cjs', '.node', '.wasm'])
 
