@@ -1,5 +1,6 @@
 import { realpathSync } from 'fs'
 import { pathToFileURL } from 'url'
+import { isAbsolute } from 'pathe'
 import { moduleResolve } from 'import-meta-resolve'
 import { fileURLToPath, normalizeid } from './utils'
 import { pcall, BUILTIN_MODULES } from './_utils'
@@ -35,6 +36,11 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
   // Skip builtins
   if (BUILTIN_MODULES.has(id)) {
     return 'node:' + id
+  }
+
+  // Skip absolute
+  if (isAbsolute(id)) {
+    return id
   }
 
   // Condition set
