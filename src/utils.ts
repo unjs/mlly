@@ -9,13 +9,6 @@ export function fileURLToPath (id: string): string {
   return normalizeSlash(_fileURLToPath(id))
 }
 
-const ProtocolRegex = /^(?<proto>.+):.+$/
-
-export function getProtocol (id: string): string | null {
-  const proto = id.match(ProtocolRegex)
-  return proto ? proto.groups.proto : null
-}
-
 export function normalizeid (id: string): string {
   if (typeof id !== 'string') {
     // @ts-ignore

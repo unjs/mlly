@@ -2,7 +2,8 @@ import { promises as fsp } from 'fs'
 import { extname } from 'pathe'
 import { readPackageJSON } from 'pkg-types'
 import { ResolveOptions, resolvePath } from './resolve'
-import { getProtocol, isNodeBuiltin } from './utils'
+import { isNodeBuiltin } from './utils'
+import { getProtocol } from './_utils'
 
 const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
 

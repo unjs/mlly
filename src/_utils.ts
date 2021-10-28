@@ -38,3 +38,10 @@ export function matchAll (regex, string, addition) {
   }
   return matches
 }
+
+const ProtocolRegex = /^(?<proto>.+):.+$/
+
+export function getProtocol (id: string): string | null {
+  const proto = id.match(ProtocolRegex)
+  return proto ? proto.groups.proto : null
+}
