@@ -2,6 +2,8 @@ import { promises as fsp } from 'fs'
 import { extname } from 'pathe'
 import { readPackageJSON } from 'pkg-types'
 import { ResolveOptions, resolvePath } from './resolve'
+import { isNodeBuiltin } from './utils'
+import { getProtocol } from './_utils'
 
 const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
 
@@ -27,7 +29,41 @@ export function detectSyntax (code: string) {
   }
 }
 
-export async function isValidNodeImport (id: string, opts: ResolveOptions & { code?: string } = {}): Promise<boolean> {
+export interface ValidNodeImportOptions extends ResolveOptions {
+  /**
+   * The contents of the import, which may be analyzed to see if it contains
+   * CJS or ESM syntax as a last step in checking whether it is a valid import.
+   */
+  code?: string
+  /**
+   * Protocols that are allowed as valid node imports.
+   *
+   * Default: ['node', 'file', 'data']
+   */
+  allowedProtocols?: Array<string>
+}
+
+const validNodeImportDefaults: ValidNodeImportOptions = {
+  allowedProtocols: ['node', 'file', 'data']
+}
+
+export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptions = {}): Promise<boolean> {
+  if (isNodeBuiltin(id)) {
+    return true
+  }
+
+  const opts = { ...validNodeImportDefaults, ..._opts }
+
+  const proto = getProtocol(id)
+  if (proto && !opts.allowedProtocols.includes(proto)) {
+    return false
+  }
+
+  // node is already validated by isNodeBuiltin and file will be normalized by resolvePath
+  if (proto === 'data') {
+    return true
+  }
+
   const resolvedPath = await resolvePath(id, opts)
   const extension = extname(resolvedPath)
 
