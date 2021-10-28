@@ -6,13 +6,6 @@ export function normalizeSlash (str) {
   return str.replace(/\\/g, '/')
 }
 
-const ProtocolRegex = /^(?<proto>.+):.+$/
-
-export function getProtocol (id: string): string | null {
-  const proto = id.match(ProtocolRegex)
-  return proto ? proto.groups.proto : null
-}
-
 export function pcall (fn, ...args) {
   try {
     return Promise.resolve(fn(...args)).catch(err => perr(err))
