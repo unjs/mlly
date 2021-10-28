@@ -1,4 +1,3 @@
-
 import { fileURLToPath as _fileURLToPath } from 'url'
 import { promises as fsp } from 'fs'
 import { normalizeSlash, BUILTIN_MODULES } from './_utils'
@@ -32,4 +31,10 @@ export async function loadURL (url: string): Promise<string> {
 export function toDataURL (code: string): string {
   const base64 = Buffer.from(code).toString('base64')
   return `data:text/javascript;base64,${base64}`
+}
+
+export function isBuiltin (id: string = '') {
+  // node:fs/promises => fs
+  id = id.replace(/^node:/, '').split('/')[0]
+  return BUILTIN_MODULES.has(id)
 }

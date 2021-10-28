@@ -1,5 +1,6 @@
 import { expect } from 'chai'
-import { detectSyntax } from 'mlly'
+import { detectSyntax, isValidNodeImport } from 'mlly'
+import { join } from 'pathe'
 
 const staticTests = {
   // ESM
@@ -32,6 +33,29 @@ describe('detectSyntax', () => {
   for (const [input, result] of Object.entries(staticTests)) {
     it(input, () => {
       expect(detectSyntax(input)).to.deep.equal(result)
+    })
+  }
+})
+
+const nodeImportTests = {
+  [import.meta.url]: true,
+  'node:fs': true,
+  fs: true,
+  'fs/promises': true,
+  vue: false,
+  [join(import.meta.url, '../invalid')]: false,
+  'data:text/javascript,console.log("hello!");': true,
+  [join(import.meta.url, '../fixture/imports/cjs')]: true,
+  [join(import.meta.url, '../fixture/imports/esm')]: true,
+  [join(import.meta.url, '../fixture/imports/esm-module')]: true,
+  [join(import.meta.url, '../fixture/imports/js-cjs')]: true,
+  [join(import.meta.url, '../fixture/imports/js-esm')]: false
+}
+
+describe('isValidNodeImport', () => {
+  for (const [input, result] of Object.entries(nodeImportTests)) {
+    it(input, async () => {
+      expect(await isValidNodeImport(input)).to.deep.equal(result)
     })
   }
 })
