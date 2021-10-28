@@ -42,8 +42,8 @@ const nodeImportTests = {
   'node:fs': true,
   fs: true,
   'fs/promises': true,
-  vue: false,
-  [join(import.meta.url, '../invalid')]: false,
+  vue: 'error',
+  [join(import.meta.url, '../invalid')]: 'error',
   'data:text/javascript,console.log("hello!");': true,
   [join(import.meta.url, '../fixture/imports/cjs')]: true,
   [join(import.meta.url, '../fixture/imports/esm')]: true,
@@ -55,7 +55,11 @@ const nodeImportTests = {
 describe('isValidNodeImport', () => {
   for (const [input, result] of Object.entries(nodeImportTests)) {
     it(input, async () => {
-      expect(await isValidNodeImport(input)).to.deep.equal(result)
+      try {
+        expect(await isValidNodeImport(input)).to.equal(result)
+      } catch {
+        expect(result).to.equal('error')
+      }
     })
   }
 })
