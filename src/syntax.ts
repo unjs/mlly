@@ -11,7 +11,7 @@ export function hasESMSyntax (code: string): boolean {
   return ESM_RE.test(code)
 }
 
-const CJS_RE = /([\s;]|^)(module.exports\b|exports\.|require\s*\(|global\b)/m
+const CJS_RE = /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m
 export function hasCJSSyntax (code: string): boolean {
   return CJS_RE.test(code)
 }
