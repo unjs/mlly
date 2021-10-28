@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect, AssertionError } from 'chai'
 import { detectSyntax, isValidNodeImport } from 'mlly'
 import { join } from 'pathe'
 
@@ -42,6 +42,10 @@ const nodeImportTests = {
   'node:fs': true,
   fs: true,
   'fs/promises': true,
+  'node:fs/promises': true,
+  // We can't detect these are invalid node imports
+  'fs/fake': true,
+  'node:fs/fake': true,
   vue: 'error',
   [join(import.meta.url, '../invalid')]: 'error',
   'data:text/javascript,console.log("hello!");': true,
@@ -57,7 +61,10 @@ describe('isValidNodeImport', () => {
     it(input, async () => {
       try {
         expect(await isValidNodeImport(input)).to.equal(result)
-      } catch {
+      } catch (e) {
+        if (e instanceof AssertionError) {
+          throw e
+        }
         expect(result).to.equal('error')
       }
     })

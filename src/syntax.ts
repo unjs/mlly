@@ -40,10 +40,23 @@ export interface ValidNodeImportOptions extends ResolveOptions {
    * Default: ['node', 'file', 'data']
    */
   allowedProtocols?: Array<string>
+  /**
+   * Custom normalizers for each protocol, returning a normalized id
+   * (or a boolean to short-circuit the validation process).
+   *
+   * If a normalizer is missing for an allowed protocol, the function will
+   * return true.
+   */
+  protocolNormalizers?: { [protocol: string]: (id: string) => string | boolean }
 }
 
 const validNodeImportDefaults: ValidNodeImportOptions = {
-  allowedProtocols: ['node', 'file', 'data']
+  allowedProtocols: ['node', 'file', 'data'],
+  protocolNormalizers: {
+    node: id => isNodeBuiltin(id) ? id : false,
+    data: () => true,
+    file: url => url
+  }
 }
 
 export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptions = {}): Promise<boolean> {
@@ -58,8 +71,12 @@ export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptio
     return false
   }
 
-  if (proto === 'data') {
-    return true
+  if (proto && proto in opts.protocolNormalizers) {
+    const result = opts.protocolNormalizers[proto]?.(id) || true
+    if (typeof result !== 'string') {
+      return result
+    }
+    id = result
   }
 
   const resolvedPath = await resolvePath(id, opts)
