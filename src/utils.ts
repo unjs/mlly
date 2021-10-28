@@ -33,7 +33,7 @@ export function toDataURL (code: string): string {
   return `data:text/javascript;base64,${base64}`
 }
 
-export function isBuiltin (id: string = '') {
+export function isNodeBuiltin (id: string = '') {
   // node:fs/promises => fs
   id = id.replace(/^node:/, '').split('/')[0]
   return BUILTIN_MODULES.has(id)

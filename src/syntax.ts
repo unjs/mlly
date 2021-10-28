@@ -2,7 +2,7 @@ import { promises as fsp } from 'fs'
 import { extname } from 'pathe'
 import { readPackageJSON } from 'pkg-types'
 import { ResolveOptions, resolvePath } from './resolve'
-import { isBuiltin } from './utils'
+import { isNodeBuiltin } from './utils'
 import { getProtocol } from './_utils'
 
 const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
@@ -48,7 +48,7 @@ const validNodeImportDefaults: ValidNodeImportOptions = {
 }
 
 export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptions = {}): Promise<boolean> {
-  if (isBuiltin(id)) {
+  if (isNodeBuiltin(id)) {
     return true
   }
 
@@ -63,7 +63,7 @@ export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptio
     return true
   }
 
-  const resolvedPath = await resolvePath(id, opts).catch(() => '')
+  const resolvedPath = await resolvePath(id, opts)
   const extension = extname(resolvedPath)
 
   if (BUILTIN_EXTENSIONS.has(extension)) {

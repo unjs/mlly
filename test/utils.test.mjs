@@ -1,7 +1,7 @@
-import { isBuiltin } from 'mlly'
+import { isNodeBuiltin } from 'mlly'
 import { expect } from 'chai'
 
-describe('isBuiltin', () => {
+describe('isNodeBuiltin', () => {
   const cases = {
     fs: true,
     fake: false,
@@ -13,11 +13,11 @@ describe('isBuiltin', () => {
 
   for (const id in cases) {
     it(`'${id}': ${cases[id]}`, () => {
-      expect(isBuiltin(id)).to.equal(cases[id])
+      expect(isNodeBuiltin(id)).to.equal(cases[id])
     })
   }
 
   it('undefined', () => {
-    expect(isBuiltin()).to.equal(false)
+    expect(isNodeBuiltin()).to.equal(false)
   })
 })
