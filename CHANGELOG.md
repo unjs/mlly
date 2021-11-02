@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.11](https://github.com/unjs/mlly/compare/v0.3.10...v0.3.11) (2021-11-02)
+
+
+### Bug Fixes
+
+* exclude windows drive letters from protocols ([#21](https://github.com/unjs/mlly/issues/21)) ([94d3506](https://github.com/unjs/mlly/commit/94d350699a132fe0d5f25031f09dc5117cf659db))
+
 ### [0.3.10](https://github.com/unjs/mlly/compare/v0.3.9...v0.3.10) (2021-10-28)
 
 
