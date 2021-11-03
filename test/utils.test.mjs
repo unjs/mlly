@@ -24,7 +24,6 @@ describe('isNodeBuiltin', () => {
 
 describe('sanitizeFilePath', () => {
   const cases = {
-    // [?*:\x00-\x1F\x7F<>#"{}|^[\]`]
     'C:/te#st/[...slug].jsx': 'C:/te_st/_...slug_.jsx',
     'C:\\te#st\\[...slug].jsx': 'C:/te_st/_...slug_.jsx',
     '/te#st/[...slug].jsx': '/te_st/_...slug_.jsx',
