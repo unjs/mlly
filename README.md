@@ -354,6 +354,28 @@ import myModule from 'my-module'
 console.log(interopDefault(myModule))
 ```
 
+### `sanitizeURIComponent`
+
+Replace reserved charachters from a segment of URI to make it compatible with [rfc2396](https://datatracker.ietf.org/doc/html/rfc2396).
+
+```js
+import { sanitizeURIComponent } from 'mlly'
+
+// foo_bar
+console.log(sanitizeURIComponent(`foo:bar`))
+```
+
+### `sanitizeFilePath`
+
+Sanitize each path of a file name or path with `sanitizeURIComponent` for URI compatibility.
+
+```js
+import { sanitizeFilePath } from 'mlly'
+
+// C:/te_st/_...slug_.jsx'
+console.log(sanitizeFilePath('C:\\te#st\\[...slug].jsx'))
+```
+
 ## License
 
 MIT
