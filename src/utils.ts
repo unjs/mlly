@@ -9,6 +9,19 @@ export function fileURLToPath (id: string): string {
   return normalizeSlash(_fileURLToPath(id))
 }
 
+// https://datatracker.ietf.org/doc/html/rfc2396
+// eslint-disable-next-line no-control-regex
+const INVALID_CHAR_RE = /[\x00-\x1F\x7F<>*#"{}|^[\]`;/?:@&=+$,]+/g
+
+export function sanitizeURIComponent (name: string = '', replacement: string = '_'): string {
+  return name.replace(INVALID_CHAR_RE, replacement)
+}
+
+export function sanitizeFilePath (filePath: string = '') {
+  return filePath.split(/[/\\]/g).map(p => sanitizeURIComponent(p)).join('/')
+    .replace(/^([a-zA-Z])_\//, '$1:/')
+}
+
 export function normalizeid (id: string): string {
   if (typeof id !== 'string') {
     // @ts-ignore
