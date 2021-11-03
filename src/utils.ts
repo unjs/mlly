@@ -11,7 +11,7 @@ export function fileURLToPath (id: string): string {
 
 // https://datatracker.ietf.org/doc/html/rfc2396
 // eslint-disable-next-line no-control-regex
-const INVALID_CHAR_RE = /[\x00-\x1F\x7F<>*#"{}|^[\]`;/?:@&=+$,]/g
+const INVALID_CHAR_RE = /[\x00-\x1F\x7F<>*#"{}|^[\]`;/?:@&=+$,]+/g
 
 export function sanitizeURIComponent (name: string = '', replacement: string = '_'): string {
   return name.replace(INVALID_CHAR_RE, replacement)

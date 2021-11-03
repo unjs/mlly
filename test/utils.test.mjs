@@ -28,6 +28,7 @@ describe('sanitizeFilePath', () => {
     'C:/te#st/[...slug].jsx': 'C:/te_st/_...slug_.jsx',
     'C:\\te#st\\[...slug].jsx': 'C:/te_st/_...slug_.jsx',
     '/te#st/[...slug].jsx': '/te_st/_...slug_.jsx',
+    '/te#st/[].jsx': '/te_st/_.jsx',
     '\0a?b*c:d\x7Fe<f>g#h"i{j}k|l^m[n]o`p.jsx': '_a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p.jsx',
     '': ''
   }
