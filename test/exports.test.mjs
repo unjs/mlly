@@ -6,7 +6,8 @@ describe('findExports', () => {
     'export function useA () { return \'a\' }': { name: 'useA', type: 'declaration' },
     'export const useD = () => { return \'d\' }': { name: 'useD', type: 'declaration' },
     'export { useB, _useC as useC }': { names: ['useB', 'useC'], type: 'named' },
-    'export default foo': { type: 'default' }
+    'export default foo': { type: 'default', name: 'default', names: ['default'] },
+    'export { foo as default }': { type: 'default', name: 'default', names: ['default'] }
   }
 
   describe('findExports', () => {

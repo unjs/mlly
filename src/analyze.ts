@@ -25,12 +25,13 @@ export interface DynamicImport extends ESMImport {
 }
 
 export interface ESMExport {
+  _type?: 'declaration' | 'named' | 'default',
   type: 'declaration' | 'named' | 'default',
   code: string
   start: number
   end: number,
   name?: string,
-  names?: string[]
+  names: string[]
 }
 
 export interface DeclarationExport extends ESMExport {
@@ -89,14 +90,32 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 }
 
 export function findExports (code: string): ESMExport[] {
+  // Find declarations like export const foo = 'bar'
   const declaredExports = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
+  // Find named exports
   const namedExports = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
   for (const namedExport of namedExports) {
     namedExport.names = namedExport.exports.split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim())
   }
 
-  const defaultExport = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default' })
+  // Find export default
+  const defaultExport = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default', name: 'default' })
 
-  return [].concat(declaredExports, namedExports, defaultExport)
+  // Merge and normalize exports
+  const exports = [].concat(declaredExports, namedExports, defaultExport)
+  for (const exp of exports) {
+    if (!exp.name && exp.names && exp.names.length === 1) {
+      exp.name = exp.names[0]
+    }
+    if (exp.name === 'default' && exp.type !== 'default') {
+      exp._type = exp.type
+      exp.type = 'default'
+    }
+    if (!exp.names && exp.name) {
+      exp.names = [exp.name]
+    }
+  }
+
+  return exports
 }
