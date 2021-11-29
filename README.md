@@ -290,6 +290,77 @@ Outputs:
 ]
 ```
 
+## Syntax detection
+
+### `isValidNodeImport`
+
+Using various syntax detection and huristics, this method an import is a valid import or not to be imported using dynamic `import()`.
+
+Note: This method also allows using dynamic import of CommonJS libraries considering
+Node.js has [Interoperability with CommonJS](https://nodejs.org/api/esm.html#interoperability-with-commonjs).
+
+When resault is `false`, we usually need a to create a CommonJS require context or add specific rules to the bundler to transform dependency.
+
+```js
+import { isValidNodeImport } from 'mlly'
+
+// If returns true, we are safe to use `import('some-lib')`
+await isValidNodeImport('some-lib', {})
+```
+
+**Algorithm:**
+
+- Check import protocol
+    - If is `data:` return `true` (✅ valid)
+    - If is not `node:`, `file:` or `data:`, return `false` (
+❌ invalid)
+- Resolve full path of import using Node.js [Resolution algorithm](https://nodejs.org/api/esm.html#resolution-algorithm)
+- Check full path extension
+  - If is `.mjs`, `.cjs`, `.node` or `.wasm`, return `true` (✅ valid)
+  - If is not `.js`, return `false` (❌ invalid)
+  - If is matching known mixed syntax (`.esm.js`, `.es.js`, etc) return `false` (
+❌ invalid)
+- Read closest `package.json` file to resolve path
+- If `type: 'module'` field is set, return `true` (✅ valid)
+- Read source code of resolved path
+- Try to detect CommonJS syntax usage
+  - If yes, return `true` (✅ valid)
+- Try to detect ESM syntax usage
+  - if yes, return `false` (
+❌ invalid)
+
+### `hasESMSyntax`
+
+Detect if code, has usage of ESM syntax (Static `import`, ESM `export` and `import.meta` usage)
+
+```js
+import { hasESMSyntax } from 'mlly'
+
+hasESMSyntax('export default foo = 123') // true
+```
+
+### `hasCJSSyntax`
+
+Detect if code, has usage of CommonJS syntax (`exports`, `module.exports`, `require` and `global` usage)
+
+```js
+import { hasCJSSyntax } from 'mlly'
+
+hasESMSyntax('export default foo = 123') // true
+```
+
+### `detectSyntax`
+
+Tests code against both CJS and ESM.
+
+`isMixed` indicates if both are detected! This is a common case with legacy packages exporting semi-compatible ESM syntax meant to be used by bundlers.
+
+```js
+import { detectSyntax } from 'mlly'
+
+// { hasESM: true, hasCJS: true, isMixed: true }
+hasESMSyntax('export default require("lodash")')
+```
 
 ## Other Utils
 
