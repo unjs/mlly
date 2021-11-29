@@ -1,11 +1,11 @@
-# 🤝 mlly
+# mlly
 
 > Missing [ECMAScript module](https://nodejs.org/api/esm.html) utils for Node.js
 
+While ESM Modules are evolving in Node.js ecosystem, there are still
+ many required features that are still experimental or missing or needed to support ESM. This package tries to fill in the gap.
 
 ## Usage
-
-> This package is ESM only. Node.js 12+ is needed to use it and it must be imported instead of required.
 
 Install npm package:
 
@@ -17,54 +17,29 @@ yarn add mlly
 npm install mlly
 ```
 
+**Note:** Node.js 14+ is recommand.
+
 Import utils:
 
 ```js
+// ESM
 import { } from 'mlly'
+
+// CommonJS
+const { } = require('mlly')
 ```
 
-## At a glance
-
-While ESM Modules are evolving in Node.js ecosystem, there are still many required features that are still experimental or missing. This package tries to fill in the gap for them.
-
-- Utils to create compatible CommonJS context
-- Resolve Utils
-  - Exposed from native Node.js implementation
-  - Windows paths normalized
-  - Supporting custom `extensions` and `/index` resolution
-  - Supporting custom `conditions`
-  - Support resolving from multiple paths or urls
-- Module Evaluation
-  - Allow evaluating modules using `data:` imports
-  - Automatic import rewrite to resolved path using static analyzes
-  - Allow bypass ESM Cache
-  - Stack-trace support
-  - `.json` loader
-- Multiple composable module utils exposed
-- Static import and export analyzes
-  - Super fast Regex based implementation
-  - Handle most of edge cases
-  - Find all static ESM imports
-  - Find all dynamic ESM imports
-  - Parse static import statement
-  - Find all named, declared and default exports
 
 
-## CommonJS Context
+## Resolving ESM modules
 
-### `createCommonJS`
-
-This utility creates a compatible CommonJS context that is missing in ECMAScript modules.
-
-```js
-import { createCommonJS } from 'mlly'
-
-const { __dirname, __filename, require } = createCommonJS(import.meta.url)
-```
-
-Note: `require` and `require.resolve` implementation are lazy functions. [`createRequire`](https://nodejs.org/api/module.html#module_module_createrequire_filename) will be called on first usage.
-
-## Resolving Modules
+Several utilities to make ESM resolution easier:
+- Respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
+- Exposed from Node.js implementation
+- Windows paths normalized
+- Supporting custom `extensions` and `/index` resolution
+- Supporting custom `conditions`
+- Support resolving from multiple paths or urls
 
 ### `resolve`
 
@@ -129,53 +104,110 @@ import { resolveImports } from 'mlly'
 console.log(await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }))
 ```
 
-## Evaluating Modules
 
-### `evalModule`
 
-Transform and evaluates module code using dynamic imports.
+## Syntax Analyzes
 
-```js
-import { evalModule } from 'mlly'
+### `isValidNodeImport`
 
-await evalModule(`console.log("Hello World!")`)
+Using various syntax detection and heuristics, this method can determine if import is a valid import or not to be imported using dynamic `import()` before hitting an error!
 
-await evalModule(`
-  import { reverse } from './utils.mjs'
-  console.log(reverse('!emosewa si sj'))
-`, { url: import.meta.url })
-```
-
-**Options:**
-
-- all `resolve` options
-- `url`: File URL
-
-### `loadModule`
-
-Dynamically loads a module by evaluating source code.
+When resault is `false`, we usually need a to create a CommonJS require context or add specific rules to the bundler to transform dependency.
 
 ```js
-import { loadModule } from 'mlly'
+import { isValidNodeImport } from 'mlly'
 
-await loadModule('./hello.mjs', { url: import.meta.url })
+// If returns true, we are safe to use `import('some-lib')`
+await isValidNodeImport('some-lib', {})
 ```
 
-Options are same as `evalModule`.
+**Algorithm:**
 
-### `transformModule`
+- Check import protocol
+    - If is `data:` return `true` (✅ valid)
+    - If is not `node:`, `file:` or `data:`, return `false` (
+❌ invalid)
+- Resolve full path of import using Node.js [Resolution algorithm](https://nodejs.org/api/esm.html#resolution-algorithm)
+- Check full path extension
+  - If is `.mjs`, `.cjs`, `.node` or `.wasm`, return `true` (✅ valid)
+  - If is not `.js`, return `false` (❌ invalid)
+  - If is matching known mixed syntax (`.esm.js`, `.es.js`, etc) return `false` (
+❌ invalid)
+- Read closest `package.json` file to resolve path
+- If `type: 'module'` field is set, return `true` (✅ valid)
+- Read source code of resolved path
+- Try to detect CommonJS syntax usage
+  - If yes, return `true` (✅ valid)
+- Try to detect ESM syntax usage
+  - if yes, return `false` (
+❌ invalid)
 
-- Resolves all relative imports will be resolved
-- All usages of `import.meta.url` will be replaced with `url` or `from` option
+**Notes:**
+
+- There might be still edge cases algorithm cannot cover. It is designed with best-efforts.
+- This method also allows using dynamic import of CommonJS libraries considering
+Node.js has [Interoperability with CommonJS](https://nodejs.org/api/esm.html#interoperability-with-commonjs).
+
+
+
+### `hasESMSyntax`
+
+Detect if code, has usage of ESM syntax (Static `import`, ESM `export` and `import.meta` usage)
 
 ```js
-import { toDataURL } from 'mlly'
-console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' })
+import { hasESMSyntax } from 'mlly'
+
+hasESMSyntax('export default foo = 123') // true
 ```
 
-Options are same as `evalModule`.
+### `hasCJSSyntax`
 
-## Import analyzes
+Detect if code, has usage of CommonJS syntax (`exports`, `module.exports`, `require` and `global` usage)
+
+```js
+import { hasCJSSyntax } from 'mlly'
+
+hasESMSyntax('export default foo = 123') // true
+```
+
+### `detectSyntax`
+
+Tests code against both CJS and ESM.
+
+`isMixed` indicates if both are detected! This is a common case with legacy packages exporting semi-compatible ESM syntax meant to be used by bundlers.
+
+```js
+import { detectSyntax } from 'mlly'
+
+// { hasESM: true, hasCJS: true, isMixed: true }
+hasESMSyntax('export default require("lodash")')
+```
+
+## CommonJS Context
+
+### `createCommonJS`
+
+This utility creates a compatible CommonJS context that is missing in ECMAScript modules.
+
+```js
+import { createCommonJS } from 'mlly'
+
+const { __dirname, __filename, require } = createCommonJS(import.meta.url)
+```
+
+Note: `require` and `require.resolve` implementation are lazy functions. [`createRequire`](https://nodejs.org/api/module.html#module_module_createrequire_filename) will be called on first usage.
+
+
+## Import/Export Analyzes
+
+Tools to quikcly analyze ESM synax and extract static `import`/`export`
+  - Super fast Regex based implementation
+  - Handle most of edge cases
+  - Find all static ESM imports
+  - Find all dynamic ESM imports
+  - Parse static import statement
+  - Find all named, declared and default exports
+
 
 ### `findStaticImports`
 
@@ -290,77 +322,61 @@ Outputs:
 ]
 ```
 
-## Syntax detection
+## Evaluating Modules
 
-### `isValidNodeImport`
+Set of utilities to evaluate ESM modules using `data:` imports
+  - Allow evaluating modules using
+  - Automatic import rewrite to resolved path using static analyzes
+  - Allow bypass ESM Cache
+  - Stack-trace support
+  - `.json` loader
 
-Using various syntax detection and huristics, this method an import is a valid import or not to be imported using dynamic `import()`.
+### `evalModule`
 
-Note: This method also allows using dynamic import of CommonJS libraries considering
-Node.js has [Interoperability with CommonJS](https://nodejs.org/api/esm.html#interoperability-with-commonjs).
-
-When resault is `false`, we usually need a to create a CommonJS require context or add specific rules to the bundler to transform dependency.
-
-```js
-import { isValidNodeImport } from 'mlly'
-
-// If returns true, we are safe to use `import('some-lib')`
-await isValidNodeImport('some-lib', {})
-```
-
-**Algorithm:**
-
-- Check import protocol
-    - If is `data:` return `true` (✅ valid)
-    - If is not `node:`, `file:` or `data:`, return `false` (
-❌ invalid)
-- Resolve full path of import using Node.js [Resolution algorithm](https://nodejs.org/api/esm.html#resolution-algorithm)
-- Check full path extension
-  - If is `.mjs`, `.cjs`, `.node` or `.wasm`, return `true` (✅ valid)
-  - If is not `.js`, return `false` (❌ invalid)
-  - If is matching known mixed syntax (`.esm.js`, `.es.js`, etc) return `false` (
-❌ invalid)
-- Read closest `package.json` file to resolve path
-- If `type: 'module'` field is set, return `true` (✅ valid)
-- Read source code of resolved path
-- Try to detect CommonJS syntax usage
-  - If yes, return `true` (✅ valid)
-- Try to detect ESM syntax usage
-  - if yes, return `false` (
-❌ invalid)
-
-### `hasESMSyntax`
-
-Detect if code, has usage of ESM syntax (Static `import`, ESM `export` and `import.meta` usage)
+Transform and evaluates module code using dynamic imports.
 
 ```js
-import { hasESMSyntax } from 'mlly'
+import { evalModule } from 'mlly'
 
-hasESMSyntax('export default foo = 123') // true
+await evalModule(`console.log("Hello World!")`)
+
+await evalModule(`
+  import { reverse } from './utils.mjs'
+  console.log(reverse('!emosewa si sj'))
+`, { url: import.meta.url })
 ```
 
-### `hasCJSSyntax`
+**Options:**
 
-Detect if code, has usage of CommonJS syntax (`exports`, `module.exports`, `require` and `global` usage)
+- all `resolve` options
+- `url`: File URL
+
+### `loadModule`
+
+Dynamically loads a module by evaluating source code.
 
 ```js
-import { hasCJSSyntax } from 'mlly'
+import { loadModule } from 'mlly'
 
-hasESMSyntax('export default foo = 123') // true
+await loadModule('./hello.mjs', { url: import.meta.url })
 ```
 
-### `detectSyntax`
+Options are same as `evalModule`.
 
-Tests code against both CJS and ESM.
+### `transformModule`
 
-`isMixed` indicates if both are detected! This is a common case with legacy packages exporting semi-compatible ESM syntax meant to be used by bundlers.
+- Resolves all relative imports will be resolved
+- All usages of `import.meta.url` will be replaced with `url` or `from` option
 
 ```js
-import { detectSyntax } from 'mlly'
-
-// { hasESM: true, hasCJS: true, isMixed: true }
-hasESMSyntax('export default require("lodash")')
+import { toDataURL } from 'mlly'
+console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' })
 ```
+
+Options are same as `evalModule`.
+
+
+
 
 ## Other Utils
 
@@ -449,4 +465,4 @@ console.log(sanitizeFilePath('C:\\te#st\\[...slug].jsx'))
 
 ## License
 
-MIT
+[MIT](./LICENSE) - Made with ❤️
