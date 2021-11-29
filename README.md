@@ -381,38 +381,38 @@ Utilities to generate JavaScript code for ESM syntax.
 
 ### `genImport`
 
-Generate an static import statement.
+Generate a static import statement.
 
 ```js
 import { genImport } from 'mlly'
 
-// import { foo } from 'pkg'
+// import { foo } from "pkg"
 console.log(genImport('pkg', 'foo'))
 
-// import { a, b } from 'pkg'
+// import { a, b } from "pkg"
 console.log(genImport('pkg', 'foo'))
 
-// import { foo as bar } from 'pkg'
+// import { foo as bar } from "pkg"
 console.log(genImport('pkg', { name: 'foo', as: 'bar' }))
 ```
 
 ### `genDynamicImport`
 
-Generate an dynamic import statement.
+Generate a dynamic import statement.
 
 ```js
 import { genDynamicImport } from 'mlly'
 
-// () => import('pkg')
+// () => import("pkg")
 console.log(genDynamicImport('pkg'))
 
-// () => import('pkg').then(m => m.default || m)
+// () => import("pkg").then(m => m.default || m)
 console.log(genDynamicImport('pkg', { interopDefault: true }))
 
-// import('pkg')
+// import("pkg")
 console.log(genDynamicImport('pkg', { wrapper: false }))
 
-// () => import('pkg' /* webpackChunkName: "pkg" */)
+// () => import("pkg" /* webpackChunkName: "pkg" */)
 console.log(genDynamicImport('pkg', { comment: 'webpackChunkName: "pkg"' }))
 ```
 
