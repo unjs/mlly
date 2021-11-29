@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.14](https://github.com/unjs/mlly/compare/v0.3.13...v0.3.14) (2021-11-29)
+
+
+### Bug Fixes
+
+* **findExports:** detect `async function` ([9fcc555](https://github.com/unjs/mlly/commit/9fcc5551bfbc188781b7d59dcd8383921fbd4ae9))
+
 ### [0.3.13](https://github.com/unjs/mlly/compare/v0.3.12...v0.3.13) (2021-11-11)
 
 
