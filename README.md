@@ -381,7 +381,7 @@ Utilities to generate JavaScript code for ESM syntax.
 
 ### `genImport` and `genExport`
 
-Generate a static import statement.
+Generate a static import/export statement.
 
 ```js
 import { genImport, genExport } from 'mlly'
@@ -393,7 +393,16 @@ console.log(genImport('pkg', 'foo'))
 console.log(genImport('pkg', ['a', 'b'])) 
 
 // import { foo as bar } from "pkg"
-console.log(genImport('pkg', { name: 'foo', as: 'bar' }))
+console.log(genImport('pkg', [{ name: 'foo', as: 'bar' }]))
+
+// export foo from "pkg"
+console.log(genExport('pkg', 'foo'))
+
+// export { a, b } from "pkg"
+console.log(genExport('pkg', ['a', 'b'])) 
+
+// export * as bar from "pkg"
+console.log(genExport('pkg', { name: '*foo*', as: 'bar' }))
 ```
 
 ### `genDynamicImport`
