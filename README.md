@@ -379,18 +379,18 @@ Options are same as `evalModule`.
 
 Utilities to generate JavaScript code for ESM syntax.
 
-### `genImport`
+### `genImport` and `genExport`
 
 Generate a static import statement.
 
 ```js
-import { genImport } from 'mlly'
+import { genImport, genExport } from 'mlly'
 
-// import { foo } from "pkg"
+// import foo from "pkg"
 console.log(genImport('pkg', 'foo'))
 
 // import { a, b } from "pkg"
-console.log(genImport('pkg', 'foo'))
+console.log(genImport('pkg', ['a', 'b'])) 
 
 // import { foo as bar } from "pkg"
 console.log(genImport('pkg', { name: 'foo', as: 'bar' }))
