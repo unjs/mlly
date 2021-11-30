@@ -17,7 +17,7 @@ describe('genImport', () => {
     })
   }
 })
-Y
+
 const genExportTests = [
   { names: 'foo', code: 'export foo from "pkg";' },
   { names: ['foo'], code: 'export { foo } from "pkg";' },
