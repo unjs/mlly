@@ -377,7 +377,7 @@ Options are same as `evalModule`.
 
 ## Code Generation
 
-Utilities to generate JavaScript code for ESM syntax.
+Utilities to generate JavaScript code.
 
 ### `genImport`
 
@@ -414,6 +414,26 @@ console.log(genDynamicImport('pkg', { wrapper: false }))
 
 // () => import("pkg" /* webpackChunkName: "pkg" */)
 console.log(genDynamicImport('pkg', { comment: 'webpackChunkName: "pkg"' }))
+```
+
+### `genObjectFromRaw`, `genObjectFromRawEntries`, `genArrayFromRaw`
+
+Utilities to generate valid JS objects from raw objects or entry arrays. All keys will 
+
+```js
+import { genObjectFromRaw, genObjectFromRawEntries, genArrayFromRaw } from 'mlly'
+
+const rawObject = { test: '() => import("pkg")' }
+// { test: () => import("pkg") }
+console.log(genObjectFromRaw(rawObject))
+
+const entries = [ ['test', '() => import("pkg")'] ]
+// { test: () => import("pkg") }
+console.log(genObjectFromRawEntries(entries))
+
+const array = ['1', '2', '() => import("pkg")']
+// [ 1, 2, () => import("pkg") ]
+console.log(genArrayFromRaw(array))
 ```
 
 ## Other Utils
