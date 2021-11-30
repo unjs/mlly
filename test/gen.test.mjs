@@ -62,7 +62,11 @@ const genObjectFromRawTests = [
       '      foo: "bar"',
       '    }',
       '  },',
-      '  arr: [1, 2, 3]',
+      '  arr: [',
+      '    1,',
+      '    2,',
+      '    3',
+      '  ]',
       '}'
     ].join('\n')
   }
