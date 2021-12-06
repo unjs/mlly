@@ -57,7 +57,7 @@ console.log(await resolve('./module.mjs', { url: import.meta.url }))
 
 **Resolve options:**
 
-- `from`: URL or string (default is `pwd()`)
+- `url`: URL or string to resolve from (default is `pwd()`)
 - `conditions`: Array of conditions used for resolution algorithm (default is `['node', 'import']`)
 - `extensions`: Array of additional extensions to check if import failed (default is `['.mjs', '.cjs', '.js', '.json']`)
 
