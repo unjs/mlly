@@ -82,7 +82,7 @@ export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptio
   const pkg = await readPackageJSON(resolvedPath).catch(() => null)
   if (pkg?.type === 'module') { return true }
 
-  const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null)
+  const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null) || ''
 
   return hasCJSSyntax(code) || !hasESMSyntax(code)
 }
