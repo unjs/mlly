@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.16](https://github.com/unjs/mlly/compare/v0.3.15...v0.3.16) (2021-12-17)
+
+
+### Bug Fixes
+
+* improve esm detection with export declartion ([#27](https://github.com/unjs/mlly/issues/27)) ([0511a93](https://github.com/unjs/mlly/commit/0511a93d3565f3a2a6679fc09a3e6ce349724478))
+
 ### [0.3.15](https://github.com/unjs/mlly/compare/v0.3.14...v0.3.15) (2021-11-29)
 
 
