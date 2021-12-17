@@ -5,7 +5,7 @@ import { ResolveOptions, resolvePath } from './resolve'
 import { isNodeBuiltin } from './utils'
 import { getProtocol } from './_utils'
 
-const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*([*{]|default|type)|import\.meta\b)/m
+const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*(?:[*{]|default|type|function|const|var|let|async function)|import\.meta\b)/m
 
 const BUILTIN_EXTENSIONS = new Set(['.mjs', '.cjs', '.node', '.wasm'])
 
@@ -82,7 +82,7 @@ export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptio
   const pkg = await readPackageJSON(resolvedPath).catch(() => null)
   if (pkg?.type === 'module') { return true }
 
-  const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null)
+  const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null) || ''
 
   return hasCJSSyntax(code) || !hasESMSyntax(code)
 }

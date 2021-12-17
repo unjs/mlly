@@ -14,10 +14,12 @@ const staticTests = {
   'import defaultExport, { export1, export2 } from "module-name";': { hasESM: true, hasCJS: false, isMixed: false },
   'import defaultExport, * as name from"module-name";': { hasESM: true, hasCJS: false, isMixed: false },
   'import"module-name"': { hasESM: true, hasCJS: false, isMixed: false },
-  //
   'import defaultMember from "module-name";': { hasESM: true, hasCJS: false, isMixed: false },
   'import "./file.mjs"': { hasESM: true, hasCJS: false, isMixed: false },
   'export default b=""': { hasESM: true, hasCJS: false, isMixed: false },
+  'export const a = 1': { hasESM: true, hasCJS: false, isMixed: false },
+  'export function hi() {}': { hasESM: true, hasCJS: false, isMixed: false },
+  'export async function foo() {}': { hasESM: true, hasCJS: false, isMixed: false },
   // CJS
   'exports.c={}': { hasESM: false, hasCJS: true, isMixed: false },
   'const b=true;module.exports={b};': { hasESM: false, hasCJS: true, isMixed: false },
