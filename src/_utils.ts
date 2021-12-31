@@ -40,7 +40,8 @@ export function matchAll (regex, string, addition) {
 }
 
 // 2+ letters, to exclude Windows drive letters
-const ProtocolRegex = /^(?<proto>.{2,}):.+$/
+// "{2,}?" to make in ungreedy and dont take "file://C" as protocol
+const ProtocolRegex = /^(?<proto>.{2,}?):.+$/
 
 export function getProtocol (id: string): string | null {
   const proto = id.match(ProtocolRegex)
