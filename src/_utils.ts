@@ -38,11 +38,3 @@ export function matchAll (regex, string, addition) {
   }
   return matches
 }
-
-// 2+ letters, to exclude Windows drive letters
-const ProtocolRegex = /^(?<proto>.{2,}):.+$/
-
-export function getProtocol (id: string): string | null {
-  const proto = id.match(ProtocolRegex)
-  return proto ? proto.groups.proto : null
-}

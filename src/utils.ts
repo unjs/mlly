@@ -51,3 +51,12 @@ export function isNodeBuiltin (id: string = '') {
   id = id.replace(/^node:/, '').split('/')[0]
   return BUILTIN_MODULES.has(id)
 }
+
+// 2+ letters, to exclude Windows drive letters
+// "{2,}?" to make in ungreedy and dont take "file://C" as protocol
+const ProtocolRegex = /^(?<proto>.{2,}?):.+$/
+
+export function getProtocol (id: string): string | null {
+  const proto = id.match(ProtocolRegex)
+  return proto ? proto.groups.proto : null
+}

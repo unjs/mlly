@@ -1,4 +1,4 @@
-import { isNodeBuiltin, sanitizeFilePath } from 'mlly'
+import { isNodeBuiltin, sanitizeFilePath, getProtocol } from 'mlly'
 import { expect } from 'chai'
 
 describe('isNodeBuiltin', () => {
@@ -39,5 +39,18 @@ describe('sanitizeFilePath', () => {
 
   it('undefined', () => {
     expect(sanitizeFilePath()).to.equal('')
+  })
+})
+
+describe('getProtocol', () => {
+  it('no protocol', () => {
+    expect(getProtocol('/src/a.ts')).to.equal(null)
+    expect(getProtocol('C:/src/a.ts')).to.equal(null)
+  })
+
+  it('file protocol', () => {
+    expect(getProtocol('file://src/a.ts')).to.equal('file')
+    expect(getProtocol('file://C:/src/a.ts')).to.equal('file')
+    expect(getProtocol('file:///C:/src/a.ts')).to.equal('file')
   })
 })
