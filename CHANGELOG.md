@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.17](https://github.com/unjs/mlly/compare/v0.3.16...v0.3.17) (2022-01-07)
+
+
+### Bug Fixes
+
+* get actual protocol for windows instead of protocol + drive ([#28](https://github.com/unjs/mlly/issues/28)) ([15140cc](https://github.com/unjs/mlly/commit/15140cca5352b2b839bb06887dfe66bd369fa7f1))
+
 ### [0.3.16](https://github.com/unjs/mlly/compare/v0.3.15...v0.3.16) (2021-12-17)
 
 
