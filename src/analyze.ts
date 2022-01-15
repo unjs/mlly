@@ -29,8 +29,8 @@ export interface ESMExport {
   type: 'declaration' | 'named' | 'default',
   code: string
   start: number
-  end: number,
-  name?: string,
+  end: number
+  name?: string
   names: string[]
 }
 
@@ -54,7 +54,7 @@ export const ESM_STATIC_IMPORT_RE = /^(?<=\s*)import\s*(["'\s]*(?<imports>[\w*${
 export const DYNAMIC_IMPORT_RE = /import\s*\((?<expression>(?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gm
 
 export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|function|let|const|var|class))\s+(?<name>[\w$_]+)/g
-const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+)}/g
+const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+)}(\s*from\s*["']\s*(?<specifier>.*[@\w_-]+)\s*["'][^\n]*)?/g
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g
 
 export function findStaticImports (code: string): StaticImport[] {
