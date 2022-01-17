@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.19](https://github.com/unjs/mlly/compare/v0.3.18...v0.3.19) (2022-01-17)
+
+
+### Bug Fixes
+
+* add specifer to NamedExport type ([#31](https://github.com/unjs/mlly/issues/31)) ([1ca4d30](https://github.com/unjs/mlly/commit/1ca4d307e975f15bc814f53ea6f63efa52cf63c8))
+
 ### [0.3.18](https://github.com/unjs/mlly/compare/v0.3.17...v0.3.18) (2022-01-17)
 
 
