@@ -32,6 +32,7 @@ export interface ESMExport {
   end: number
   name?: string
   names: string[]
+  specifier?: string
 }
 
 export interface DeclarationExport extends ESMExport {
@@ -44,6 +45,7 @@ export interface NamedExport extends ESMExport {
   type: 'named'
   exports: string
   names: string[]
+  specifier?: string
 }
 
 export interface DefaultExport extends ESMExport {
