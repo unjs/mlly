@@ -25,8 +25,8 @@ export interface DynamicImport extends ESMImport {
 }
 
 export interface ESMExport {
-  _type?: 'declaration' | 'named' | 'default',
-  type: 'declaration' | 'named' | 'default',
+  _type?: 'declaration' | 'named' | 'default' | 'star',
+  type: 'declaration' | 'named' | 'default' | 'star',
   code: string
   start: number
   end: number
@@ -57,6 +57,7 @@ export const DYNAMIC_IMPORT_RE = /import\s*\((?<expression>(?:[^)(]+|\((?:[^)(]+
 
 export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|function|let|const|var|class))\s+(?<name>[\w$_]+)/g
 const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+)}(\s*from\s*["']\s*(?<specifier>.*[@\w_-]+)\s*["'][^\n]*)?/g
+const EXPORT_STAR_RE = /\bexport\s*(\*)\s*(\s*from\s*["']\s*(?<specifier>.*[@\w_-]+)\s*["'][^\n]*)?/g
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g
 
 export function findStaticImports (code: string): StaticImport[] {
@@ -104,8 +105,11 @@ export function findExports (code: string): ESMExport[] {
   // Find export default
   const defaultExport = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default', name: 'default' })
 
+  // Find export star
+  const starExports = matchAll(EXPORT_STAR_RE, code, { type: 'star' })
+
   // Merge and normalize exports
-  const exports = [].concat(declaredExports, namedExports, defaultExport)
+  const exports = [].concat(declaredExports, namedExports, defaultExport, starExports)
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0]
