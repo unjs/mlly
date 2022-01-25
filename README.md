@@ -375,47 +375,6 @@ console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' }
 
 Options are same as `evalModule`.
 
-## Code Generation
-
-Utilities to generate JavaScript code for ESM syntax.
-
-### `genImport`
-
-Generate a static import statement.
-
-```js
-import { genImport } from 'mlly'
-
-// import { foo } from "pkg"
-console.log(genImport('pkg', 'foo'))
-
-// import { a, b } from "pkg"
-console.log(genImport('pkg', 'foo'))
-
-// import { foo as bar } from "pkg"
-console.log(genImport('pkg', { name: 'foo', as: 'bar' }))
-```
-
-### `genDynamicImport`
-
-Generate a dynamic import statement.
-
-```js
-import { genDynamicImport } from 'mlly'
-
-// () => import("pkg")
-console.log(genDynamicImport('pkg'))
-
-// () => import("pkg").then(m => m.default || m)
-console.log(genDynamicImport('pkg', { interopDefault: true }))
-
-// import("pkg")
-console.log(genDynamicImport('pkg', { wrapper: false }))
-
-// () => import("pkg" /* webpackChunkName: "pkg" */)
-console.log(genDynamicImport('pkg', { comment: 'webpackChunkName: "pkg"' }))
-```
-
 ## Other Utils
 
 ### `fileURLToPath`
