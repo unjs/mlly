@@ -4,7 +4,7 @@
 
 While ESM Modules are evolving in Node.js ecosystem, there are still
  many required features that are still experimental or missing or needed to support ESM. This package tries to fill in the gap.
-
+url
 ## Usage
 
 Install npm package:
@@ -52,7 +52,7 @@ Additionally supports resolving without extension and `/index` similar to Common
 import { resolve } from 'mlly'
 
 // file:///home/user/project/module.mjs
-console.log(await resolve('./module.mjs', { url: import.meta.url }))
+console.log(await resolve('./module.mjs', { from: import.meta.url }))
 ```
 
 **Resolve options:**
@@ -69,7 +69,7 @@ Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
 import { resolvePath } from 'mlly'
 
 // //home/user/project/module.mjs
-console.log(await resolvePath('./module.mjs', { url: import.meta.url }))
+console.log(await resolvePath('./module.mjs', { from: import.meta.url }))
 ```
 
 ### `createResolve`
@@ -79,7 +79,7 @@ Create a `resolve` function with defaults.
 ```js
 import { createResolve } from 'mlly'
 
-const _resolve = createResolve({ url: import.meta.url })
+const _resolve = createResolve({ from: import.meta.url })
 
 // file:///home/user/project/module.mjs
 console.log(await _resolve('./module.mjs'))
@@ -90,7 +90,7 @@ console.log(await _resolve('./module.mjs'))
 ```js
 import { createResolve } from 'mlly'
 
-import.meta.resolve = createResolve({ url: import.meta.url })
+import.meta.resolve = createResolve({ from: import.meta.url })
 ```
 
 ### `resolveImports`
@@ -101,7 +101,7 @@ Resolve all static and dynamic imports with relative paths to full resolved path
 import { resolveImports } from 'mlly'
 
 // import foo from 'file:///home/user/project/bar.mjs'
-console.log(await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }))
+console.log(await resolveImports(`import foo from './bar.mjs'`, { from: import.meta.url }))
 ```
 
 
