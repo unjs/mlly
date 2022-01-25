@@ -4,7 +4,7 @@
 
 While ESM Modules are evolving in Node.js ecosystem, there are still
  many required features that are still experimental or missing or needed to support ESM. This package tries to fill in the gap.
-url
+
 ## Usage
 
 Install npm package:
