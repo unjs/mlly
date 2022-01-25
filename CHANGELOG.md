@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/unjs/mlly/compare/v0.4.0...v0.4.1) (2022-01-25)
+
+
+### Bug Fixes
+
+* **resolve:** ensure absolute id exists and resolved ([f505b7c](https://github.com/unjs/mlly/commit/f505b7ccf3b7978c5bdf1a4c68208a20475d3cfb))
+
 ## [0.4.0](https://github.com/unjs/mlly/compare/v0.3.19...v0.4.0) (2022-01-25)
 
 
