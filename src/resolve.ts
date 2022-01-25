@@ -1,4 +1,4 @@
-import { realpathSync } from 'fs'
+import { existsSync, realpathSync } from 'fs'
 import { pathToFileURL } from 'url'
 import { isAbsolute } from 'pathe'
 import { moduleResolve } from 'import-meta-resolve'
@@ -38,9 +38,11 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     return 'node:' + id
   }
 
-  // Skip absolute
-  if (isAbsolute(id)) {
-    return id
+  // Skip resolve for absolute paths
+  if (isAbsolute(id) && existsSync(id)) {
+    // Resolve realPath and normalize slash
+    const realPath = realpathSync(fileURLToPath(id))
+    return pathToFileURL(realPath).toString()
   }
 
   // Condition set
