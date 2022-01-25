@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/unjs/mlly/compare/v0.3.19...v0.4.0) (2022-01-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* code-gen utils moved to https://github.com/unjs/knitwork
+
+### Features
+
+* drop code-gen utils (genImport and genDynamicImport) ([42583e1](https://github.com/unjs/mlly/commit/42583e14ad2c8d464bd3107b8a4bea576806ec79))
+* export star ([#33](https://github.com/unjs/mlly/issues/33)) ([3f4e844](https://github.com/unjs/mlly/commit/3f4e844e7993828253196edcfec42b9fe34cc17e))
+
 ### [0.3.19](https://github.com/unjs/mlly/compare/v0.3.18...v0.3.19) (2022-01-17)
 
 
