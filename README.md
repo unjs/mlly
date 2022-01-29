@@ -167,7 +167,7 @@ Detect if code, has usage of CommonJS syntax (`exports`, `module.exports`, `requ
 ```js
 import { hasCJSSyntax } from 'mlly'
 
-hasESMSyntax('export default foo = 123') // true
+hasCJSSyntax('export default foo = 123') // false
 ```
 
 ### `detectSyntax`
@@ -180,7 +180,7 @@ Tests code against both CJS and ESM.
 import { detectSyntax } from 'mlly'
 
 // { hasESM: true, hasCJS: true, isMixed: true }
-hasESMSyntax('export default require("lodash")')
+detectSyntax('export default require("lodash")')
 ```
 
 ## CommonJS Context
