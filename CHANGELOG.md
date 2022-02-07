@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.2](https://github.com/unjs/mlly/compare/v0.4.1...v0.4.2) (2022-02-07)
+
+
+### Bug Fixes
+
+* prevent multiple exports of multiple signatures ([#39](https://github.com/unjs/mlly/issues/39)) ([d492116](https://github.com/unjs/mlly/commit/d4921168d9fddff9354177116b220f3669b6169f))
+
 ### [0.4.1](https://github.com/unjs/mlly/compare/v0.4.0...v0.4.1) (2022-01-25)
 
 
