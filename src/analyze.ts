@@ -109,7 +109,11 @@ export function findExports (code: string): ESMExport[] {
   const starExports = matchAll(EXPORT_STAR_RE, code, { type: 'star' })
 
   // Merge and normalize exports
-  const exports = [].concat(declaredExports, namedExports, defaultExport, starExports)
+  const exports = [].concat(declaredExports, namedExports, defaultExport, starExports).filter((exp, index, exports) => {
+    // Prevent multiple exports of same function, only keep latest iteration of signatures
+    return !exports[index + 1] || exp.name !== exports[index + 1].name
+  })
+
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0]
