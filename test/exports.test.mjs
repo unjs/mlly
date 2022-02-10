@@ -34,5 +34,13 @@ describe('findExports', () => {
         }
       })
     }
+    it('handles multiple exports', () => {
+      const matches = findExports(`
+        export { useTestMe1 } from "@/test/foo1";
+        export { useTestMe2 } from "@/test/foo2";
+        export { useTestMe3 } from "@/test/foo3";
+      `)
+      expect(matches.length).to.eql(3)
+    })
   })
 })
