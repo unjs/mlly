@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.3](https://github.com/unjs/mlly/compare/v0.4.2...v0.4.3) (2022-02-11)
+
+
+### Bug Fixes
+
+* test for name after normalisation ([#40](https://github.com/unjs/mlly/issues/40)) ([5fd933b](https://github.com/unjs/mlly/commit/5fd933b4ea6c5e2fde1bcbe377b42e86172fba68))
+
 ### [0.4.2](https://github.com/unjs/mlly/compare/v0.4.1...v0.4.2) (2022-02-07)
 
 
