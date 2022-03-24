@@ -46,10 +46,10 @@ const staticTests = {
   'import "module-name";': {
     specifier: 'module-name'
   },
-  'import { thing } from "module-name";import { other } from "other-module"': {
+  'import { thing } from "module-name";import { other } from "other-module"': [{
     specifier: 'module-name',
     namedImports: { thing: 'thing' }
-  }
+  }]
 }
 
 staticTests[`import {
@@ -98,26 +98,28 @@ const dynamicTests = {
 }
 
 describe('findStaticImports', () => {
-  for (const [input, test] of Object.entries(staticTests)) {
+  for (const [input, _results] of Object.entries(staticTests)) {
     it(input.replace(/\n/g, '\\n'), () => {
       const matches = findStaticImports(input)
-      expect(matches.length).to.equal(1)
+      const results = Array.isArray(_results) ? _results : [_results]
 
-      const match = matches[0]
-      expect(match.type).to.equal('static')
+      results.forEach((test, index) => {
+        const match = matches[index]
+        expect(match.type).to.equal('static')
 
-      expect(match.specifier).to.equal(test.specifier)
+        expect(match.specifier).to.equal(test.specifier)
 
-      const parsed = parseStaticImport(match)
-      if (test.defaultImport) {
-        expect(parsed.defaultImport).to.equals(test.defaultImport)
-      }
-      if (test.namedImports) {
-        expect(parsed.namedImports).to.eql(test.namedImports)
-      }
-      if (test.namespacedImport) {
-        expect(parsed.namespacedImport).to.eql(test.namespacedImport)
-      }
+        const parsed = parseStaticImport(match)
+        if (test.defaultImport) {
+          expect(parsed.defaultImport).to.equals(test.defaultImport)
+        }
+        if (test.namedImports) {
+          expect(parsed.namedImports).to.eql(test.namedImports)
+        }
+        if (test.namespacedImport) {
+          expect(parsed.namespacedImport).to.eql(test.namespacedImport)
+        }
+      })
     })
   }
 })
