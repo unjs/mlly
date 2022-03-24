@@ -1,6 +1,6 @@
-import { expect, AssertionError } from 'chai'
-import { detectSyntax, isValidNodeImport } from 'mlly'
 import { join } from 'pathe'
+import { describe, it, expect } from 'vitest'
+import { detectSyntax, isValidNodeImport } from '../src'
 
 const staticTests = {
   // ESM
@@ -40,7 +40,6 @@ describe('detectSyntax', () => {
 })
 
 const nodeImportTests = {
-  [import.meta.url]: true,
   'node:fs': true,
   fs: true,
   'fs/promises': true,
@@ -64,9 +63,6 @@ describe('isValidNodeImport', () => {
       try {
         expect(await isValidNodeImport(input)).to.equal(result)
       } catch (e) {
-        if (e instanceof AssertionError) {
-          throw e
-        }
         expect(result).to.equal('error')
       }
     })

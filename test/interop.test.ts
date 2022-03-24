@@ -1,5 +1,5 @@
-import { expect } from 'chai'
-import { interopDefault } from 'mlly'
+import { describe, it, expect } from 'vitest'
+import { interopDefault } from '../src'
 
 const tests = [
   [{}, {}],

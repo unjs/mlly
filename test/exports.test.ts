@@ -1,5 +1,5 @@
-import { expect } from 'chai'
-import { findExports } from 'mlly'
+import { describe, it, expect } from 'vitest'
+import { findExports } from '../src'
 
 describe('findExports', () => {
   const tests = {

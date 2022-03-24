@@ -1,5 +1,5 @@
-import { isNodeBuiltin, sanitizeFilePath, getProtocol } from 'mlly'
-import { expect } from 'chai'
+import { describe, it, expect } from 'vitest'
+import { isNodeBuiltin, sanitizeFilePath, getProtocol } from '../src'
 
 describe('isNodeBuiltin', () => {
   const cases = {

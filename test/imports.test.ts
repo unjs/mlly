@@ -1,5 +1,5 @@
-import { expect } from 'chai'
-import { findDynamicImports, findStaticImports, parseStaticImport } from 'mlly'
+import { describe, it, expect } from 'vitest'
+import { findDynamicImports, findStaticImports, parseStaticImport } from '../src'
 
 // -- Static import --
 

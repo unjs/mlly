@@ -18,21 +18,23 @@
   ],
   "scripts": {
     "build": "unbuild",
+    "dev": "vitest",
     "lint": "eslint --ext .ts src",
-    "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
-    "test": "yarn build && mocha ./test/**/*.test.mjs"
+    "release": "pnpm test && pnpm build && standard-version && pnpm publish && git push --follow-tags",
+    "test": "pnpm lint && vitest run"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
-    "chai": "^4.3.4",
+    "c8": "^7.11.0",
     "eslint": "latest",
-    "import-meta-resolve": "^1.1.1",
-    "jiti": "^1.12.5",
-    "mocha": "^9.1.2",
-    "pathe": "^0.2.0",
-    "pkg-types": "^0.3.1",
+    "import-meta-resolve": "latest",
+    "jiti": "latest",
+    "pathe": "latest",
+    "pkg-types": "latest",
     "standard-version": "latest",
-    "unbuild": "^0.5.7"
-  }
+    "unbuild": "latest",
+    "vitest": "^0.7.10"
+  },
+  "packageManager": "pnpm@6.32.3"
 }
