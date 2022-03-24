@@ -45,6 +45,10 @@ const staticTests = {
   },
   'import "module-name";': {
     specifier: 'module-name'
+  },
+  'import { thing } from "module-name";import { other } from "other-module"': {
+    specifier: 'module-name',
+    namedImports: { thing: 'thing' }
   }
 }
 
