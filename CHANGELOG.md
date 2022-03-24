@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/unjs/mlly/compare/v0.4.3...v0.5.0) (2022-03-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **pkg:** avoid inlining dependencies
+
+### Bug Fixes
+
+* improve regexp for multiple imports on same line ([#41](https://github.com/unjs/mlly/issues/41)) ([bc64246](https://github.com/unjs/mlly/commit/bc64246a907b09c597093b36da93291a23cb305b))
+
+
+* **pkg:** avoid inlining dependencies ([0c28f44](https://github.com/unjs/mlly/commit/0c28f44db5643e3d4520aabf09a158082f31b746))
+
 ### [0.4.3](https://github.com/unjs/mlly/compare/v0.4.2...v0.4.3) (2022-02-11)
 
 
