@@ -102,9 +102,9 @@ describe('findStaticImports', () => {
     it(input.replace(/\n/g, '\\n'), () => {
       const matches = findStaticImports(input)
       const results = Array.isArray(_results) ? _results : [_results]
-
-      results.forEach((test, index) => {
-        const match = matches[index]
+      for (let i = 0; i < results.length; i++) {
+        const test = results[i]
+        const match = matches[i]
         expect(match.type).to.equal('static')
 
         expect(match.specifier).to.equal(test.specifier)
@@ -119,7 +119,7 @@ describe('findStaticImports', () => {
         if (test.namespacedImport) {
           expect(parsed.namespacedImport).to.eql(test.namespacedImport)
         }
-      })
+      }
     })
   }
 })
