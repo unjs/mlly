@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/unjs/mlly/compare/v0.5.0...v0.5.1) (2022-03-25)
+
+
+### Bug Fixes
+
+* inline import-meta-resolve ([2c0a147](https://github.com/unjs/mlly/commit/2c0a147641fb78f2455378caf88e48b9565e2477))
+
 ## [0.5.0](https://github.com/unjs/mlly/compare/v0.4.3...v0.5.0) (2022-03-24)
 
 
