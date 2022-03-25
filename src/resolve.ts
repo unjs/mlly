@@ -1,7 +1,7 @@
 import { existsSync, realpathSync } from 'fs'
 import { pathToFileURL } from 'url'
 import { isAbsolute } from 'pathe'
-import { moduleResolve } from 'import-meta-resolve'
+import { moduleResolve } from '../lib/import-meta-resolve'
 import { fileURLToPath, normalizeid } from './utils'
 import { pcall, BUILTIN_MODULES } from './_utils'
 

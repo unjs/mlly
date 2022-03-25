@@ -44,7 +44,7 @@ Several utilities to make ESM resolution easier:
 ### `resolve`
 
 Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
-(internally using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve) that exposes Node.js implementation).
+(based on experimental Node.js implementation extracted from [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve)).
 
 Additionally supports resolving without extension and `/index` similar to CommonJS.
 
