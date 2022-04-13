@@ -46,10 +46,16 @@ const staticTests = {
   'import "module-name";': {
     specifier: 'module-name'
   },
-  'import { thing } from "module-name";import { other } from "other-module"': [{
-    specifier: 'module-name',
-    namedImports: { thing: 'thing' }
-  }]
+  'import { thing } from "module-name";import { other } from "other-module"': [
+    {
+      specifier: 'module-name',
+      namedImports: { thing: 'thing' }
+    }, {
+      specifier: 'other-module',
+      namedImports: { other: 'other' }
+    }
+  ],
+  '"import"===node.object.meta.name&&"': []
 }
 
 staticTests[`import {
@@ -102,6 +108,7 @@ describe('findStaticImports', () => {
     it(input.replace(/\n/g, '\\n'), () => {
       const matches = findStaticImports(input)
       const results = Array.isArray(_results) ? _results : [_results]
+      expect(results.length).toEqual(matches.length)
       for (let i = 0; i < results.length; i++) {
         const test = results[i]
         const match = matches[i]

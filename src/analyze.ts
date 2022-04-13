@@ -52,7 +52,7 @@ export interface DefaultExport extends ESMExport {
   type: 'default'
 }
 
-export const ESM_STATIC_IMPORT_RE = /(?<=\s*|^|;)import\s*(["'\s]*(?<imports>[\w*${}\n\r\t, /]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][\s;]*/gm
+export const ESM_STATIC_IMPORT_RE = /(?<=\s|^|;)import\s*(["'\s]*(?<imports>[\w*${}\n\r\t, /]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][\s;]*/gm
 export const DYNAMIC_IMPORT_RE = /import\s*\((?<expression>(?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gm
 
 export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|function|let|const|var|class))\s+(?<name>[\w$_]+)/g
