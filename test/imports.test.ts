@@ -4,7 +4,6 @@ import { findDynamicImports, findStaticImports, parseStaticImport } from '../src
 // -- Static import --
 
 const staticTests = {
-
   'import defaultMember from "module-name";': {
     specifier: 'module-name',
     defaultImport: 'defaultMember'
@@ -55,8 +54,17 @@ const staticTests = {
       namedImports: { other: 'other' }
     }
   ],
+  // Edge cases
   '"import"===node.object.meta.name&&"': []
 }
+
+staticTests[`
+Object.freeze(['node', 'import'])
+const a = 123
+
+const b = new Set(['node', 'import'])
+const c = ['.mjs', '.cjs', '.js', '.json']
+`] = []
 
 staticTests[`import {
   member1,
@@ -108,7 +116,7 @@ describe('findStaticImports', () => {
     it(input.replace(/\n/g, '\\n'), () => {
       const matches = findStaticImports(input)
       const results = Array.isArray(_results) ? _results : [_results]
-      expect(results.length).toEqual(matches.length)
+      expect(matches.length).toEqual(results.length)
       for (let i = 0; i < results.length; i++) {
         const test = results[i]
         const match = matches[i]
