@@ -118,7 +118,7 @@ export function resolvePath (id: string, opts?: ResolveOptions) {
 }
 
 export function createResolve (defaults?: ResolveOptions) {
-  return (id, url) => {
+  return (id: string, url?: ResolveOptions['url']) => {
     return resolve(id, { url, ...defaults })
   }
 }
