@@ -8,7 +8,7 @@ import { pcall, BUILTIN_MODULES } from './_utils'
 const DEFAULT_CONDITIONS_SET = new Set(['node', 'import'])
 const DEFAULT_URL = pathToFileURL(process.cwd())
 const DEFAULT_EXTENSIONS = ['.mjs', '.cjs', '.js', '.json']
-const NOT_FOUND_ERRORS = new Set(['ERR_MODULE_NOT_FOUND', 'ERR_UNSUPPORTED_DIR_IMPORT', 'MODULE_NOT_FOUND'])
+const NOT_FOUND_ERRORS = new Set(['ERR_MODULE_NOT_FOUND', 'ERR_UNSUPPORTED_DIR_IMPORT', 'MODULE_NOT_FOUND', 'ERR_PACKAGE_PATH_NOT_EXPORTED'])
 
 export interface ResolveOptions {
   url?: string | URL | (string | URL)[]
