@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.3](https://github.com/unjs/mlly/compare/v0.5.2...v0.5.3) (2022-06-16)
+
+
+### Features
+
+* support named star export ([#45](https://github.com/unjs/mlly/issues/45)) ([af777cb](https://github.com/unjs/mlly/commit/af777cbe3ce09d23c6a994334e658f1b21e71ea6))
+
+
+### Bug Fixes
+
+* don't throw if module subpath not found ([#46](https://github.com/unjs/mlly/issues/46)) ([37d5bcc](https://github.com/unjs/mlly/commit/37d5bcc221e83be4298a4e52b351900a962823e3))
+* make `url` optional in resolver created with `createResolve` ([#44](https://github.com/unjs/mlly/issues/44)) ([7c1bda4](https://github.com/unjs/mlly/commit/7c1bda4221b8a162e39610ebf9f50f957a32d7f9))
+
 ### [0.5.2](https://github.com/unjs/mlly/compare/v0.5.1...v0.5.2) (2022-04-13)
 
 
