@@ -43,14 +43,13 @@ describe('findExports', () => {
     expect(matches.length).to.eql(3)
   })
 
-  it('works', () => {
+  it('works with multiple named exports', () => {
     const code = `
-import { pauseTracking, resetTracking, isRef, toRaw, isShallow as isShallow$1, isReactive, ReactiveEffect, ref, shallowReadonly, track, reactive, shallowReactive, trigger, isProxy, EffectScope, markRaw, proxyRefs, computed as computed$1, isReadonly } from '@vue/reactivity';
-export { EffectScope, ReactiveEffect, customRef, effect, effectScope, getCurrentScope, isProxy, isReactive, isReadonly, isRef, isShallow, markRaw, onScopeDispose, proxyRefs, reactive, readonly, ref, shallowReactive, shallowReadonly, shallowRef, stop, toRaw, toRef, toRefs, triggerRef, unref } from '@vue/reactivity';
-import { isString, isFunction, isPromise, isArray, NOOP, getGlobalThis, extend, EMPTY_OBJ, toHandlerKey, toNumber, hyphenate, camelize, isOn, hasOwn, isModelListener, hasChanged, remove, isObject, isSet, isMap, isPlainObject, invokeArrayFns, isBuiltInDirective, capitalize, isGloballyWhitelisted, def, isReservedProp, EMPTY_ARR, toRawType, makeMap, NO, normalizeClass, normalizeStyle } from '@vue/shared';
-export { camelize, capitalize, normalizeClass, normalizeProps, normalizeStyle, toDisplayString, toHandlerKey } from '@vue/shared';
+export { foo } from 'foo1';
+export { bar } from 'foo2';
+export { foobar } from 'foo2';
 `
     const matches = findExports(code)
-    expect(matches).to.have.lengthOf(2)
+    expect(matches).to.have.lengthOf(3)
   })
 })
