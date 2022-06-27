@@ -127,6 +127,6 @@ export function findExports (code: string): ESMExport[] {
   return exports.filter((exp, index, exports) => {
     // Prevent multiple exports of same function, only keep latest iteration of signatures
     const nextExport = exports[index + 1]
-    return !nextExport || exp.type !== nextExport.type || exp.name !== nextExport.name
+    return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
 }
