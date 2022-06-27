@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { findExports } from '../src'
+import { ESMExport, findExports } from '../src'
 
 describe('findExports', () => {
-  const tests = {
+  const tests: Record<string, Partial<ESMExport>> = {
     'export function useA () { return \'a\' }': { name: 'useA', type: 'declaration' },
     'export const useD = () => { return \'d\' }': { name: 'useD', type: 'declaration' },
     'export { useB, _useC as useC }': { names: ['useB', 'useC'], type: 'named' },
@@ -18,19 +18,19 @@ describe('findExports', () => {
   for (const [input, test] of Object.entries(tests)) {
     it(input.replace(/\n/g, '\\n'), () => {
       const matches = findExports(input)
-      expect(matches.length).to.equal(1)
+      expect(matches.length).toEqual(1)
       const match = matches[0]
       if (test.type) {
-        expect(match.type).to.eql(test.type)
+        expect(match.type).toEqual(test.type)
       }
       if (test.name) {
-        expect(match.name).to.eql(test.name)
+        expect(match.name).toEqual(test.name)
       }
       if (test.names) {
-        expect(match.names).to.deep.eql(test.names)
+        expect(match.names).toEqual(test.names)
       }
       if (test.specifier) {
-        expect(match.specifier).to.eql(test.specifier)
+        expect(match.specifier).toEqual(test.specifier)
       }
     })
   }
