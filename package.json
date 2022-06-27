@@ -24,8 +24,8 @@
     "test": "pnpm lint && vitest run"
   },
   "dependencies": {
-    "pathe": "^0.3.0",
-    "pkg-types": "^0.3.2"
+    "pathe": "^0.3.1",
+    "pkg-types": "^0.3.3"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
@@ -37,5 +37,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@6.32.23"
+  "packageManager": "pnpm@6.32.24"
 }
