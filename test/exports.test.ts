@@ -53,7 +53,7 @@ export { foobar } from 'foo2';
     expect(matches).to.have.lengthOf(3)
   })
 
-  it('test', () => {
+  it('the commented out export should be filtered out', () => {
     const code = `
       // export { foo } from 'foo1';
       // exports default 'foo';
