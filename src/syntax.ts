@@ -4,7 +4,7 @@ import { readPackageJSON } from 'pkg-types'
 import { ResolveOptions, resolvePath } from './resolve'
 import { isNodeBuiltin, getProtocol } from './utils'
 
-const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*(?:[*{]|default|type|function|const|var|let|async function)|import\.meta\b)/m
+const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m
 
 const BUILTIN_EXTENSIONS = new Set(['.mjs', '.cjs', '.node', '.wasm'])
 

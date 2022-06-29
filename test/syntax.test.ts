@@ -20,6 +20,7 @@ const staticTests = {
   'export const a = 1': { hasESM: true, hasCJS: false, isMixed: false },
   'export function hi() {}': { hasESM: true, hasCJS: false, isMixed: false },
   'export async function foo() {}': { hasESM: true, hasCJS: false, isMixed: false },
+  'export class': { hasESM: true, hasCJS: false, isMixed: false },
   // CJS
   'exports.c={}': { hasESM: false, hasCJS: true, isMixed: false },
   'const b=true;module.exports={b};': { hasESM: false, hasCJS: true, isMixed: false },
