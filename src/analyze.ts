@@ -59,6 +59,7 @@ export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|functi
 const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+)}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
 const EXPORT_STAR_RE = /\bexport\s*(\*)(\s*as\s+(?<name>[\w$_]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g
+const COMMENT_RE = /(\/\*[\s\S]*\*\/)|(\/\/.*)/g
 
 export function findStaticImports (code: string): StaticImport[] {
   return matchAll(ESM_STATIC_IMPORT_RE, code, { type: 'static' })
@@ -93,6 +94,8 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 }
 
 export function findExports (code: string): ESMExport[] {
+  // Filter out commented code to eliminate the effect of regular match export
+  code = filterCommentCode(code)
   // Find declarations like export const foo = 'bar'
   const declaredExports = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
@@ -129,4 +132,12 @@ export function findExports (code: string): ESMExport[] {
     const nextExport = exports[index + 1]
     return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
+}
+
+function filterCommentCode (code: string) {
+  const matchedComments = matchAll(COMMENT_RE, code, { type: 'comments' })
+  for (const matched of matchedComments) {
+    code = code.replace(matched.code, '')
+  }
+  return code
 }
