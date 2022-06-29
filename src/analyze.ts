@@ -135,7 +135,7 @@ export function findExports (code: string): ESMExport[] {
 }
 
 function filterCommentCode (code: string) {
-  const matchedComments = matchAll(COMMENT_RE, code, { type: 'comments' })
+  const matchedComments = matchAll(COMMENT_RE, code, { type: 'comment' })
   for (const matched of matchedComments) {
     code = code.replace(matched.code, '')
   }
