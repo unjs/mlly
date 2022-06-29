@@ -81,9 +81,6 @@ export { foobar } from 'foo2';
       export { bar } from 'foo2';
       export { foobar } from 'foo2';
     `
-    /**
-     * export const a = 123
-     */
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(2)
   })
