@@ -95,7 +95,7 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 
 export function findExports (code: string): ESMExport[] {
   // Filter out commented code to eliminate the effect of regular match export
-  code = filterCommentCode(code)
+  code = code.replace(COMMENT_RE, '').trim()
   // Find declarations like export const foo = 'bar'
   const declaredExports = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
@@ -132,12 +132,4 @@ export function findExports (code: string): ESMExport[] {
     const nextExport = exports[index + 1]
     return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
-}
-
-function filterCommentCode (code: string) {
-  const matchedComments = matchAll(COMMENT_RE, code, { type: 'comment' })
-  for (const matched of matchedComments) {
-    code = code.replace(matched.code, '')
-  }
-  return code
 }
