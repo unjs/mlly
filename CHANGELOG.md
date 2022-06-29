@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/unjs/mlly/compare/v0.5.3...v0.5.4) (2022-06-29)
+
+
+### Bug Fixes
+
+* **detectSyntax:** detect `export class` as esm syntax ([896c8a7](https://github.com/unjs/mlly/commit/896c8a7dd087d041ffb29a00065a4f71d62ed249))
+* **findExports:** filtering for named exports ([#55](https://github.com/unjs/mlly/issues/55)) ([df908fd](https://github.com/unjs/mlly/commit/df908fd509d7357265038b5fec414c41bd3ebd67))
+
 ### [0.5.3](https://github.com/unjs/mlly/compare/v0.5.2...v0.5.3) (2022-06-16)
 
 
