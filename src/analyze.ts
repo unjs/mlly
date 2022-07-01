@@ -94,23 +94,28 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 }
 
 export function findExports (code: string): ESMExport[] {
+  // Return early when there is no legal export statement
+  const exportsLocation = getExportTokenLocation(code)
+  if (!exportsLocation.length) {
+    return []
+  }
   // Find declarations like export const foo = 'bar'
-  const declaredExports = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
+  const declaredExports: DeclarationExport[] = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
   // Find named exports
-  const namedExports = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
+  const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
   for (const namedExport of namedExports) {
     namedExport.names = namedExport.exports.split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim())
   }
 
   // Find export default
-  const defaultExport = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default', name: 'default' })
+  const defaultExport: DefaultExport[] = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default', name: 'default' })
 
   // Find export star
-  const starExports = matchAll(EXPORT_STAR_RE, code, { type: 'star' })
+  const starExports: ESMExport[] = matchAll(EXPORT_STAR_RE, code, { type: 'star' })
 
   // Merge and normalize exports
-  const exports = [].concat(declaredExports, namedExports, defaultExport, starExports)
+  const exports: ESMExport[] = [].concat(declaredExports, namedExports, defaultExport, starExports)
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0]
@@ -123,7 +128,6 @@ export function findExports (code: string): ESMExport[] {
       exp.names = [exp.name]
     }
   }
-  const exportsLocation = getExportTokenLocation(code)
   return exports.filter((exp, index, exports) => {
     // Filter out noise that does not match the semantics of export
     if (!isExportStatement(exportsLocation, exp)) {
@@ -131,7 +135,7 @@ export function findExports (code: string): ESMExport[] {
     }
     // Prevent multiple exports of same function, only keep latest iteration of signatures
     const nextExport = exports[index + 1]
-    return isExportStatement(exportsLocation, exp) || !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
+    return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
 }
 
@@ -139,8 +143,8 @@ interface TokenLocation {
   start: number
   end: number
 }
-function isExportStatement (exportsLcation: TokenLocation[], exp) {
-  return exportsLcation.some(location => exp.start <= location.start && exp.end >= location.end)
+function isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
+  return exportsLocation.some(location => exp.start <= location.start && exp.end >= location.end)
 }
 
 function getExportTokenLocation (code: string) {
