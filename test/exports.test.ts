@@ -36,68 +36,78 @@ describe('findExports', () => {
   }
   it('handles multiple exports', () => {
     const matches = findExports(`
-        export { useTestMe1 } from "@/test/foo1";
-        export { useTestMe2 } from "@/test/foo2";
-        export { useTestMe3 } from "@/test/foo3";
-      `)
+          export { useTestMe1 } from "@/test/foo1";
+          export { useTestMe2 } from "@/test/foo2";
+          export { useTestMe3 } from "@/test/foo3";
+        `)
     expect(matches.length).to.eql(3)
   })
 
   it('works with multiple named exports', () => {
     const code = `
-export { foo } from 'foo1';
-export { bar } from 'foo2';
-export { foobar } from 'foo2';
-`
+  export { foo } from 'foo1';
+  export { bar } from 'foo2';
+  export { foobar } from 'foo2';
+  `
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(3)
   })
 
   it('the commented out export should be filtered out', () => {
     const code = `
-      // export { foo } from 'foo1';
-      // exports default 'foo';
-      // export { useB, _useC as useC };
-      // export function useA () { return 'a' }
-      // export { default } from "./other"
-      // export async function foo () {}
-      // export { foo as default }
-      //export * from "./other"
-      //export * as foo from "./other"
+        // export { foo } from 'foo1';
+        // exports default 'foo';
+        // export { useB, _useC as useC };
+        // export function useA () { return 'a' }
+        // export { default } from "./other"
+        // export async function foo () {}
+        // export { foo as default }
+        //export * from "./other"
+        //export * as foo from "./other"
 
-      /**
-       * export const a = 123
-       * export { foo } from 'foo1';
-       * exports default 'foo'
-       * export function useA () { return 'a' }
-       * export { useB, _useC as useC };
-       *export { default } from "./other"
-       *export async function foo () {}
-       * export { foo as default }
-       * export * from "./other"
-       export * as foo from "./other"
-       */
-      export { bar } from 'foo2';
-      export { foobar } from 'foo2';
-    `
+        /**
+         * export const a = 123
+         * export { foo } from 'foo1';
+         * exports default 'foo'
+         * export function useA () { return 'a' }
+         * export { useB, _useC as useC };
+         *export { default } from "./other"
+         *export async function foo () {}
+         * export { foo as default }
+         * export * from "./other"
+         export * as foo from "./other"
+         */
+        export { bar } from 'foo2';
+        export { foobar } from 'foo2';
+      `
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(2)
   })
   it('export in string', () => {
-    const code = `
-      const test = "Hello world"
-      const test1 = "export { ba1 } from 'foo2'"
-      const test2 = "testexport { bar2 } from 'foo2'"
-      const test3 = "test export { bar3 } from 'foo2'"
-      const test4 = "export { bar4 } from 'foo2' test"
-      const test5 = \`
-        test1
-        export { bar4 } from 'foo2' test
-        test2
-      \`
-      export { bar } from 'foo2';
-      export { foobar } from 'foo2';
-    `
+    const tests: string[] = [
+      'export function useA () { return \'a\' }',
+      'export const useD = () => { return \'d\' }',
+      'export { useB, _useC as useC }',
+      'export default foo',
+      'export { default } from "./other"',
+      'export async function foo ()',
+      'export const $foo = () => {}',
+      'export { foo as default }',
+      'export * from "./other"',
+      'export * as foo from "./other"'
+    ]
+    const code = tests.reduce((codeStr, statement, idx) => {
+      codeStr = `
+        ${codeStr}
+        const test${idx}0 = "${statement}"
+        const test${idx}1 = \`
+          test1
+          ${statement}
+          test2
+        \`
+      `
+      return codeStr
+    }, 'export { bar } from \'foo2\'; \n export { foobar } from \'foo2\';')
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(2)
   })

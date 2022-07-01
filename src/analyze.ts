@@ -1,3 +1,4 @@
+import { tokenizer } from 'acorn'
 import { matchAll } from './_utils'
 
 export interface ESMImport {
@@ -59,12 +60,6 @@ export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|functi
 const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+)}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
 const EXPORT_STAR_RE = /\bexport\s*(\*)(\s*as\s+(?<name>[\w$_]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g
-const MULTI_LINE_COMMENTS_RE = /\/\*.*?\*\//gms
-const SINGLE_LINE_COMMENTS_RE = /\/\/.*$/gm
-const QUOTES_RE = [
-  /['"](.*)export(.*)from(.*)['"]/gm,
-  /[`](.*)export(.*)from(.*)[`]/gms
-]
 
 export function findStaticImports (code: string): StaticImport[] {
   return matchAll(ESM_STATIC_IMPORT_RE, code, { type: 'static' })
@@ -99,8 +94,6 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 }
 
 export function findExports (code: string): ESMExport[] {
-  // Filter out commented code to eliminate the effect of regular match export
-  code = stripComments(code)
   // Find declarations like export const foo = 'bar'
   const declaredExports = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
@@ -118,7 +111,6 @@ export function findExports (code: string): ESMExport[] {
 
   // Merge and normalize exports
   const exports = [].concat(declaredExports, namedExports, defaultExport, starExports)
-
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0]
@@ -131,18 +123,42 @@ export function findExports (code: string): ESMExport[] {
       exp.names = [exp.name]
     }
   }
-
+  const exportsLocation = getExportTokenLocation(code)
   return exports.filter((exp, index, exports) => {
+    // Filter out noise that does not match the semantics of export
+    if (!isExportStatement(exportsLocation, exp)) {
+      return false
+    }
     // Prevent multiple exports of same function, only keep latest iteration of signatures
     const nextExport = exports[index + 1]
-    return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
+    return isExportStatement(exportsLocation, exp) || !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
 }
 
-function stripComments (code: string) {
-  return code
-    .replace(MULTI_LINE_COMMENTS_RE, '')
-    .replace(SINGLE_LINE_COMMENTS_RE, '')
-    .replace(QUOTES_RE[0], '""')
-    .replace(QUOTES_RE[1], '``')
+interface TokenLocation {
+  start: number
+  end: number
+}
+function isExportStatement (exportsLcation: TokenLocation[], exp) {
+  return exportsLcation.some(location => exp.start <= location.start && exp.end >= location.end)
+}
+
+function getExportTokenLocation (code: string) {
+  const tokens = tokenizer(code, {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    allowHashBang: true,
+    allowAwaitOutsideFunction: true,
+    allowImportExportEverywhere: true
+  })
+  const locations: TokenLocation[] = []
+  for (const token of tokens) {
+    if (token.type.label === 'export') {
+      locations.push({
+        start: token.start,
+        end: token.end
+      })
+    }
+  }
+  return locations
 }

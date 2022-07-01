@@ -24,6 +24,7 @@
     "test": "pnpm lint && vitest run"
   },
   "dependencies": {
+    "acorn": "^8.7.1",
     "pathe": "^0.3.1",
     "pkg-types": "^0.3.3"
   },
