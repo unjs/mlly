@@ -77,7 +77,24 @@ export { foobar } from 'foo2';
        * export * from "./other"
        export * as foo from "./other"
        */
-
+      export { bar } from 'foo2';
+      export { foobar } from 'foo2';
+    `
+    const matches = findExports(code)
+    expect(matches).to.have.lengthOf(2)
+  })
+  it('export in string', () => {
+    const code = `
+      const test = "Hello world"
+      const test1 = "export { ba1 } from 'foo2'"
+      const test2 = "testexport { bar2 } from 'foo2'"
+      const test3 = "test export { bar3 } from 'foo2'"
+      const test4 = "export { bar4 } from 'foo2' test"
+      const test5 = \`
+        test1
+        export { bar4 } from 'foo2' test
+        test2
+      \`
       export { bar } from 'foo2';
       export { foobar } from 'foo2';
     `
