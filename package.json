@@ -1,6 +1,6 @@
 {
   "name": "mlly",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Missing ECMAScript module utils for Node.js",
   "repository": "unjs/mlly",
   "license": "MIT",
@@ -24,8 +24,7 @@
     "test": "pnpm lint && vitest run"
   },
   "dependencies": {
-    "acorn": "^8.7.1",
-    "pathe": "^0.3.1",
+    "pathe": "^0.3.2",
     "pkg-types": "^0.3.3"
   },
   "devDependencies": {
@@ -38,5 +37,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@6.32.24"
+  "packageManager": "pnpm@7.5.2"
 }
