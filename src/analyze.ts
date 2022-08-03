@@ -130,14 +130,14 @@ export function findExports (code: string): ESMExport[] {
   if (!exports.length) {
     return []
   }
-  const exportLocations = _getExportLocations(code)
-  if (!exportLocations.length) {
+  const exportLocations = _tryGetExportLocations(code)
+  if (exportLocations && !exportLocations.length) {
     return []
   }
 
   return exports.filter((exp, index, exports) => {
     // Filter false positive export matches
-    if (!_isExportStatement(exportLocations, exp)) {
+    if (exportLocations && !_isExportStatement(exportLocations, exp)) {
       return false
     }
     // Prevent multiple exports of same function, only keep latest iteration of signatures
@@ -166,6 +166,14 @@ interface TokenLocation {
 
 function _isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
   return exportsLocation.some(location => exp.start <= location.start && exp.end >= location.end)
+}
+
+function _tryGetExportLocations (code: string) {
+  try {
+    return _getExportLocations(code)
+  } catch (err) {
+    return null
+  }
 }
 
 function _getExportLocations (code: string) {

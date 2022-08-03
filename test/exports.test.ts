@@ -15,7 +15,9 @@ describe('findExports', () => {
     'export const $foo = () => {}': { type: 'declaration', names: ['$foo'] },
     'export { foo as default }': { type: 'default', name: 'default', names: ['default'] },
     'export * from "./other"': { type: 'star', specifier: './other' },
-    'export * as foo from "./other"': { type: 'star', specifier: './other', name: 'foo' }
+    'export * as foo from "./other"': { type: 'star', specifier: './other', name: 'foo' },
+    // eslint-disable-next-line no-template-curly-in-string
+    'const a = `<div${JSON.stringify({ class: 42 })}>`;\nexport default true;': { type: 'default', name: 'default', names: ['default'] }
   }
 
   for (const [input, test] of Object.entries(tests)) {
