@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7](https://github.com/unjs/mlly/compare/v0.5.6...v0.5.7) (2022-08-03)
+
+
+### Bug Fixes
+
+* **findExports:** disable tokenizer if parsing fails (resolves [#64](https://github.com/unjs/mlly/issues/64)) ([4ed5c61](https://github.com/unjs/mlly/commit/4ed5c61108e2c6f809626a8b5ae1ae3268e0fc0a))
+
 ### [0.5.6](https://github.com/unjs/mlly/compare/v0.5.5...v0.5.6) (2022-08-03)
 
 
