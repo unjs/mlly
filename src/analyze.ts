@@ -94,11 +94,6 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 }
 
 export function findExports (code: string): ESMExport[] {
-  // Return early when there is no legal export statement
-  const exportsLocation = getExportTokenLocation(code)
-  if (!exportsLocation.length) {
-    return []
-  }
   // Find declarations like export const foo = 'bar'
   const declaredExports: DeclarationExport[] = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
@@ -128,9 +123,19 @@ export function findExports (code: string): ESMExport[] {
       exp.names = [exp.name]
     }
   }
+
+  // Return early when there is no  export statement
+  if (!exports.length) {
+    return []
+  }
+  const exportLocations = _getExportLocations(code)
+  if (!exportLocations.length) {
+    return []
+  }
+
   return exports.filter((exp, index, exports) => {
-    // Filter out noise that does not match the semantics of export
-    if (!isExportStatement(exportsLocation, exp)) {
+    // Filter false positive export matches
+    if (!_isExportStatement(exportLocations, exp)) {
       return false
     }
     // Prevent multiple exports of same function, only keep latest iteration of signatures
@@ -139,15 +144,18 @@ export function findExports (code: string): ESMExport[] {
   })
 }
 
+// --- Internal ---
+
 interface TokenLocation {
   start: number
   end: number
 }
-function isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
+
+function _isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
   return exportsLocation.some(location => exp.start <= location.start && exp.end >= location.end)
 }
 
-function getExportTokenLocation (code: string) {
+function _getExportLocations (code: string) {
   const tokens = tokenizer(code, {
     ecmaVersion: 'latest',
     sourceType: 'module',
