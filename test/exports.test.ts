@@ -41,19 +41,19 @@ describe('findExports', () => {
   }
   it('handles multiple exports', () => {
     const matches = findExports(`
-        export { useTestMe1 } from "@/test/foo1";
-        export { useTestMe2 } from "@/test/foo2";
-        export { useTestMe3 } from "@/test/foo3";
-      `)
+      export { useTestMe1 } from "@/test/foo1";
+      export { useTestMe2 } from "@/test/foo2";
+      export { useTestMe3 } from "@/test/foo3";
+    `)
     expect(matches.length).to.eql(3)
   })
 
   it('works with multiple named exports', () => {
     const code = `
-export { foo } from 'foo1';
-export { bar } from 'foo2';
-export { foobar } from 'foo2';
-`
+  export { foo } from 'foo1';
+  export { bar } from 'foo2';
+  export { foobar } from 'foo2';
+  `
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(3)
   })
