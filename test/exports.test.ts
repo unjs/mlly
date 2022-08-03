@@ -50,10 +50,10 @@ describe('findExports', () => {
 
   it('works with multiple named exports', () => {
     const code = `
-  export { foo } from 'foo1';
-  export { bar } from 'foo2';
-  export { foobar } from 'foo2';
-  `
+      export { foo } from 'foo1';
+      export { bar } from 'foo2';
+      export { foobar } from 'foo2';
+    `
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(3)
   })
@@ -61,31 +61,31 @@ describe('findExports', () => {
   // TODO: https://github.com/unjs/mlly/issues/64
   it.todo('the commented out export should be filtered out', () => {
     const code = `
-        // export { foo } from 'foo1';
-        // exports default 'foo';
-        // export { useB, _useC as useC };
-        // export function useA () { return 'a' }
-        // export { default } from "./other"
-        // export async function foo () {}
-        // export { foo as default }
-        //export * from "./other"
-        //export * as foo from "./other"
+      // export { foo } from 'foo1';
+      // exports default 'foo';
+      // export { useB, _useC as useC };
+      // export function useA () { return 'a' }
+      // export { default } from "./other"
+      // export async function foo () {}
+      // export { foo as default }
+      //export * from "./other"
+      //export * as foo from "./other"
 
-        /**
-         * export const a = 123
-         * export { foo } from 'foo1';
-         * exports default 'foo'
-         * export function useA () { return 'a' }
-         * export { useB, _useC as useC };
-         *export { default } from "./other"
-         *export async function foo () {}
-         * export { foo as default }
-         * export * from "./other"
-         export * as foo from "./other"
-         */
-        export { bar } from 'foo2';
-        export { foobar } from 'foo2';
-      `
+      /**
+       * export const a = 123
+       * export { foo } from 'foo1';
+       * exports default 'foo'
+       * export function useA () { return 'a' }
+       * export { useB, _useC as useC };
+       *export { default } from "./other"
+        *export async function foo () {}
+        * export { foo as default }
+        * export * from "./other"
+        export * as foo from "./other"
+        */
+      export { bar } from 'foo2';
+      export { foobar } from 'foo2';
+    `
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(2)
   })
@@ -123,9 +123,9 @@ describe('findExports', () => {
 describe('fineExportNames', () => {
   it('findExportNames', () => {
     expect(findExportNames(`
-    export const foo = 'bar'
-    export { bar, baz }
-    export default something
+      export const foo = 'bar'
+      export { bar, baz }
+      export default something
     `)).toMatchInlineSnapshot(`
       [
         "foo",
