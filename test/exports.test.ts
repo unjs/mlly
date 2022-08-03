@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ESMExport, findExports } from '../src'
+import { ESMExport, findExports, findExportNames, resolveModuleExportNames } from '../src'
 
 describe('findExports', () => {
   const tests: Record<string, Partial<ESMExport>> = {
@@ -113,5 +113,45 @@ describe('findExports', () => {
     }, 'export { bar } from \'foo2\'; \n export { foobar } from \'foo2\';')
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(2)
+  })
+})
+
+describe('fineExportNames', () => {
+  it('findExportNames', () => {
+    expect(findExportNames(`
+    export const foo = 'bar'
+    export { bar, baz }
+    export default something
+    `)).toMatchInlineSnapshot(`
+      [
+        "foo",
+        "bar",
+        "baz",
+        "default",
+      ]
+    `)
+  })
+})
+
+describe('resolveModuleExportNames', () => {
+  it('resolveModuleExportNames', async () => {
+    expect(await resolveModuleExportNames('pathe')).toMatchInlineSnapshot(`
+      [
+        "basename",
+        "delimiter",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "normalize",
+        "normalizeString",
+        "parse",
+        "relative",
+        "resolve",
+        "sep",
+        "toNamespacedPath",
+      ]
+    `)
   })
 })

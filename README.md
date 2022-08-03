@@ -29,8 +29,6 @@ import { } from 'mlly'
 const { } = require('mlly')
 ```
 
-
-
 ## Resolving ESM modules
 
 Several utilities to make ESM resolution easier:
@@ -286,8 +284,6 @@ const foo = await import('bar')
 
 ### `findExports`
 
-**Note:** API Of this function might be broken in a breaking change for code matcher
-
 ```js
 import { findExports } from 'mlly'
 
@@ -320,6 +316,32 @@ Outputs:
   },
   { type: 'default', code: 'export default ', start: 46, end: 61 }
 ]
+```
+
+### `findExportNames`
+
+Same as `findExports` but returns array of export names.
+
+```js
+import { findExportNames } from 'mlly'
+
+// [ "foo", "bar", "baz", "default" ]
+console.log(findExportNames(`
+export const foo = 'bar'
+export { bar, baz }
+export default something
+`))
+```
+
+## `resolveModuleExportNames`
+
+Resolves module and reads its contents to extract possible export names using static analyzes.
+
+```js
+import { resolveModuleExportNames } from 'mlly'
+
+// ["basename", "dirname", ... ]
+console.log(await resolveModuleExportNames('pathe'))
 ```
 
 ## Evaluating Modules
