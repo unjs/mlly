@@ -1,5 +1,7 @@
 import { tokenizer } from 'acorn'
 import { matchAll } from './_utils'
+import { resolvePath, ResolveOptions } from './resolve'
+import { loadURL } from './utils'
 
 export interface ESMImport {
   type: 'static' | 'dynamic'
@@ -142,6 +144,17 @@ export function findExports (code: string): ESMExport[] {
     const nextExport = exports[index + 1]
     return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
+}
+
+export function findExportNames (code: string): string[] {
+  return findExports(code).flatMap(exp => exp.names)
+}
+
+export async function resolveModuleExportNames (id: string, opts?: ResolveOptions): Promise<string[]> {
+  const url = await resolvePath(id, opts)
+  const code = await loadURL(url)
+  const exports = findExports(code)
+  return exports.flatMap(exp => exp.names)
 }
 
 // --- Internal ---
