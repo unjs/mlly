@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.6](https://github.com/unjs/mlly/compare/v0.5.5...v0.5.6) (2022-08-03)
+
+
+### Features
+
+* `resolveModuleExportNames` and `findExportNames` ([#63](https://github.com/unjs/mlly/issues/63)) ([a699573](https://github.com/unjs/mlly/commit/a6995739fcf42f7f69b1df33caac8f5060e283d5))
+* **findExports:** use acorn tokenizer to filter false positive exports ([#56](https://github.com/unjs/mlly/issues/56)) ([7039f54](https://github.com/unjs/mlly/commit/7039f54277b1791e99b4f625198dfba2dbf6fbe6))
+
+
+### Bug Fixes
+
+* **findExports:** get exports with trailing comma ([#61](https://github.com/unjs/mlly/issues/61)) ([79a3ceb](https://github.com/unjs/mlly/commit/79a3ceb5f9b831325351a411a8d1fdc0c2fb6778))
+
 ### [0.5.5](https://github.com/unjs/mlly/compare/v0.5.4...v0.5.5) (2022-07-20)
 
 
