@@ -9,6 +9,8 @@ describe('findExports', () => {
     'export default foo': { type: 'default', name: 'default', names: ['default'] },
     'export { default } from "./other"': { type: 'default', name: 'default', names: ['default'], specifier: './other' },
     'export { default , } from "./other"': { type: 'default', name: 'default', names: ['default'], specifier: './other' },
+    'export { useA , } from "./path"': { type: 'named', name: 'useA', names: ['useA'], specifier: './path' },
+    'export { useA , useB  , } from "./path"': { type: 'named', names: ['useA', 'useB'], specifier: './path' },
     'export async function foo ()': { type: 'declaration', names: ['foo'] },
     'export const $foo = () => {}': { type: 'declaration', names: ['$foo'] },
     'export { foo as default }': { type: 'default', name: 'default', names: ['default'] },
