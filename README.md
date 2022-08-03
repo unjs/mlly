@@ -320,7 +320,7 @@ Outputs:
 
 ### `findExportNames`
 
-Same as `fineExports` but returns array of export names.
+Same as `findExports` but returns array of export names.
 
 ```js
 import { findExports } from 'mlly'
