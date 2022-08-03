@@ -1,4 +1,3 @@
-import { tokenizer } from 'acorn'
 import { matchAll } from './_utils'
 import { resolvePath, ResolveOptions } from './resolve'
 import { loadURL } from './utils'
@@ -126,20 +125,7 @@ export function findExports (code: string): ESMExport[] {
     }
   }
 
-  // Return early when there is no  export statement
-  if (!exports.length) {
-    return []
-  }
-  const exportLocations = _getExportLocations(code)
-  if (!exportLocations.length) {
-    return []
-  }
-
   return exports.filter((exp, index, exports) => {
-    // Filter false positive export matches
-    if (!_isExportStatement(exportLocations, exp)) {
-      return false
-    }
     // Prevent multiple exports of same function, only keep latest iteration of signatures
     const nextExport = exports[index + 1]
     return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
@@ -155,35 +141,4 @@ export async function resolveModuleExportNames (id: string, opts?: ResolveOption
   const code = await loadURL(url)
   const exports = findExports(code)
   return exports.flatMap(exp => exp.names)
-}
-
-// --- Internal ---
-
-interface TokenLocation {
-  start: number
-  end: number
-}
-
-function _isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
-  return exportsLocation.some(location => exp.start <= location.start && exp.end >= location.end)
-}
-
-function _getExportLocations (code: string) {
-  const tokens = tokenizer(code, {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    allowHashBang: true,
-    allowAwaitOutsideFunction: true,
-    allowImportExportEverywhere: true
-  })
-  const locations: TokenLocation[] = []
-  for (const token of tokens) {
-    if (token.type.label === 'export') {
-      locations.push({
-        start: token.start,
-        end: token.end
-      })
-    }
-  }
-  return locations
 }

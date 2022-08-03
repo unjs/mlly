@@ -3,7 +3,6 @@ lockfileVersion: 5.4
 specifiers:
   '@nuxtjs/eslint-config-typescript': latest
   '@types/node': latest
-  acorn: ^8.8.0
   c8: latest
   eslint: latest
   jiti: latest
@@ -14,7 +13,6 @@ specifiers:
   vitest: latest
 
 dependencies:
-  acorn: 8.8.0
   pathe: 0.3.3
   pkg-types: 0.3.3
 
@@ -642,6 +640,7 @@ packages:
     resolution: {integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+    dev: true
 
   /add-stream/1.0.0:
     resolution: {integrity: sha512-qQLMr+8o0WC4FZGQTcJiKBVC59JylcPSrTtk6usvmIDFUOCKegapy1VHQwRbFMOFyb/inzUVqHs+eMYKDM1YeQ==}
@@ -906,7 +905,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
     dev: true
 
   /concat-stream/2.0.0:
