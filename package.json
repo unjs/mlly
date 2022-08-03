@@ -24,7 +24,7 @@
     "test": "pnpm lint && vitest run"
   },
   "dependencies": {
-    "pathe": "^0.3.2",
+    "pathe": "^0.3.3",
     "pkg-types": "^0.3.3"
   },
   "devDependencies": {
@@ -37,5 +37,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@7.5.2"
+  "packageManager": "pnpm@7.8.0"
 }

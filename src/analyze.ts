@@ -57,7 +57,7 @@ export const ESM_STATIC_IMPORT_RE = /(?<=\s|^|;)import\s*(["'\s]*(?<imports>[\w*
 export const DYNAMIC_IMPORT_RE = /import\s*\((?<expression>(?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gm
 
 export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|function|let|const|var|class))\s+(?<name>[\w$_]+)/g
-const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+)}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
+const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+?)(?:[,\s]*)}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
 const EXPORT_STAR_RE = /\bexport\s*(\*)(\s*as\s+(?<name>[\w$_]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^"\s](?=\s*")|(?<='\s*)[^']*[^'\s](?=\s*'))\s*["'][^\n]*)?/g
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g
 
@@ -105,7 +105,7 @@ export function findExports (code: string): ESMExport[] {
   // Find named exports
   const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
   for (const namedExport of namedExports) {
-    namedExport.names = namedExport.exports.split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim()).filter(name => !!name)
+    namedExport.names = namedExport.exports.split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim())
   }
 
   // Find export default
