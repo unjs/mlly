@@ -1,3 +1,4 @@
+import { tokenizer } from 'acorn'
 import { matchAll } from './_utils'
 
 export interface ESMImport {
@@ -94,23 +95,22 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
 
 export function findExports (code: string): ESMExport[] {
   // Find declarations like export const foo = 'bar'
-  const declaredExports = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
+  const declaredExports: DeclarationExport[] = matchAll(EXPORT_DECAL_RE, code, { type: 'declaration' })
 
   // Find named exports
-  const namedExports = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
+  const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
   for (const namedExport of namedExports) {
     namedExport.names = namedExport.exports.split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim())
   }
 
   // Find export default
-  const defaultExport = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default', name: 'default' })
+  const defaultExport: DefaultExport[] = matchAll(EXPORT_DEFAULT_RE, code, { type: 'default', name: 'default' })
 
   // Find export star
-  const starExports = matchAll(EXPORT_STAR_RE, code, { type: 'star' })
+  const starExports: ESMExport[] = matchAll(EXPORT_STAR_RE, code, { type: 'star' })
 
   // Merge and normalize exports
-  const exports = [].concat(declaredExports, namedExports, defaultExport, starExports)
-
+  const exports: ESMExport[] = [].concat(declaredExports, namedExports, defaultExport, starExports)
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0]
@@ -124,9 +124,53 @@ export function findExports (code: string): ESMExport[] {
     }
   }
 
+  // Return early when there is no  export statement
+  if (!exports.length) {
+    return []
+  }
+  const exportLocations = _getExportLocations(code)
+  if (!exportLocations.length) {
+    return []
+  }
+
   return exports.filter((exp, index, exports) => {
+    // Filter false positive export matches
+    if (!_isExportStatement(exportLocations, exp)) {
+      return false
+    }
     // Prevent multiple exports of same function, only keep latest iteration of signatures
     const nextExport = exports[index + 1]
     return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
   })
+}
+
+// --- Internal ---
+
+interface TokenLocation {
+  start: number
+  end: number
+}
+
+function _isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
+  return exportsLocation.some(location => exp.start <= location.start && exp.end >= location.end)
+}
+
+function _getExportLocations (code: string) {
+  const tokens = tokenizer(code, {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    allowHashBang: true,
+    allowAwaitOutsideFunction: true,
+    allowImportExportEverywhere: true
+  })
+  const locations: TokenLocation[] = []
+  for (const token of tokens) {
+    if (token.type.label === 'export') {
+      locations.push({
+        start: token.start,
+        end: token.end
+      })
+    }
+  }
+  return locations
 }
