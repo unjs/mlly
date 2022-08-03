@@ -323,17 +323,26 @@ Outputs:
 Same as `findExports` but returns array of export names.
 
 ```js
-import { findExports } from 'mlly'
+import { findExportNames } from 'mlly'
 
 // [ "foo", "bar", "baz", "default" ]
-console.log(findExports(`
+console.log(findExportNames(`
 export const foo = 'bar'
 export { bar, baz }
 export default something
 `))
 ```
 
-##
+## `resolveModuleExportNames`
+
+Resolves module and reads its contents to extract possible export names using static analyzes.
+
+```js
+import { resolveModuleExportNames } from 'mlly'
+
+// ["basename", "dirname", ... ]
+console.log(await resolveModuleExportNames('pathe'))
+```
 
 ## Evaluating Modules
 
