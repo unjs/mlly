@@ -147,14 +147,15 @@ export function findExports (code: string): ESMExport[] {
 }
 
 export function findExportNames (code: string): string[] {
-  return findExports(code).flatMap(exp => exp.names)
+  return findExports(code).flatMap(exp => exp.names).filter(Boolean)
 }
 
 export async function resolveModuleExportNames (id: string, opts?: ResolveOptions): Promise<string[]> {
   const url = await resolvePath(id, opts)
   const code = await loadURL(url)
   const exports = findExports(code)
-  return exports.flatMap(exp => exp.names)
+  // TODO: Support recursive for start exports
+  return exports.flatMap(exp => exp.names).filter(Boolean)
 }
 
 // --- Internal ---
