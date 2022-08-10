@@ -26,7 +26,8 @@
   "dependencies": {
     "acorn": "^8.8.0",
     "pathe": "^0.3.3",
-    "pkg-types": "^0.3.3"
+    "pkg-types": "^0.3.3",
+    "ufo": "^0.8.5"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",

@@ -1,5 +1,6 @@
 import { existsSync, realpathSync } from 'fs'
 import { pathToFileURL } from 'url'
+import { joinURL } from 'ufo'
 import { isAbsolute } from 'pathe'
 import { moduleResolve } from '../lib/import-meta-resolve'
 import { fileURLToPath, normalizeid } from './utils'
@@ -56,12 +57,16 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     _urls.push(DEFAULT_URL)
   }
   const urls = [..._urls]
-  // TODO: Consider pnp
-  for (const url of _urls) {
-    if (url.protocol === 'file:' && !url.pathname.includes('node_modules')) {
-      const newURL = new URL(url)
-      newURL.pathname += '/node_modules'
-      urls.push(newURL)
+  for (let url of _urls) {
+    if (url.protocol === 'file:') {
+      if (!url.pathname.match(/[^/]+\.[^/.]+$/)) {
+        // URL does not ends with extension. It is probably a directory.
+        url = new URL(url)
+        url.pathname = joinURL(url.pathname, '_index.js')
+      }
+      urls.push(new URL('./', url))
+      // TODO: Remove in next major version seems not necessary
+      urls.push(new URL('./node_modules', url))
     }
   }
 
