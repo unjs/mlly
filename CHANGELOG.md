@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.8](https://github.com/unjs/mlly/compare/v0.5.7...v0.5.8) (2022-08-10)
+
+
+### Features
+
+* **resolveModuleExportNames:** resolve recursive star exports ([50991e4](https://github.com/unjs/mlly/commit/50991e491efba146dc3385da2b13a44eb3c13374))
+
+
+### Bug Fixes
+
+* **resolveModuleExportNames:** filter out star exports ([dd63a31](https://github.com/unjs/mlly/commit/dd63a31010d8b55d2fbdf4f910afda9b629b2bbb))
+
 ### [0.5.7](https://github.com/unjs/mlly/compare/v0.5.6...v0.5.7) (2022-08-03)
 
 
