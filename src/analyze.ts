@@ -154,8 +154,21 @@ export async function resolveModuleExportNames (id: string, opts?: ResolveOption
   const url = await resolvePath(id, opts)
   const code = await loadURL(url)
   const exports = findExports(code)
-  // TODO: Support recursive for start exports
-  return exports.flatMap(exp => exp.names).filter(Boolean)
+
+  // Explicit named exports
+  const exportNames = new Set(exports.flatMap(exp => exp.names).filter(Boolean))
+
+  // Recursive * exports
+  for (const exp of exports) {
+    if (exp.type === 'star') {
+      const subExports = await resolveModuleExportNames(exp.specifier, { ...opts, url })
+      for (const subExport of subExports) {
+        exportNames.add(subExport)
+      }
+    }
+  }
+
+  return Array.from(exportNames)
 }
 
 // --- Internal ---

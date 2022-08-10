@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { describe, it, expect } from 'vitest'
 import { ESMExport, findExports, findExportNames, resolveModuleExportNames } from '../src'
 
@@ -136,9 +137,32 @@ describe('fineExportNames', () => {
 })
 
 describe('resolveModuleExportNames', () => {
-  it('resolveModuleExportNames', async () => {
+  it('direct exports', async () => {
     expect(await resolveModuleExportNames('pathe')).toMatchInlineSnapshot(`
       [
+        "basename",
+        "delimiter",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "normalize",
+        "normalizeString",
+        "parse",
+        "relative",
+        "resolve",
+        "sep",
+        "toNamespacedPath",
+      ]
+    `)
+  })
+
+  it('star exports', async () => {
+    expect(await resolveModuleExportNames(new URL('./fixture/exports.mjs', import.meta.url).toString())).toMatchInlineSnapshot(`
+      [
+        "foo",
+        "_resolve",
         "basename",
         "delimiter",
         "dirname",
