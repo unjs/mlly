@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.9](https://github.com/unjs/mlly/compare/v0.5.8...v0.5.9) (2022-08-10)
+
+
+### Bug Fixes
+
+* **resolve:** properly resolve relative to file urls ([2099c28](https://github.com/unjs/mlly/commit/2099c28a1065cdaddcd1168f1d20293a15403a18))
+
 ### [0.5.8](https://github.com/unjs/mlly/compare/v0.5.7...v0.5.8) (2022-08-10)
 
 
