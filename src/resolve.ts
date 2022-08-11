@@ -57,14 +57,10 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     _urls.push(DEFAULT_URL)
   }
   const urls = [..._urls]
-  for (let url of _urls) {
+  for (const url of _urls) {
     if (url.protocol === 'file:') {
-      if (!url.pathname.match(/[^/]+\.[^/.]+$/)) {
-        // URL does not ends with extension. It is probably a directory.
-        url = new URL(joinURL(url.pathname, '_index.js'), url)
-      }
       urls.push(new URL('./', url))
-      urls.push(new URL(joinURL(url.pathname, 'node_modules'), url))
+      urls.push(new URL(joinURL(url.pathname, '_index.js'), url))
     }
   }
 
