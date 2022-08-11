@@ -57,14 +57,11 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     _urls.push(DEFAULT_URL)
   }
   const urls = [..._urls]
-  for (let url of _urls) {
+  for (const url of _urls) {
     if (url.protocol === 'file:') {
-      if (!url.pathname.match(/[^/]+\.[^/.]+$/)) {
-        // URL does not ends with extension. It is probably a directory.
-        url = new URL(url)
-        url.pathname = joinURL(url.pathname, '_index.js')
-      }
       urls.push(new URL('./', url))
+      // If url is directory
+      urls.push(new URL(joinURL(url.pathname, '_index.js'), url))
       // TODO: Remove in next major version seems not necessary
       urls.push(new URL('./node_modules', url))
     }
