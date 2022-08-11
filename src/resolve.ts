@@ -61,6 +61,8 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     if (url.protocol === 'file:') {
       urls.push(new URL('./', url))
       urls.push(new URL(joinURL(url.pathname, '_index.js'), url))
+      // TODO: Remove in next major version seems not necessary
+      urls.push(new URL('./node_modules', url))
     }
   }
 
