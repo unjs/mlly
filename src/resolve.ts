@@ -61,12 +61,10 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
     if (url.protocol === 'file:') {
       if (!url.pathname.match(/[^/]+\.[^/.]+$/)) {
         // URL does not ends with extension. It is probably a directory.
-        url = new URL(url)
-        url.pathname = joinURL(url.pathname, '_index.js')
+        url = new URL(joinURL(url.pathname, '_index.js'), url)
       }
       urls.push(new URL('./', url))
-      // TODO: Remove in next major version seems not necessary
-      urls.push(new URL('./node_modules', url))
+      urls.push(new URL(joinURL(url.pathname, 'node_modules'), url))
     }
   }
 
