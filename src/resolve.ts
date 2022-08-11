@@ -60,6 +60,7 @@ function _resolve (id: string, opts: ResolveOptions = {}): string {
   for (const url of _urls) {
     if (url.protocol === 'file:') {
       urls.push(new URL('./', url))
+      // If url is directory
       urls.push(new URL(joinURL(url.pathname, '_index.js'), url))
       // TODO: Remove in next major version seems not necessary
       urls.push(new URL('./node_modules', url))
