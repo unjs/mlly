@@ -33,7 +33,7 @@ export function normalizeid (id: string): string {
   if (BUILTIN_MODULES.has(id)) {
     return 'node:' + id
   }
-  return 'file://' + normalizeSlash(encodeURI(id))
+  return 'file://' + encodeURI(normalizeSlash(id))
 }
 
 export async function loadURL (url: string): Promise<string> {
