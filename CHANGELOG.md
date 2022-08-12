@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.12](https://github.com/unjs/mlly/compare/v0.5.11...v0.5.12) (2022-08-12)
+
+
+### Bug Fixes
+
+* **normalizeid:** encode file uri after normalizing slashes ([4569fa0](https://github.com/unjs/mlly/commit/4569fa0878004ac71d2539ab5ec7029b46b8eed4))
+
 ### [0.5.11](https://github.com/unjs/mlly/compare/v0.5.10...v0.5.11) (2022-08-12)
 
 
