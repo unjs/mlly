@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.13](https://github.com/unjs/mlly/compare/v0.5.12...v0.5.13) (2022-08-18)
+
+
+### Features
+
+* **findExports:** support typescript enum exports ([#69](https://github.com/unjs/mlly/issues/69)) ([ac7c37c](https://github.com/unjs/mlly/commit/ac7c37c079cdfa602d9e0d908292f51cd0472406))
+
 ### [0.5.12](https://github.com/unjs/mlly/compare/v0.5.11...v0.5.12) (2022-08-12)
 
 
