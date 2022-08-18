@@ -32,6 +32,7 @@
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
+    "@vitest/coverage-c8": "^0.22.1",
     "c8": "latest",
     "eslint": "latest",
     "jiti": "latest",
