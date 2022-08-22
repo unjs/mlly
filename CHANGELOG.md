@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.14](https://github.com/unjs/mlly/compare/v0.5.13...v0.5.14) (2022-08-22)
+
+
+### Bug Fixes
+
+* **findExports:** support multiple exports terminated with `;` ([#72](https://github.com/unjs/mlly/issues/72)) ([e7a8de3](https://github.com/unjs/mlly/commit/e7a8de395ad5d2ef73c670c06fb07a97e1eb33fa))
+
 ### [0.5.13](https://github.com/unjs/mlly/compare/v0.5.12...v0.5.13) (2022-08-18)
 
 
