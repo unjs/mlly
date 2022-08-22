@@ -182,4 +182,12 @@ describe('resolveModuleExportNames', () => {
       ]
     `)
   })
+
+  it('multiple inline', () => {
+    const code = `
+export { foo } from 'foo1';export { bar } from 'foo2';export * as foobar from 'foo2';
+`
+    const matches = findExports(code)
+    expect(matches).to.have.lengthOf(3)
+  })
 })
