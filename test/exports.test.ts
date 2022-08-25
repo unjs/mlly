@@ -119,6 +119,17 @@ describe('findExports', () => {
     const matches = findExports(code)
     expect(matches).to.have.lengthOf(2)
   })
+
+  it('works with line feed named exports', () => {
+    const code = `
+    export {
+      _foo as foo,
+      bar,
+    };
+    `
+    const matches = findExports(code)
+    expect(matches[0].names).toEqual(['foo', 'bar'])
+  })
 })
 
 describe('fineExportNames', () => {
