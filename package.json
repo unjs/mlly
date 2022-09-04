@@ -32,7 +32,7 @@
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
-    "@vitest/coverage-c8": "^0.22.1",
+    "@vitest/coverage-c8": "^0.23.0",
     "c8": "latest",
     "eslint": "latest",
     "jiti": "latest",
@@ -41,5 +41,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@7.9.5"
+  "packageManager": "pnpm@7.10.0"
 }
