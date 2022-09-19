@@ -74,12 +74,12 @@ export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptio
     return false
   }
 
+  const pkg = await readPackageJSON(resolvedPath).catch(() => null)
+  if (pkg?.type === 'module') { return true }
+
   if (resolvedPath.match(/\.(\w+-)?esm?(-\w+)?\.js$/)) {
     return false
   }
-
-  const pkg = await readPackageJSON(resolvedPath).catch(() => null)
-  if (pkg?.type === 'module') { return true }
 
   const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null) || ''
 
