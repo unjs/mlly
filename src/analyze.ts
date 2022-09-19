@@ -102,7 +102,7 @@ export function findExports (code: string): ESMExport[] {
   // Find named exports
   const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, { type: 'named' })
   for (const namedExport of namedExports) {
-    namedExport.names = namedExport.exports.split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim())
+    namedExport.names = namedExport.exports.replace(/^\r?\n?/, '').split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, '').trim())
   }
 
   // Find export default
