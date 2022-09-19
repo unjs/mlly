@@ -25,21 +25,21 @@
   },
   "dependencies": {
     "acorn": "^8.8.0",
-    "pathe": "^0.3.5",
-    "pkg-types": "^0.3.4",
+    "pathe": "^0.3.8",
+    "pkg-types": "^0.3.5",
     "ufo": "^0.8.5"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
-    "@vitest/coverage-c8": "^0.22.1",
+    "@vitest/coverage-c8": "^0.23.4",
     "c8": "latest",
     "eslint": "latest",
     "jiti": "latest",
     "standard-version": "latest",
-    "typescript": "^4.7.4",
+    "typescript": "^4.8.3",
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@7.9.5"
+  "packageManager": "pnpm@7.12.0"
 }
