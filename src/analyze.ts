@@ -178,10 +178,13 @@ interface TokenLocation {
 }
 
 function _isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
-  return exportsLocation.some(location =>
-    (exp.start <= location.start && location.start <= exp.end) ||
-    (exp.start <= location.end && location.end <= exp.end)
-  )
+  return exportsLocation.some((location) => {
+    // AST token inside the regex match
+    return exp.start <= location.start && exp.end >= location.end
+    // AST Token start or end is within the regex match
+    // return (exp.start <= location.start && location.start <= exp.end) ||
+    // (exp.start <= location.end && location.end <= exp.end)
+  })
 }
 
 function _tryGetExportLocations (code: string) {
