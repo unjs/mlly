@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.16](https://github.com/unjs/mlly/compare/v0.5.15...v0.5.16) (2022-09-20)
+
+
+### Features
+
+* **isValidNodeImport:** mark unknown `/es/` path as invalid without depending on syntax detection (resolves [#23](https://github.com/unjs/mlly/issues/23)) ([70e2141](https://github.com/unjs/mlly/commit/70e2141df40fec20881650b45dc70fa2ee7651dc))
+
+
+### Bug Fixes
+
+* **findExports:** correctly dedup named exports ([#86](https://github.com/unjs/mlly/issues/86)) ([6b5df10](https://github.com/unjs/mlly/commit/6b5df10e5c346f173f0731a5f9d4dca77c99a4b4))
+
 ### [0.5.15](https://github.com/unjs/mlly/compare/v0.5.14...v0.5.15) (2022-09-19)
 
 
