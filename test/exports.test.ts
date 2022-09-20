@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { describe, it, expect } from 'vitest'
 import { ESMExport, findExports, findExportNames, resolveModuleExportNames } from '../src'
 
@@ -132,13 +131,15 @@ describe('findExports', () => {
   })
 
   // https://github.com/nuxt/framework/issues/7658
-  it('works the same with or without comment', () => {
+  it.only('works the same with or without comment', () => {
     const code1 = `
-    export default function useMain() {}`
-    const matches1 = findExports(code1)
+export default function useMain() {}
+`
     const code2 = `
 export default function useMain() {}
-// export default function useMain() {}`
+// export default function useMain() {}
+`
+    const matches1 = findExports(code1)
     const matches2 = findExports(code2)
     expect(matches1).toHaveLength(1)
     expect(matches1[0].name).toEqual('default')

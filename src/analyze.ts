@@ -135,15 +135,14 @@ export function findExports (code: string): ESMExport[] {
     return []
   }
 
-  return exports.filter((exp, index, exports) => {
+  return exports
     // Filter false positive export matches
-    if (exportLocations && !_isExportStatement(exportLocations, exp)) {
-      return false
-    }
+    .filter(exp => !exportLocations || _isExportStatement(exportLocations, exp))
     // Prevent multiple exports of same function, only keep latest iteration of signatures
-    const nextExport = exports[index + 1]
-    return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
-  })
+    .filter((exp, index, exports) => {
+      const nextExport = exports[index + 1]
+      return !nextExport || exp.type !== nextExport.type || !exp.name || exp.name !== nextExport.name
+    })
 }
 
 export function findExportNames (code: string): string[] {
@@ -179,7 +178,10 @@ interface TokenLocation {
 }
 
 function _isExportStatement (exportsLocation: TokenLocation[], exp: ESMExport) {
-  return exportsLocation.some(location => exp.start <= location.start && exp.end >= location.end)
+  return exportsLocation.some(location =>
+    (exp.start <= location.start && location.start <= exp.end) ||
+    (exp.start <= location.end && location.end <= exp.end)
+  )
 }
 
 function _tryGetExportLocations (code: string) {
