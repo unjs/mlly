@@ -130,6 +130,20 @@ describe('findExports', () => {
     const matches = findExports(code)
     expect(matches[0].names).toEqual(['foo', 'bar'])
   })
+
+  // https://github.com/nuxt/framework/issues/7658
+  it('works the same with or without comment', () => {
+    const code1 = `
+    export default function useMain() {}`
+    const matches1 = findExports(code1)
+    const code2 = `
+export default function useMain() {}
+// export default function useMain() {}`
+    const matches2 = findExports(code2)
+    expect(matches1).toHaveLength(1)
+    expect(matches1[0].name).toEqual('default')
+    expect(matches2).toEqual(matches1)
+  })
 })
 
 describe('fineExportNames', () => {
