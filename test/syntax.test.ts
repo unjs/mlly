@@ -55,7 +55,9 @@ const nodeImportTests = {
   [join(import.meta.url, '../fixture/imports/esm')]: true,
   [join(import.meta.url, '../fixture/imports/esm-module')]: true,
   [join(import.meta.url, '../fixture/imports/js-cjs')]: true,
-  [join(import.meta.url, '../fixture/imports/js-esm')]: false
+  [join(import.meta.url, '../fixture/imports/js-esm')]: false,
+  [join(import.meta.url, '../fixture/imports/js-esm/es/index.mjs')]: true,
+  [join(import.meta.url, '../fixture/imports/js-esm/es/index.js')]: false
 }
 
 describe('isValidNodeImport', () => {
@@ -63,7 +65,10 @@ describe('isValidNodeImport', () => {
     it(input, async () => {
       try {
         expect(await isValidNodeImport(input)).to.equal(result)
-      } catch (e) {
+      } catch (err) {
+        if (result !== 'error') {
+          throw err
+        }
         expect(result).to.equal('error')
       }
     })
