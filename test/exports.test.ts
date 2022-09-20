@@ -131,7 +131,7 @@ describe('findExports', () => {
   })
 
   // https://github.com/nuxt/framework/issues/7658
-  it.only('works the same with or without comment', () => {
+  it('works the same with or without comment', () => {
     const code1 = `
 export default function useMain() {}
 `
