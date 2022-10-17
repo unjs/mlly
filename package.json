@@ -27,12 +27,12 @@
     "acorn": "^8.8.0",
     "pathe": "^0.3.9",
     "pkg-types": "^0.3.5",
-    "ufo": "^0.8.5"
+    "ufo": "^0.8.6"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
-    "@vitest/coverage-c8": "^0.24.1",
+    "@vitest/coverage-c8": "^0.24.3",
     "c8": "latest",
     "eslint": "latest",
     "jiti": "latest",
@@ -41,5 +41,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@7.13.4"
+  "packageManager": "pnpm@7.13.5"
 }
