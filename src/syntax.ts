@@ -75,6 +75,7 @@ export async function isValidNodeImport (id: string, _options: ValidNodeImportOp
   }
 
   const package_ = await readPackageJSON(resolvedPath).catch(() => {});
+  // @ts-ignore
   if (package_?.type === "module") { return true; }
 
   if (/\.(\w+-)?esm?(-\w+)?\.js$|\/(esm?)\//.test(resolvedPath)) {
