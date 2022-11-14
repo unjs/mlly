@@ -1,31 +1,31 @@
-import { promises as fsp } from 'fs'
-import { extname } from 'pathe'
-import { readPackageJSON } from 'pkg-types'
-import { ResolveOptions, resolvePath } from './resolve'
-import { isNodeBuiltin, getProtocol } from './utils'
+import { promises as fsp } from "node:fs";
+import { extname } from "pathe";
+import { readPackageJSON } from "pkg-types";
+import { ResolveOptions, resolvePath } from "./resolve";
+import { isNodeBuiltin, getProtocol } from "./utils";
 
-const ESM_RE = /([\s;]|^)(import[\w,{}\s*]*from|import\s*['"*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m
+const ESM_RE = /([\s;]|^)(import[\s\w*,{}]*from|import\s*["'*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m;
 
-const BUILTIN_EXTENSIONS = new Set(['.mjs', '.cjs', '.node', '.wasm'])
+const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
 export function hasESMSyntax (code: string): boolean {
-  return ESM_RE.test(code)
+  return ESM_RE.test(code);
 }
 
-const CJS_RE = /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m
+const CJS_RE = /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 export function hasCJSSyntax (code: string): boolean {
-  return CJS_RE.test(code)
+  return CJS_RE.test(code);
 }
 
 export function detectSyntax (code: string) {
-  const hasESM = hasESMSyntax(code)
-  const hasCJS = hasCJSSyntax(code)
+  const hasESM = hasESMSyntax(code);
+  const hasCJS = hasCJSSyntax(code);
 
   return {
     hasESM,
     hasCJS,
     isMixed: hasESM && hasCJS
-  }
+  };
 }
 
 export interface ValidNodeImportOptions extends ResolveOptions {
@@ -43,45 +43,45 @@ export interface ValidNodeImportOptions extends ResolveOptions {
 }
 
 const validNodeImportDefaults: ValidNodeImportOptions = {
-  allowedProtocols: ['node', 'file', 'data']
-}
+  allowedProtocols: ["node", "file", "data"]
+};
 
-export async function isValidNodeImport (id: string, _opts: ValidNodeImportOptions = {}): Promise<boolean> {
+export async function isValidNodeImport (id: string, _options: ValidNodeImportOptions = {}): Promise<boolean> {
   if (isNodeBuiltin(id)) {
-    return true
+    return true;
   }
 
-  const opts = { ...validNodeImportDefaults, ..._opts }
+  const options = { ...validNodeImportDefaults, ..._options };
 
-  const proto = getProtocol(id)
-  if (proto && !opts.allowedProtocols.includes(proto)) {
-    return false
+  const proto = getProtocol(id);
+  if (proto && !options.allowedProtocols.includes(proto)) {
+    return false;
   }
 
   // node is already validated by isNodeBuiltin and file will be normalized by resolvePath
-  if (proto === 'data') {
-    return true
+  if (proto === "data") {
+    return true;
   }
 
-  const resolvedPath = await resolvePath(id, opts)
-  const extension = extname(resolvedPath)
+  const resolvedPath = await resolvePath(id, options);
+  const extension = extname(resolvedPath);
 
   if (BUILTIN_EXTENSIONS.has(extension)) {
-    return true
+    return true;
   }
 
-  if (extension !== '.js') {
-    return false
+  if (extension !== ".js") {
+    return false;
   }
 
-  const pkg = await readPackageJSON(resolvedPath).catch(() => null)
-  if (pkg?.type === 'module') { return true }
+  const package_ = await readPackageJSON(resolvedPath).catch(() => {});
+  if (package_?.type === "module") { return true; }
 
-  if (resolvedPath.match(/\.(\w+-)?esm?(-\w+)?\.js$|\/(esm?)\//)) {
-    return false
+  if (/\.(\w+-)?esm?(-\w+)?\.js$|\/(esm?)\//.test(resolvedPath)) {
+    return false;
   }
 
-  const code = opts.code || await fsp.readFile(resolvedPath, 'utf-8').catch(() => null) || ''
+  const code = options.code || await fsp.readFile(resolvedPath, "utf8").catch(() => {}) || "";
 
-  return hasCJSSyntax(code) || !hasESMSyntax(code)
+  return hasCJSSyntax(code) || !hasESMSyntax(code);
 }

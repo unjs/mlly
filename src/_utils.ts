@@ -1,32 +1,32 @@
-import { builtinModules } from 'module'
+import { builtinModules } from "node:module";
 
-export const BUILTIN_MODULES = new Set(builtinModules)
+export const BUILTIN_MODULES = new Set(builtinModules);
 
-export function normalizeSlash (str) {
-  return str.replace(/\\/g, '/')
+export function normalizeSlash (string_) {
+  return string_.replace(/\\/g, "/");
 }
 
-export function pcall (fn, ...args) {
+export function pcall (function_, ...arguments_) {
   try {
-    return Promise.resolve(fn(...args)).catch(err => perr(err))
-  } catch (err) {
-    return perr(err)
+    return Promise.resolve(function_(...arguments_)).catch(error => perr(error));
+  } catch (error) {
+    return perr(error);
   }
 }
 
-export function perr (_err) {
-  const err = new Error(_err)
-  err.code = _err.code
-  Error.captureStackTrace(err, pcall)
-  return Promise.reject(err)
+export function perr (_error) {
+  const error = new Error(_error);
+  error.code = _error.code;
+  Error.captureStackTrace(error, pcall);
+  return Promise.reject(error);
 }
 
-export function isObject (val) {
-  return val !== null && typeof val === 'object'
+export function isObject (value) {
+  return value !== null && typeof value === "object";
 }
 
 export function matchAll (regex, string, addition) {
-  const matches = []
+  const matches = [];
   for (const match of string.matchAll(regex)) {
     matches.push({
       ...addition,
@@ -34,7 +34,7 @@ export function matchAll (regex, string, addition) {
       code: match[0],
       start: match.index,
       end: match.index + match[0].length
-    })
+    });
   }
-  return matches
+  return matches;
 }
