@@ -66,7 +66,7 @@ Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
 ```js
 import { resolvePath } from 'mlly'
 
-// //home/user/project/module.mjs
+// /home/user/project/module.mjs
 console.log(await resolvePath('./module.mjs', { url: import.meta.url }))
 ```
 
