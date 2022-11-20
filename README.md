@@ -17,7 +17,7 @@ yarn add mlly
 npm install mlly
 ```
 
-**Note:** Node.js 14+ is recommand.
+**Note:** Node.js 14+ is recommended.
 
 Import utils:
 
@@ -110,7 +110,7 @@ console.log(await resolveImports(`import foo from './bar.mjs'`, { url: import.me
 
 Using various syntax detection and heuristics, this method can determine if import is a valid import or not to be imported using dynamic `import()` before hitting an error!
 
-When resault is `false`, we usually need a to create a CommonJS require context or add specific rules to the bundler to transform dependency.
+When result is `false`, we usually need a to create a CommonJS require context or add specific rules to the bundler to transform dependency.
 
 ```js
 import { isValidNodeImport } from 'mlly'
@@ -198,9 +198,9 @@ Note: `require` and `require.resolve` implementation are lazy functions. [`creat
 
 ## Import/Export Analyzes
 
-Tools to quikcly analyze ESM synax and extract static `import`/`export`
+Tools to quickly analyze ESM syntax and extract static `import`/`export`
   - Super fast Regex based implementation
-  - Handle most of edge cases
+  - Handle most edge cases
   - Find all static ESM imports
   - Find all dynamic ESM imports
   - Parse static import statement
@@ -239,7 +239,7 @@ Outputs:
 
 ### `parseStaticImport`
 
-Parse a dynamic ESM import statement previusly matched by `findStaticImports`.
+Parse a dynamic ESM import statement previously matched by `findStaticImports`.
 
 Example:
 
@@ -462,7 +462,7 @@ console.log(interopDefault(myModule))
 
 ### `sanitizeURIComponent`
 
-Replace reserved charachters from a segment of URI to make it compatible with [rfc2396](https://datatracker.ietf.org/doc/html/rfc2396).
+Replace reserved characters from a segment of URI to make it compatible with [rfc2396](https://datatracker.ietf.org/doc/html/rfc2396).
 
 ```js
 import { sanitizeURIComponent } from 'mlly'
