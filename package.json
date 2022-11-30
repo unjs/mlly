@@ -27,10 +27,10 @@
     "acorn": "^8.8.1",
     "pathe": "^1.0.0",
     "pkg-types": "^1.0.1",
-    "ufo": "^1.0.0"
+    "ufo": "^1.0.1"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.11.10",
     "@vitest/coverage-c8": "^0.25.3",
     "c8": "^7.12.0",
     "eslint": "^8.28.0",
