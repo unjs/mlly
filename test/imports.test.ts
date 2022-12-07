@@ -92,6 +92,11 @@ staticTests[`import {
   namedImports: { Component: "Component" }
 };
 
+staticTests["import { foo, type Foo } from \"foo\""] = {
+  specifier: "foo",
+  namedImports: { foo: "foo" }
+};
+
 // -- Dynamic import --
 const dynamicTests = {
   "const { test, /* here */, another, } = await import ( \"module-name\" );": {

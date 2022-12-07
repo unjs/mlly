@@ -146,6 +146,17 @@ export default function useMain() {}
     expect(matches1[0].name).toEqual("default");
     expect(matches2).toEqual(matches1);
   });
+
+  it("ignore export type", () => {
+    const code = `
+export { type AType, type B as BType, foo } from 'foo'
+`;
+    const matches = findExports(code);
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toHaveLength(1);
+    expect(matches[0].names[0]).toEqual("foo");
+    expect(matches[0].name).toEqual("foo");
+  });
 });
 
 describe("fineExportNames", () => {
