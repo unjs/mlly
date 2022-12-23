@@ -347,7 +347,6 @@ console.log(await resolveModuleExportNames('pathe'))
 ## Evaluating Modules
 
 Set of utilities to evaluate ESM modules using `data:` imports
-  - Allow evaluating modules using
   - Automatic import rewrite to resolved path using static analyzes
   - Allow bypass ESM Cache
   - Stack-trace support
