@@ -62,6 +62,7 @@ export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|functi
 const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
 const EXPORT_STAR_RE = /\bexport\s*(\*)(\s*as\s+(?<name>[\w$]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g;
+const TYPE_RE = /^\s*?type\s/;
 
 export function findStaticImports (code: string): StaticImport[] {
   return matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" });
@@ -79,7 +80,7 @@ export function parseStaticImport (matched: StaticImport): ParsedStaticImport {
   const namedImports = {};
   for (const namedImport of cleanedImports.match(/{([^}]*)}/)?.[1]?.split(",") || []) {
     const [, source = namedImport.trim(), importName = source] = namedImport.match(/^\s*(\S*) as (\S*)\s*$/) || [];
-    if (source) {
+    if (source && !TYPE_RE.test(source)) {
       namedImports[source] = importName;
     }
   }
@@ -102,7 +103,11 @@ export function findExports (code: string): ESMExport[] {
   // Find named exports
   const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, { type: "named" });
   for (const namedExport of namedExports) {
-    namedExport.names = namedExport.exports.replace(/^\r?\n?/, "").split(/\s*,\s*/g).map(name => name.replace(/^.*?\sas\s/, "").trim());
+    namedExport.names = namedExport.exports
+      .replace(/^\r?\n?/, "")
+      .split(/\s*,\s*/g)
+      .filter(name => !TYPE_RE.test(name))
+      .map(name => name.replace(/^.*?\sas\s/, "").trim());
   }
 
   // Find export default
