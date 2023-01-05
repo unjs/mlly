@@ -8,7 +8,7 @@ describe("isNodeBuiltin", () => {
     "node:fs": true,
     "node:fake": false,
     "fs/promises": true,
-    "fs/fake": true // invalid import
+    "fs/fake": true, // invalid import
   };
 
   for (const id in cases) {
@@ -28,8 +28,9 @@ describe("sanitizeFilePath", () => {
     "C:\\te#st\\[...slug].jsx": "C:/te_st/_...slug_.jsx",
     "/te#st/[...slug].jsx": "/te_st/_...slug_.jsx",
     "/te#st/[].jsx": "/te_st/_.jsx",
-    "\0a?b*c:d\u007Fe<f>g#h\"i{j}k|l^m[n]o`p.jsx": "_a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p.jsx",
-    "": ""
+    '\0a?b*c:d\u007Fe<f>g#h"i{j}k|l^m[n]o`p.jsx':
+      "_a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p.jsx",
+    "": "",
   };
   for (const id in cases) {
     it(`'${id}': ${cases[id]}`, () => {

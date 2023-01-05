@@ -1,35 +1,37 @@
-
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import { fileURLToPath } from "./utils";
 import { isObject } from "./_utils";
 
 export interface CommonjsContext {
-  __filename: string
-  __dirname: string
+  __filename: string;
+  __dirname: string;
   // TODO!
   // eslint-disable-next-line no-undef
-  require: NodeRequire
+  require: NodeRequire;
 }
 
-export function createCommonJS (url: string): CommonjsContext {
+export function createCommonJS(url: string): CommonjsContext {
   const __filename = fileURLToPath(url);
   const __dirname = dirname(__filename);
 
   // Lazy require
   let _nativeRequire;
-  const getNativeRequire = () => _nativeRequire || (_nativeRequire = createRequire(url));
-  function require (id) { return getNativeRequire()(id); }
+  const getNativeRequire = () =>
+    _nativeRequire || (_nativeRequire = createRequire(url));
+  function require(id) {
+    return getNativeRequire()(id);
+  }
   require.resolve = (id, options) => getNativeRequire().resolve(id, options);
 
   return {
     __filename,
     __dirname,
-    require
+    require,
   } as CommonjsContext;
 }
 
-export function interopDefault (sourceModule: any): any {
+export function interopDefault(sourceModule: any): any {
   if (!isObject(sourceModule) || !("default" in sourceModule)) {
     return sourceModule;
   }
@@ -41,7 +43,9 @@ export function interopDefault (sourceModule: any): any {
           Object.defineProperty(newModule, key, {
             enumerable: false,
             configurable: false,
-            get () { return newModule; }
+            get() {
+              return newModule;
+            },
           });
         }
       } catch {}
@@ -51,7 +55,9 @@ export function interopDefault (sourceModule: any): any {
           Object.defineProperty(newModule, key, {
             enumerable: true,
             configurable: true,
-            get () { return sourceModule[key]; }
+            get() {
+              return sourceModule[key];
+            },
           });
         }
       } catch {}

@@ -1,29 +1,78 @@
 import { describe, it, expect } from "vitest";
-import { ESMExport, findExports, findExportNames, resolveModuleExportNames } from "../src";
+import {
+  ESMExport,
+  findExports,
+  findExportNames,
+  resolveModuleExportNames,
+} from "../src";
 
 describe("findExports", () => {
   const tests: Record<string, Partial<ESMExport>> = {
-    "export function useA () { return 'a' }": { name: "useA", type: "declaration" },
-    "export const useD = () => { return 'd' }": { name: "useD", type: "declaration" },
-    "export { useB, _useC as useC }": { names: ["useB", "useC"], type: "named" },
-    "export default foo": { type: "default", name: "default", names: ["default"] },
-    "export { default } from \"./other\"": { type: "default", name: "default", names: ["default"], specifier: "./other" },
-    "export { default , } from \"./other\"": { type: "default", name: "default", names: ["default"], specifier: "./other" },
-    "export { useA , } from \"./path\"": { type: "named", name: "useA", names: ["useA"], specifier: "./path" },
-    "export { useA , useB  , } from \"./path\"": { type: "named", names: ["useA", "useB"], specifier: "./path" },
+    "export function useA () { return 'a' }": {
+      name: "useA",
+      type: "declaration",
+    },
+    "export const useD = () => { return 'd' }": {
+      name: "useD",
+      type: "declaration",
+    },
+    "export { useB, _useC as useC }": {
+      names: ["useB", "useC"],
+      type: "named",
+    },
+    "export default foo": {
+      type: "default",
+      name: "default",
+      names: ["default"],
+    },
+    'export { default } from "./other"': {
+      type: "default",
+      name: "default",
+      names: ["default"],
+      specifier: "./other",
+    },
+    'export { default , } from "./other"': {
+      type: "default",
+      name: "default",
+      names: ["default"],
+      specifier: "./other",
+    },
+    'export { useA , } from "./path"': {
+      type: "named",
+      name: "useA",
+      names: ["useA"],
+      specifier: "./path",
+    },
+    'export { useA , useB  , } from "./path"': {
+      type: "named",
+      names: ["useA", "useB"],
+      specifier: "./path",
+    },
     "export async function foo ()": { type: "declaration", names: ["foo"] },
     "export const $foo = () => {}": { type: "declaration", names: ["$foo"] },
-    "export { foo as default }": { type: "default", name: "default", names: ["default"] },
-    "export * from \"./other\"": { type: "star", specifier: "./other" },
-    "export * as foo from \"./other\"": { type: "star", specifier: "./other", name: "foo" },
+    "export { foo as default }": {
+      type: "default",
+      name: "default",
+      names: ["default"],
+    },
+    'export * from "./other"': { type: "star", specifier: "./other" },
+    'export * as foo from "./other"': {
+      type: "star",
+      specifier: "./other",
+      name: "foo",
+    },
     // eslint-disable-next-line no-template-curly-in-string
-    "const a = `<div${JSON.stringify({ class: 42 })}>`;\nexport default true;": { type: "default", name: "default", names: ["default"] },
-    "export const enum foo { a = 'xx' }": { type: "declaration", names: ["foo"] },
+    "const a = `<div${JSON.stringify({ class: 42 })}>`;\nexport default true;":
+      { type: "default", name: "default", names: ["default"] },
+    "export const enum foo { a = 'xx' }": {
+      type: "declaration",
+      names: ["foo"],
+    },
     "export enum bar { a = 'xx' }": { type: "declaration", names: ["bar"] },
     "export const { a, b } = foo": { type: "named", names: ["a", "b"] },
     "export const [ a, b ] = foo": { type: "named", names: ["a", "b"] },
     "export const [\na\n, b ] = foo": { type: "named", names: ["a", "b"] },
-    "export const [ a:b,\nc = 1] = foo": { type: "named", names: ["b", "c"] }
+    "export const [ a:b,\nc = 1] = foo": { type: "named", names: ["b", "c"] },
   };
 
   for (const [input, test] of Object.entries(tests)) {
@@ -100,12 +149,12 @@ describe("findExports", () => {
       "export const useD = () => { return 'd' }",
       "export { useB, _useC as useC }",
       "export default foo",
-      "export { default } from \"./other\"",
+      'export { default } from "./other"',
       "export async function foo ()",
       "export const $foo = () => {}",
       "export { foo as default }",
-      "export * from \"./other\"",
-      "export * as foo from \"./other\""
+      'export * from "./other"',
+      'export * as foo from "./other"',
     ];
     // eslint-disable-next-line unicorn/no-array-reduce
     const code = tests.reduce((codeString, statement, index) => {
@@ -165,11 +214,13 @@ export { type AType, type B as BType, foo } from 'foo'
 
 describe("fineExportNames", () => {
   it("findExportNames", () => {
-    expect(findExportNames(`
+    expect(
+      findExportNames(`
     export const foo = 'bar'
     export { bar, baz }
     export default something
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       [
         "foo",
         "bar",
@@ -203,7 +254,11 @@ describe("resolveModuleExportNames", () => {
   });
 
   it("star exports", async () => {
-    expect(await resolveModuleExportNames(new URL("fixture/exports.mjs", import.meta.url).toString())).toMatchInlineSnapshot(`
+    expect(
+      await resolveModuleExportNames(
+        new URL("fixture/exports.mjs", import.meta.url).toString()
+      )
+    ).toMatchInlineSnapshot(`
       [
         "foo",
         "_resolve",

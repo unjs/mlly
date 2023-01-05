@@ -1,1 +1,1 @@
-export default 'esm-module'
+export default "esm-module";

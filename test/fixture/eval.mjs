@@ -1,16 +1,25 @@
-import { evalModule, loadModule, fileURLToPath } from 'mlly'
+import { evalModule, loadModule, fileURLToPath } from "mlly";
 
-await evalModule('console.log("Eval works!")')
+await evalModule('console.log("Eval works!")');
 
-await evalModule(`
+await evalModule(
+  `
   import { reverse } from './utils.mjs'
   console.log(reverse('!emosewa si sj'))
-`, {
-  url: fileURLToPath(import.meta.url)
-})
+`,
+  {
+    url: fileURLToPath(import.meta.url),
+  }
+);
 
-await loadModule('./hello.mjs', { url: import.meta.url })
+await loadModule("./hello.mjs", { url: import.meta.url });
 
-console.log(await loadModule('../../package.json', { url: import.meta.url }).then(r => r.default.name))
+console.log(
+  await loadModule("../../package.json", { url: import.meta.url }).then(
+    (r) => r.default.name
+  )
+);
 
-await loadModule('./eval-err.mjs', { url: import.meta.url }).catch(e => console.error(e))
+await loadModule("./eval-err.mjs", { url: import.meta.url }).catch((e) =>
+  console.error(e)
+);

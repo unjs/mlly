@@ -5,11 +5,17 @@ const tests = [
   [{}, {}],
   [{ default: {} }, {}],
   [true, true],
-  [[1, 2, 3], [1, 2, 3]],
+  [
+    [1, 2, 3],
+    [1, 2, 3],
+  ],
   [{ default: { x: 2 } }, { x: 2 }],
   [{ named: 2 }, { named: 2 }],
   [{ named: 2, default: {} }, { named: 2 }],
-  [{ named: 1, default: { x: 2 } }, { named: 1, x: 2 }]
+  [
+    { named: 1, default: { x: 2 } },
+    { named: 1, x: 2 },
+  ],
 ];
 
 describe("interopDefault", () => {

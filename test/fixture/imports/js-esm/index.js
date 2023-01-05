@@ -1,1 +1,1 @@
-export default 'js-esm'
+export default "js-esm";

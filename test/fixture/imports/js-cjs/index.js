@@ -1,1 +1,1 @@
-module.exports = 'js-cjs'
+module.exports = "js-cjs";

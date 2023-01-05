@@ -1,3 +1,3 @@
-import { resolve } from 'mlly'
+import { resolve } from "mlly";
 
-console.log(await resolve('./404.mjs'))
+console.log(await resolve("./404.mjs"));

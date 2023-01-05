@@ -1,2 +1,2 @@
 // @ts-ignore
-console.log(await Promise.resolve('foo'))
+console.log(await Promise.resolve("foo"));
