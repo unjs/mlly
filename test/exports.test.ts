@@ -19,7 +19,11 @@ describe("findExports", () => {
     // eslint-disable-next-line no-template-curly-in-string
     "const a = `<div${JSON.stringify({ class: 42 })}>`;\nexport default true;": { type: "default", name: "default", names: ["default"] },
     "export const enum foo { a = 'xx' }": { type: "declaration", names: ["foo"] },
-    "export enum bar { a = 'xx' }": { type: "declaration", names: ["bar"] }
+    "export enum bar { a = 'xx' }": { type: "declaration", names: ["bar"] },
+    "export const { a, b } = foo": { type: "named", names: ["a", "b"] },
+    "export const [ a, b ] = foo": { type: "named", names: ["a", "b"] },
+    "export const [\na\n, b ] = foo": { type: "named", names: ["a", "b"] },
+    "export const [ a:b,\nc = 1] = foo": { type: "named", names: ["b", "c"] }
   };
 
   for (const [input, test] of Object.entries(tests)) {

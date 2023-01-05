@@ -60,6 +60,7 @@ export const DYNAMIC_IMPORT_RE = /import\s*\((?<expression>(?:[^()]+|\((?:[^()]+
 
 export const EXPORT_DECAL_RE = /\bexport\s+(?<declaration>(async function|function|let|const enum|const|enum|var|class))\s+(?<name>[\w$]+)/g;
 const EXPORT_NAMED_RE = /\bexport\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
+const EXPORT_NAMED_DESTRUCT = /\bexport\s+(let|var|const)\s+(?:{(?<exports1>[^}]+?)[\s,]*}|\[(?<exports2>[^\]]+?)[\s,]*])\s+=/gm;
 const EXPORT_STAR_RE = /\bexport\s*(\*)(\s*as\s+(?<name>[\w$]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
 const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g;
 const TYPE_RE = /^\s*?type\s/;
@@ -110,6 +111,21 @@ export function findExports (code: string): ESMExport[] {
       .map(name => name.replace(/^.*?\sas\s/, "").trim());
   }
 
+  const destructuredExports: NamedExport[] = matchAll(EXPORT_NAMED_DESTRUCT, code, { type: "named" });
+  for (const namedExport of destructuredExports) {
+    // @ts-expect-error groups
+    namedExport.exports = namedExport.exports1 || namedExport.exports2
+    namedExport.names = namedExport.exports
+      .replace(/^\r?\n?/, "")
+      .split(/\s*,\s*/g)
+      .filter(name => !TYPE_RE.test(name))
+      .map(name => name
+        .replace(/^.*?\s*:\s*/, "")
+        .replace(/\s*=\s*.*$/, "")
+        .trim()
+        )
+  }
+
   // Find export default
   const defaultExport: DefaultExport[] = matchAll(EXPORT_DEFAULT_RE, code, { type: "default", name: "default" });
 
@@ -121,6 +137,7 @@ export function findExports (code: string): ESMExport[] {
   const exports: ESMExport[] = [
     ...declaredExports,
     ...namedExports,
+    ...destructuredExports,
     ...defaultExport,
     ...starExports
   ];
