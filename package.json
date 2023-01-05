@@ -19,7 +19,7 @@
   "scripts": {
     "build": "unbuild",
     "dev": "vitest",
-    "lint": "eslint --ext .ts src test && prettier -c src test lib",
+    "lint": "eslint --ext .ts,.js src test && prettier -c src test lib",
     "release": "pnpm test && pnpm build && standard-version && pnpm publish && git push --follow-tags",
     "test": "pnpm lint && vitest run"
   },
