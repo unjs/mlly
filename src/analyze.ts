@@ -123,7 +123,7 @@ export function findExports (code: string): ESMExport[] {
         .replace(/^.*?\s*:\s*/, "")
         .replace(/\s*=\s*.*$/, "")
         .trim()
-        )
+      )
   }
 
   // Find export default
