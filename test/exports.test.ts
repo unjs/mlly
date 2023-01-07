@@ -280,6 +280,20 @@ describe("resolveModuleExportNames", () => {
     `);
   });
 
+  it("star exports with package", async () => {
+    expect(
+      await resolveModuleExportNames(
+        new URL("fixture/package/exports.mjs", import.meta.url).toString()
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        "StaticRouter",
+        "unstable_StaticRouterProvider",
+        "unstable_createStaticRouter",
+      ]
+    `);
+  });
+
   it("multiple inline", () => {
     const code = `
 export { foo } from 'foo1';export { bar } from 'foo2';export * as foobar from 'foo2';
