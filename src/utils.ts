@@ -14,7 +14,9 @@ export function fileURLToPath(id: string): string {
 const INVALID_CHAR_RE = /[\u0000-\u001F"#$&*+,/:;<=>?@[\]^`{|}\u007F]+/g;
 
 export function sanitizeURIComponent(name = "", replacement = "_"): string {
-  return name.replace(INVALID_CHAR_RE, replacement);
+  return name
+    .replace(INVALID_CHAR_RE, replacement)
+    .replace(/%../g, replacement);
 }
 
 export function sanitizeFilePath(filePath = "") {
