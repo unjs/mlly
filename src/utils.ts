@@ -21,7 +21,7 @@ export function sanitizeURIComponent(name = "", replacement = "_"): string {
 
 export function sanitizeFilePath(filePath = "") {
   return filePath
-    .replace(/\?.*$/, '') // remove query string
+    .replace(/\?.*$/, "") // remove query string
     .split(/[/\\]/g)
     .map((p) => sanitizeURIComponent(p))
     .join("/")
