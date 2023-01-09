@@ -104,6 +104,9 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
         break;
       }
     }
+    if (resolved) {
+      break;
+    }
   }
 
   // Throw error if not found
