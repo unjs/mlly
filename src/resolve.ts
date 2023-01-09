@@ -2,7 +2,7 @@ import { existsSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { joinURL } from "ufo";
 import { isAbsolute } from "pathe";
-import { moduleResolve } from "../lib/import-meta-resolve";
+import { moduleResolve } from "import-meta-resolve";
 import { fileURLToPath, normalizeid } from "./utils";
 import { pcall, BUILTIN_MODULES } from "./_utils";
 
