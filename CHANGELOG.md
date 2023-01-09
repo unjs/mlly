@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/unjs/mlly/compare/v1.0.0...v1.1.0) (2023-01-09)
+
+
+### Features
+
+* **findExports:** support for exports destructuring ([#133](https://github.com/unjs/mlly/issues/133)) ([7e877b6](https://github.com/unjs/mlly/commit/7e877b65b08fc24737ad688e86cfad72f5800654))
+
+
+### Bug Fixes
+
+* ignore `type` imports and exports ([#124](https://github.com/unjs/mlly/issues/124)) ([1523bbc](https://github.com/unjs/mlly/commit/1523bbc78654e34dc275281b6025cf0d645fcb5e))
+* **resolve:** stop searching when module is resolved ([#135](https://github.com/unjs/mlly/issues/135)) ([f10e797](https://github.com/unjs/mlly/commit/f10e797e0df0bb89b37e5a684d7225461be18e81))
+* **sanitizeFilePath:** remove query string ([#141](https://github.com/unjs/mlly/issues/141)) ([203676a](https://github.com/unjs/mlly/commit/203676af76d002e7524871881fe683e0aedd0c9f))
+* **sanitizeURIComponent:** sanitize url escaping ([#137](https://github.com/unjs/mlly/issues/137)) ([f91da0d](https://github.com/unjs/mlly/commit/f91da0d82b9ff375c993df019a7da23fbc2db955))
+
 ## [1.0.0](https://github.com/unjs/mlly/compare/v0.5.17...v1.0.0) (2022-11-14)
 
 ### [0.5.17](https://github.com/unjs/mlly/compare/v0.5.16...v0.5.17) (2022-11-14)
