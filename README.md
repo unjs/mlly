@@ -3,7 +3,7 @@
 > Missing [ECMAScript module](https://nodejs.org/api/esm.html) utils for Node.js
 
 While ESM Modules are evolving in Node.js ecosystem, there are still
- many required features that are still experimental or missing or needed to support ESM. This package tries to fill in the gap.
+many required features that are still experimental or missing or needed to support ESM. This package tries to fill in the gap.
 
 ## Usage
 
@@ -23,15 +23,16 @@ Import utils:
 
 ```js
 // ESM
-import { } from 'mlly'
+import {} from "mlly";
 
 // CommonJS
-const { } = require('mlly')
+const {} = require("mlly");
 ```
 
 ## Resolving ESM modules
 
 Several utilities to make ESM resolution easier:
+
 - Respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
 - Exposed from Node.js implementation
 - Windows paths normalized
@@ -42,15 +43,15 @@ Several utilities to make ESM resolution easier:
 ### `resolve`
 
 Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
-(based on experimental Node.js implementation extracted from [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve)).
+(using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve)).
 
 Additionally supports resolving without extension and `/index` similar to CommonJS.
 
 ```js
-import { resolve } from 'mlly'
+import { resolve } from "mlly";
 
 // file:///home/user/project/module.mjs
-console.log(await resolve('./module.mjs', { url: import.meta.url }))
+console.log(await resolve("./module.mjs", { url: import.meta.url }));
 ```
 
 **Resolve options:**
@@ -64,10 +65,10 @@ console.log(await resolve('./module.mjs', { url: import.meta.url }))
 Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
 
 ```js
-import { resolvePath } from 'mlly'
+import { resolvePath } from "mlly";
 
 // /home/user/project/module.mjs
-console.log(await resolvePath('./module.mjs', { url: import.meta.url }))
+console.log(await resolvePath("./module.mjs", { url: import.meta.url }));
 ```
 
 ### `createResolve`
@@ -75,20 +76,20 @@ console.log(await resolvePath('./module.mjs', { url: import.meta.url }))
 Create a `resolve` function with defaults.
 
 ```js
-import { createResolve } from 'mlly'
+import { createResolve } from "mlly";
 
-const _resolve = createResolve({ url: import.meta.url })
+const _resolve = createResolve({ url: import.meta.url });
 
 // file:///home/user/project/module.mjs
-console.log(await _resolve('./module.mjs'))
+console.log(await _resolve("./module.mjs"));
 ```
 
 **Example:** Ponyfill [import.meta.resolve](https://nodejs.org/api/esm.html#esm_import_meta_resolve_specifier_parent):
 
 ```js
-import { createResolve } from 'mlly'
+import { createResolve } from "mlly";
 
-import.meta.resolve = createResolve({ url: import.meta.url })
+import.meta.resolve = createResolve({ url: import.meta.url });
 ```
 
 ### `resolveImports`
@@ -96,13 +97,13 @@ import.meta.resolve = createResolve({ url: import.meta.url })
 Resolve all static and dynamic imports with relative paths to full resolved path.
 
 ```js
-import { resolveImports } from 'mlly'
+import { resolveImports } from "mlly";
 
 // import foo from 'file:///home/user/project/bar.mjs'
-console.log(await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }))
+console.log(
+  await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url })
+);
 ```
-
-
 
 ## Syntax Analyzes
 
@@ -113,24 +114,22 @@ Using various syntax detection and heuristics, this method can determine if impo
 When result is `false`, we usually need a to create a CommonJS require context or add specific rules to the bundler to transform dependency.
 
 ```js
-import { isValidNodeImport } from 'mlly'
+import { isValidNodeImport } from "mlly";
 
 // If returns true, we are safe to use `import('some-lib')`
-await isValidNodeImport('some-lib', {})
+await isValidNodeImport("some-lib", {});
 ```
 
 **Algorithm:**
 
-- Check import protocol
-    - If is `data:` return `true` (✅ valid)
-    - If is not `node:`, `file:` or `data:`, return `false` (
-❌ invalid)
+- Check import protocol - If is `data:` return `true` (✅ valid) - If is not `node:`, `file:` or `data:`, return `false` (
+  ❌ invalid)
 - Resolve full path of import using Node.js [Resolution algorithm](https://nodejs.org/api/esm.html#resolution-algorithm)
 - Check full path extension
   - If is `.mjs`, `.cjs`, `.node` or `.wasm`, return `true` (✅ valid)
   - If is not `.js`, return `false` (❌ invalid)
   - If is matching known mixed syntax (`.esm.js`, `.es.js`, etc) return `false` (
-❌ invalid)
+    ❌ invalid)
 - Read closest `package.json` file to resolve path
 - If `type: 'module'` field is set, return `true` (✅ valid)
 - Read source code of resolved path
@@ -138,24 +137,22 @@ await isValidNodeImport('some-lib', {})
   - If yes, return `true` (✅ valid)
 - Try to detect ESM syntax usage
   - if yes, return `false` (
-❌ invalid)
+    ❌ invalid)
 
 **Notes:**
 
 - There might be still edge cases algorithm cannot cover. It is designed with best-efforts.
 - This method also allows using dynamic import of CommonJS libraries considering
-Node.js has [Interoperability with CommonJS](https://nodejs.org/api/esm.html#interoperability-with-commonjs).
-
-
+  Node.js has [Interoperability with CommonJS](https://nodejs.org/api/esm.html#interoperability-with-commonjs).
 
 ### `hasESMSyntax`
 
 Detect if code, has usage of ESM syntax (Static `import`, ESM `export` and `import.meta` usage)
 
 ```js
-import { hasESMSyntax } from 'mlly'
+import { hasESMSyntax } from "mlly";
 
-hasESMSyntax('export default foo = 123') // true
+hasESMSyntax("export default foo = 123"); // true
 ```
 
 ### `hasCJSSyntax`
@@ -163,9 +160,9 @@ hasESMSyntax('export default foo = 123') // true
 Detect if code, has usage of CommonJS syntax (`exports`, `module.exports`, `require` and `global` usage)
 
 ```js
-import { hasCJSSyntax } from 'mlly'
+import { hasCJSSyntax } from "mlly";
 
-hasCJSSyntax('export default foo = 123') // false
+hasCJSSyntax("export default foo = 123"); // false
 ```
 
 ### `detectSyntax`
@@ -175,10 +172,10 @@ Tests code against both CJS and ESM.
 `isMixed` indicates if both are detected! This is a common case with legacy packages exporting semi-compatible ESM syntax meant to be used by bundlers.
 
 ```js
-import { detectSyntax } from 'mlly'
+import { detectSyntax } from "mlly";
 
 // { hasESM: true, hasCJS: true, isMixed: true }
-detectSyntax('export default require("lodash")')
+detectSyntax('export default require("lodash")');
 ```
 
 ## CommonJS Context
@@ -188,24 +185,23 @@ detectSyntax('export default require("lodash")')
 This utility creates a compatible CommonJS context that is missing in ECMAScript modules.
 
 ```js
-import { createCommonJS } from 'mlly'
+import { createCommonJS } from "mlly";
 
-const { __dirname, __filename, require } = createCommonJS(import.meta.url)
+const { __dirname, __filename, require } = createCommonJS(import.meta.url);
 ```
 
 Note: `require` and `require.resolve` implementation are lazy functions. [`createRequire`](https://nodejs.org/api/module.html#module_module_createrequire_filename) will be called on first usage.
 
-
 ## Import/Export Analyzes
 
 Tools to quickly analyze ESM syntax and extract static `import`/`export`
-  - Super fast Regex based implementation
-  - Handle most edge cases
-  - Find all static ESM imports
-  - Find all dynamic ESM imports
-  - Parse static import statement
-  - Find all named, declared and default exports
 
+- Super fast Regex based implementation
+- Handle most edge cases
+- Find all static ESM imports
+- Find all dynamic ESM imports
+- Parse static import statement
+- Find all named, declared and default exports
 
 ### `findStaticImports`
 
@@ -214,12 +210,14 @@ Find all static ESM imports.
 Example:
 
 ```js
-import { findStaticImports } from 'mlly'
+import { findStaticImports } from "mlly";
 
-console.log(findStaticImports(`
+console.log(
+  findStaticImports(`
 // Empty line
 import foo, { bar /* foo */ } from 'baz'
-`))
+`)
+);
 ```
 
 Outputs:
@@ -227,14 +225,14 @@ Outputs:
 ```js
 [
   {
-    type: 'static',
-    imports: 'foo, { bar /* foo */ } ',
-    specifier: 'baz',
+    type: "static",
+    imports: "foo, { bar /* foo */ } ",
+    specifier: "baz",
     code: "import foo, { bar /* foo */ } from 'baz'",
     start: 15,
-    end: 55
-  }
-]
+    end: 55,
+  },
+];
 ```
 
 ### `parseStaticImport`
@@ -244,14 +242,13 @@ Parse a dynamic ESM import statement previously matched by `findStaticImports`.
 Example:
 
 ```js
-import { findStaticImports, parseStaticImport } from 'mlly'
+import { findStaticImports, parseStaticImport } from "mlly";
 
-const [match0] = findStaticImports(`import baz, { x, y as z } from 'baz'`)
-console.log(parseStaticImport(match0))
+const [match0] = findStaticImports(`import baz, { x, y as z } from 'baz'`);
+console.log(parseStaticImport(match0));
 ```
 
 Outputs:
-
 
 ```js
 {
@@ -267,7 +264,6 @@ Outputs:
 }
 ```
 
-
 ### `findDynamicImports`
 
 Find all dynamic ESM imports.
@@ -275,23 +271,27 @@ Find all dynamic ESM imports.
 Example:
 
 ```js
-import { findDynamicImports } from 'mlly'
+import { findDynamicImports } from "mlly";
 
-console.log(findDynamicImports(`
+console.log(
+  findDynamicImports(`
 const foo = await import('bar')
-`))
+`)
+);
 ```
 
 ### `findExports`
 
 ```js
-import { findExports } from 'mlly'
+import { findExports } from "mlly";
 
-console.log(findExports(`
+console.log(
+  findExports(`
 export const foo = 'bar'
 export { bar, baz }
 export default something
-`))
+`)
+);
 ```
 
 Outputs:
@@ -299,23 +299,23 @@ Outputs:
 ```js
 [
   {
-    type: 'declaration',
-    declaration: 'const',
-    name: 'foo',
-    code: 'export const foo',
+    type: "declaration",
+    declaration: "const",
+    name: "foo",
+    code: "export const foo",
     start: 1,
-    end: 17
+    end: 17,
   },
   {
-    type: 'named',
-    exports: ' bar, baz ',
-    code: 'export { bar, baz }',
+    type: "named",
+    exports: " bar, baz ",
+    code: "export { bar, baz }",
     start: 26,
     end: 45,
-    names: [ 'bar', 'baz' ]
+    names: ["bar", "baz"],
   },
-  { type: 'default', code: 'export default ', start: 46, end: 61 }
-]
+  { type: "default", code: "export default ", start: 46, end: 61 },
+];
 ```
 
 ### `findExportNames`
@@ -323,14 +323,16 @@ Outputs:
 Same as `findExports` but returns array of export names.
 
 ```js
-import { findExportNames } from 'mlly'
+import { findExportNames } from "mlly";
 
 // [ "foo", "bar", "baz", "default" ]
-console.log(findExportNames(`
+console.log(
+  findExportNames(`
 export const foo = 'bar'
 export { bar, baz }
 export default something
-`))
+`)
+);
 ```
 
 ## `resolveModuleExportNames`
@@ -338,33 +340,37 @@ export default something
 Resolves module and reads its contents to extract possible export names using static analyzes.
 
 ```js
-import { resolveModuleExportNames } from 'mlly'
+import { resolveModuleExportNames } from "mlly";
 
 // ["basename", "dirname", ... ]
-console.log(await resolveModuleExportNames('pathe'))
+console.log(await resolveModuleExportNames("pathe"));
 ```
 
 ## Evaluating Modules
 
 Set of utilities to evaluate ESM modules using `data:` imports
-  - Automatic import rewrite to resolved path using static analyzes
-  - Allow bypass ESM Cache
-  - Stack-trace support
-  - `.json` loader
+
+- Automatic import rewrite to resolved path using static analyzes
+- Allow bypass ESM Cache
+- Stack-trace support
+- `.json` loader
 
 ### `evalModule`
 
 Transform and evaluates module code using dynamic imports.
 
 ```js
-import { evalModule } from 'mlly'
+import { evalModule } from "mlly";
 
-await evalModule(`console.log("Hello World!")`)
+await evalModule(`console.log("Hello World!")`);
 
-await evalModule(`
+await evalModule(
+  `
   import { reverse } from './utils.mjs'
   console.log(reverse('!emosewa si sj'))
-`, { url: import.meta.url })
+`,
+  { url: import.meta.url }
+);
 ```
 
 **Options:**
@@ -377,9 +383,9 @@ await evalModule(`
 Dynamically loads a module by evaluating source code.
 
 ```js
-import { loadModule } from 'mlly'
+import { loadModule } from "mlly";
 
-await loadModule('./hello.mjs', { url: import.meta.url })
+await loadModule("./hello.mjs", { url: import.meta.url });
 ```
 
 Options are same as `evalModule`.
@@ -390,8 +396,10 @@ Options are same as `evalModule`.
 - All usages of `import.meta.url` will be replaced with `url` or `from` option
 
 ```js
-import { toDataURL } from 'mlly'
-console.log(transformModule(`console.log(import.meta.url)`), { url: 'test.mjs' })
+import { toDataURL } from "mlly";
+console.log(transformModule(`console.log(import.meta.url)`), {
+  url: "test.mjs",
+});
 ```
 
 Options are same as `evalModule`.
@@ -403,13 +411,13 @@ Options are same as `evalModule`.
 Similar to [url.fileURLToPath](https://nodejs.org/api/url.html#url_url_fileurltopath_url) but also converts windows backslash `\` to unix slash `/` and handles if input is already a path.
 
 ```js
-import { fileURLToPath } from 'mlly'
+import { fileURLToPath } from "mlly";
 
 // /foo/bar.js
-console.log(fileURLToPath('file:///foo/bar.js'))
+console.log(fileURLToPath("file:///foo/bar.js"));
 
 // C:/path
-console.log(fileURLToPath('file:///C:/path/'))
+console.log(fileURLToPath("file:///C:/path/"));
 ```
 
 ### `normalizeid`
@@ -417,10 +425,10 @@ console.log(fileURLToPath('file:///C:/path/'))
 Ensures id has either of `node:`, `data:`, `http:`, `https:` or `file:` protocols.
 
 ```js
-import { ensureProtocol } from 'mlly'
+import { ensureProtocol } from "mlly";
 
 // file:///foo/bar.js
-console.log(normalizeid('/foo/bar.js'))
+console.log(normalizeid("/foo/bar.js"));
 ```
 
 ### `loadURL`
@@ -428,10 +436,10 @@ console.log(normalizeid('/foo/bar.js'))
 Read source contents of a URL. (currently only file protocol supported)
 
 ```js
-import { resolve, loadURL } from 'mlly'
+import { resolve, loadURL } from "mlly";
 
-const url = await resolve('./index.mjs', { url: import.meta.url })
-console.log(await loadURL(url))
+const url = await resolve("./index.mjs", { url: import.meta.url });
+console.log(await loadURL(url));
 ```
 
 ### `toDataURL`
@@ -439,12 +447,14 @@ console.log(await loadURL(url))
 Convert code to [`data:`](https://nodejs.org/api/esm.html#esm_data_imports) URL using base64 encoding.
 
 ```js
-import { toDataURL } from 'mlly'
+import { toDataURL } from "mlly";
 
-console.log(toDataURL(`
+console.log(
+  toDataURL(`
   // This is an example
   console.log('Hello world')
-`))
+`)
+);
 ```
 
 ### `interopDefault`
@@ -453,10 +463,10 @@ Return the default export of a module at the top-level, alongside any other name
 
 ```js
 // Assuming the shape { default: { foo: 'bar' }, baz: 'qux' }
-import myModule from 'my-module'
+import myModule from "my-module";
 
 // Returns { foo: 'bar', baz: 'qux' }
-console.log(interopDefault(myModule))
+console.log(interopDefault(myModule));
 ```
 
 ### `sanitizeURIComponent`
@@ -464,10 +474,10 @@ console.log(interopDefault(myModule))
 Replace reserved characters from a segment of URI to make it compatible with [rfc2396](https://datatracker.ietf.org/doc/html/rfc2396).
 
 ```js
-import { sanitizeURIComponent } from 'mlly'
+import { sanitizeURIComponent } from "mlly";
 
 // foo_bar
-console.log(sanitizeURIComponent(`foo:bar`))
+console.log(sanitizeURIComponent(`foo:bar`));
 ```
 
 ### `sanitizeFilePath`
@@ -475,10 +485,10 @@ console.log(sanitizeURIComponent(`foo:bar`))
 Sanitize each path of a file name or path with `sanitizeURIComponent` for URI compatibility.
 
 ```js
-import { sanitizeFilePath } from 'mlly'
+import { sanitizeFilePath } from "mlly";
 
 // C:/te_st/_...slug_.jsx'
-console.log(sanitizeFilePath('C:\\te#st\\[...slug].jsx'))
+console.log(sanitizeFilePath("C:\\te#st\\[...slug].jsx"));
 ```
 
 ## License
