@@ -236,6 +236,7 @@ describe("resolveModuleExportNames", () => {
     expect(await resolveModuleExportNames("pathe")).toMatchInlineSnapshot(`
       [
         "basename",
+        "default",
         "delimiter",
         "dirname",
         "extname",
@@ -263,6 +264,7 @@ describe("resolveModuleExportNames", () => {
         "foo",
         "_resolve",
         "basename",
+        "default",
         "delimiter",
         "dirname",
         "extname",
