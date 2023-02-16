@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.1.1
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.1.0...v1.1.1)
+
+
+### 📦 Build
+
+  - Add types field to exports ([190a5ec](https://github.com/unjs/mlly/commit/190a5ec))
+
+### 🏡 Chore
+
+  - Update ufo ([f1ee21c](https://github.com/unjs/mlly/commit/f1ee21c))
+  - Switch to changelogen ([4b57ff9](https://github.com/unjs/mlly/commit/4b57ff9))
+
+### ✅ Tests
+
+  - Update snapshot ([3f2b36a](https://github.com/unjs/mlly/commit/3f2b36a))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+
 ## [1.1.0](https://github.com/unjs/mlly/compare/v1.0.0...v1.1.0) (2023-01-09)
 
 
