@@ -27,7 +27,7 @@
     "acorn": "^8.8.2",
     "pathe": "^1.1.0",
     "pkg-types": "^1.0.1",
-    "ufo": "^1.0.1"
+    "ufo": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.13.0",

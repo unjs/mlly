@@ -14,7 +14,7 @@ specifiers:
   prettier: ^2.8.4
   standard-version: ^9.5.0
   typescript: ^4.9.5
-  ufo: ^1.0.1
+  ufo: ^1.1.0
   unbuild: ^1.1.1
   vitest: ^0.28.5
 
@@ -22,7 +22,7 @@ dependencies:
   acorn: 8.8.2
   pathe: 1.1.0
   pkg-types: 1.0.1
-  ufo: 1.0.1
+  ufo: 1.1.0
 
 devDependencies:
   '@types/node': 18.13.0
@@ -3162,7 +3162,7 @@ packages:
       acorn: 8.8.2
       pathe: 1.1.0
       pkg-types: 1.0.1
-      ufo: 1.0.1
+      ufo: 1.1.0
 
   /modify-values/1.0.1:
     resolution: {integrity: sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==}
@@ -4095,8 +4095,8 @@ packages:
     hasBin: true
     dev: true
 
-  /ufo/1.0.1:
-    resolution: {integrity: sha512-boAm74ubXHY7KJQZLlXrtMz52qFvpsbOxDcZOnw/Wf+LS4Mmyu7JxmzD4tDLtUQtmZECypJ0FrCz4QIe6dvKRA==}
+  /ufo/1.1.0:
+    resolution: {integrity: sha512-LQc2s/ZDMaCN3QLpa+uzHUOQ7SdV0qgv3VBXOolQGXTaaZpIur6PwUclF5nN2hNkiTRcUugXd1zFOW3FLJ135Q==}
 
   /uglify-js/3.15.3:
     resolution: {integrity: sha512-6iCVm2omGJbsu3JWac+p6kUiOpg3wFO2f8lIXjfEb8RrmLjzog1wTPMmwKB7swfzzqxj9YM+sGUM++u1qN4qJg==}
