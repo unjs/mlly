@@ -31,7 +31,7 @@
     "ufo": "^1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^18.14.0",
+    "@types/node": "^18.14.1",
     "@vitest/coverage-c8": "^0.28.5",
     "c8": "^7.13.0",
     "changelogen": "^0.4.1",
