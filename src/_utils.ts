@@ -28,15 +28,22 @@ export function isObject(value) {
 }
 
 export function matchAll(regex, string, addition) {
-  const matches = [];
-  for (const match of string.matchAll(regex)) {
-    matches.push({
+  const comments = [...string.matchAll(/\/\/.*|\/\*[\S\s]*?\*\//g)].map(
+    (match) => [match.index, match.index + match[0].length]
+  );
+
+  return [...string.matchAll(regex)]
+    .filter(
+      (match) =>
+        !comments.some(
+          ([start, end]) => start <= match.index && match.index <= end
+        )
+    )
+    .map((match) => ({
       ...addition,
       ...match.groups,
       code: match[0],
       start: match.index,
       end: match.index + match[0].length,
-    });
-  }
-  return matches;
+    }));
 }
