@@ -128,7 +128,9 @@ staticTests[`
    * import { zoo } from "zoo"
    */
 
+  const start = '/*'
   import { ioo } from "ioo"
+  const end = '*/'
 `] = [
   {
     specifier: "too",
@@ -160,6 +162,7 @@ const dynamicTests = {
     expression: '"abc"',
   },
   '// import("abc").then(r => r.default)': [],
+  '/* import("abc").then(r => r.default) */': [],
 };
 
 describe("findStaticImports", () => {
