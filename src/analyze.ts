@@ -62,8 +62,12 @@ export const DYNAMIC_IMPORT_RE =
 
 export const EXPORT_DECAL_RE =
   /\bexport\s+(?<declaration>(async function|function|let|const enum|const|enum|var|class))\s+(?<name>[\w$]+)/g;
+export const EXPORT_DECAL_TYPE_RE =
+  /\bexport\s+(?<declaration>(interface|type|declare (async function|function|let|const enum|const|enum|var|class)))\s+(?<name>[\w$]+)/g;
 const EXPORT_NAMED_RE =
   /\bexport\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
+const EXPORT_NAMED_TYPE_RE =
+  /\bexport\s+type\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
 const EXPORT_NAMED_DESTRUCT =
   /\bexport\s+(let|var|const)\s+(?:{(?<exports1>[^}]+?)[\s,]*}|\[(?<exports2>[^\]]+?)[\s,]*])\s+=/gm;
 const EXPORT_STAR_RE =
@@ -117,16 +121,11 @@ export function findExports(code: string): ESMExport[] {
   });
 
   // Find named exports
-  const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, {
-    type: "named",
-  });
-  for (const namedExport of namedExports) {
-    namedExport.names = namedExport.exports
-      .replace(/^\r?\n?/, "")
-      .split(/\s*,\s*/g)
-      .filter((name) => !TYPE_RE.test(name))
-      .map((name) => name.replace(/^.*?\sas\s/, "").trim());
-  }
+  const namedExports: NamedExport[] = normalizeNamedExports(
+    matchAll(EXPORT_NAMED_RE, code, {
+      type: "named",
+    })
+  );
 
   const destructuredExports: NamedExport[] = matchAll(
     EXPORT_NAMED_DESTRUCT,
@@ -161,25 +160,13 @@ export function findExports(code: string): ESMExport[] {
 
   // Merge and normalize exports
   // eslint-disable-next-line unicorn/no-array-push-push
-  const exports: ESMExport[] = [
+  const exports: ESMExport[] = normalizeExports([
     ...declaredExports,
     ...namedExports,
     ...destructuredExports,
     ...defaultExport,
     ...starExports,
-  ];
-  for (const exp of exports) {
-    if (!exp.name && exp.names && exp.names.length === 1) {
-      exp.name = exp.names[0];
-    }
-    if (exp.name === "default" && exp.type !== "default") {
-      exp._type = exp.type;
-      exp.type = "default";
-    }
-    if (!exp.names && exp.name) {
-      exp.names = [exp.name];
-    }
-  }
+  ]);
 
   // Return early when there is no  export statement
   if (exports.length === 0) {
@@ -207,6 +194,82 @@ export function findExports(code: string): ESMExport[] {
         );
       })
   );
+}
+
+export function findTypeExports(code: string): ESMExport[] {
+  // Find declarations like export const foo = 'bar'
+  const declaredExports: DeclarationExport[] = matchAll(
+    EXPORT_DECAL_TYPE_RE,
+    code,
+    { type: "declaration" }
+  );
+
+  // Find named exports
+  const namedExports: NamedExport[] = normalizeNamedExports(
+    matchAll(EXPORT_NAMED_TYPE_RE, code, {
+      type: "named",
+    })
+  );
+
+  // Merge and normalize exports
+  const exports: ESMExport[] = normalizeExports([
+    ...declaredExports,
+    ...namedExports,
+  ]);
+
+  // Return early when there is no  export statement
+  if (exports.length === 0) {
+    return [];
+  }
+  const exportLocations = _tryGetExportLocations(code);
+  if (exportLocations && exportLocations.length === 0) {
+    return [];
+  }
+
+  return (
+    exports
+      // Filter false positive export matches
+      .filter(
+        (exp) => !exportLocations || _isExportStatement(exportLocations, exp)
+      )
+      // Prevent multiple exports of same function, only keep latest iteration of signatures
+      .filter((exp, index, exports) => {
+        const nextExport = exports[index + 1];
+        return (
+          !nextExport ||
+          exp.type !== nextExport.type ||
+          !exp.name ||
+          exp.name !== nextExport.name
+        );
+      })
+  );
+}
+
+function normalizeExports(exports: ESMExport[]) {
+  for (const exp of exports) {
+    if (!exp.name && exp.names && exp.names.length === 1) {
+      exp.name = exp.names[0];
+    }
+    if (exp.name === "default" && exp.type !== "default") {
+      exp._type = exp.type;
+      exp.type = "default";
+    }
+    if (!exp.names && exp.name) {
+      exp.names = [exp.name];
+    }
+  }
+  return exports;
+}
+
+function normalizeNamedExports(namedExports: NamedExport[]) {
+  for (const namedExport of namedExports) {
+    namedExport.names = namedExport.exports
+      .replace(/^\r?\n?/, "")
+      .split(/\s*,\s*/g)
+      .filter((name) => !TYPE_RE.test(name))
+      .map((name) => name.replace(/^.*?\sas\s/, "").trim());
+  }
+  return namedExports;
 }
 
 export function findExportNames(code: string): string[] {
