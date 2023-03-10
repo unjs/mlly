@@ -329,7 +329,7 @@ describe("findTypeExports", () => {
             "Bing",
           ],
           "start": 156,
-          "type": "type-declaration",
+          "type": "declaration",
         },
         {
           "code": "export declare function getWidget",
@@ -340,7 +340,7 @@ describe("findTypeExports", () => {
             "getWidget",
           ],
           "start": 189,
-          "type": "type-declaration",
+          "type": "declaration",
         },
         {
           "code": "export type { Foo } from \\"./foo\\"",
@@ -352,7 +352,7 @@ describe("findTypeExports", () => {
           ],
           "specifier": "./foo",
           "start": 11,
-          "type": "type",
+          "type": "named",
         },
         {
           "code": "export type { Bar } from \\"./bar\\"",
@@ -364,7 +364,7 @@ describe("findTypeExports", () => {
           ],
           "specifier": "./bar",
           "start": 55,
-          "type": "type",
+          "type": "named",
         },
         {
           "code": "export type { Qux }",
@@ -376,7 +376,7 @@ describe("findTypeExports", () => {
           ],
           "specifier": undefined,
           "start": 126,
-          "type": "type",
+          "type": "named",
         },
       ]
     `);

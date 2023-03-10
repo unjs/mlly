@@ -28,20 +28,8 @@ export interface DynamicImport extends ESMImport {
 }
 
 export interface ESMExport {
-  _type?:
-    | "declaration"
-    | "named"
-    | "default"
-    | "star"
-    | "type"
-    | "type-declaration";
-  type:
-    | "declaration"
-    | "named"
-    | "default"
-    | "star"
-    | "type"
-    | "type-declaration";
+  _type?: "declaration" | "named" | "default" | "star";
+  type: "declaration" | "named" | "default" | "star";
   code: string;
   start: number;
   end: number;
@@ -213,13 +201,13 @@ export function findTypeExports(code: string): ESMExport[] {
   const declaredExports: DeclarationExport[] = matchAll(
     EXPORT_DECAL_TYPE_RE,
     code,
-    { type: "type-declaration" }
+    { type: "declaration" }
   );
 
   // Find named exports
   const namedExports: NamedExport[] = normalizeNamedExports(
     matchAll(EXPORT_NAMED_TYPE_RE, code, {
-      type: "type",
+      type: "named",
     })
   );
 
