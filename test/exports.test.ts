@@ -4,6 +4,7 @@ import {
   findExports,
   findExportNames,
   resolveModuleExportNames,
+  findTypeExports,
 } from "../src";
 
 describe("findExports", () => {
@@ -101,82 +102,6 @@ describe("findExports", () => {
           export { useTestMe3 } from "@/test/foo3";
         `);
     expect(matches.length).to.eql(3);
-  });
-
-  it("finds type exports", () => {
-    const matches = findExports(
-      `
-          export type { Foo } from "./foo";
-          export type { Bar } from "./bar";
-          interface Qux {}
-          export type { Qux }
-          export type Bing = Qux
-          export declare function getWidget(n: number): Widget
-        `,
-      { types: true }
-    );
-    expect(matches).toMatchInlineSnapshot(`
-      [
-        {
-          "code": "export type Bing",
-          "declaration": "type",
-          "end": 172,
-          "name": "Bing",
-          "names": [
-            "Bing",
-          ],
-          "start": 156,
-          "type": "type-declaration",
-        },
-        {
-          "code": "export declare function getWidget",
-          "declaration": "declare function",
-          "end": 222,
-          "name": "getWidget",
-          "names": [
-            "getWidget",
-          ],
-          "start": 189,
-          "type": "type-declaration",
-        },
-        {
-          "code": "export type { Foo } from \\"./foo\\"",
-          "end": 43,
-          "exports": " Foo",
-          "name": "Foo",
-          "names": [
-            "Foo",
-          ],
-          "specifier": "./foo",
-          "start": 11,
-          "type": "type",
-        },
-        {
-          "code": "export type { Bar } from \\"./bar\\"",
-          "end": 87,
-          "exports": " Bar",
-          "name": "Bar",
-          "names": [
-            "Bar",
-          ],
-          "specifier": "./bar",
-          "start": 55,
-          "type": "type",
-        },
-        {
-          "code": "export type { Qux }",
-          "end": 145,
-          "exports": " Qux",
-          "name": "Qux",
-          "names": [
-            "Qux",
-          ],
-          "specifier": undefined,
-          "start": 126,
-          "type": "type",
-        },
-      ]
-    `);
   });
 
   it("works with multiple named exports", () => {
@@ -378,5 +303,82 @@ export { foo } from 'foo1';export { bar } from 'foo2';export * as foobar from 'f
 `;
     const matches = findExports(code);
     expect(matches).to.have.lengthOf(3);
+  });
+});
+
+describe("findTypeExports", () => {
+  it("finds type exports", () => {
+    const matches = findTypeExports(
+      `
+          export type { Foo } from "./foo";
+          export type { Bar } from "./bar";
+          interface Qux {}
+          export type { Qux }
+          export type Bing = Qux
+          export declare function getWidget(n: number): Widget
+        `
+    );
+    expect(matches).toMatchInlineSnapshot(`
+      [
+        {
+          "code": "export type Bing",
+          "declaration": "type",
+          "end": 172,
+          "name": "Bing",
+          "names": [
+            "Bing",
+          ],
+          "start": 156,
+          "type": "type-declaration",
+        },
+        {
+          "code": "export declare function getWidget",
+          "declaration": "declare function",
+          "end": 222,
+          "name": "getWidget",
+          "names": [
+            "getWidget",
+          ],
+          "start": 189,
+          "type": "type-declaration",
+        },
+        {
+          "code": "export type { Foo } from \\"./foo\\"",
+          "end": 43,
+          "exports": " Foo",
+          "name": "Foo",
+          "names": [
+            "Foo",
+          ],
+          "specifier": "./foo",
+          "start": 11,
+          "type": "type",
+        },
+        {
+          "code": "export type { Bar } from \\"./bar\\"",
+          "end": 87,
+          "exports": " Bar",
+          "name": "Bar",
+          "names": [
+            "Bar",
+          ],
+          "specifier": "./bar",
+          "start": 55,
+          "type": "type",
+        },
+        {
+          "code": "export type { Qux }",
+          "end": 145,
+          "exports": " Qux",
+          "name": "Qux",
+          "names": [
+            "Qux",
+          ],
+          "specifier": undefined,
+          "start": 126,
+          "type": "type",
+        },
+      ]
+    `);
   });
 });
