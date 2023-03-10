@@ -108,9 +108,9 @@ describe("findExports", () => {
       `
           export type { Foo } from "./foo";
           export type { Bar } from "./bar";
-          interface Foo {}
-          export type { Foo }
-          export type Bing = Foo
+          interface Qux {}
+          export type { Qux }
+          export type Bing = Qux
           export declare function getWidget(n: number): Widget
         `,
       { types: true }
@@ -164,12 +164,12 @@ describe("findExports", () => {
           "type": "type",
         },
         {
-          "code": "export type { Foo }",
+          "code": "export type { Qux }",
           "end": 145,
-          "exports": " Foo",
-          "name": "Foo",
+          "exports": " Qux",
+          "name": "Qux",
           "names": [
-            "Foo",
+            "Qux",
           ],
           "specifier": undefined,
           "start": 126,
