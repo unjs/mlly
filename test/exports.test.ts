@@ -108,11 +108,37 @@ describe("findExports", () => {
       `
           export type { Foo } from "./foo";
           export type { Bar } from "./bar";
+          interface Foo {}
+          export type { Foo }
+          export type Bing = Foo
+          export declare function getWidget(n: number): Widget
         `,
       { types: true }
     );
     expect(matches).toMatchInlineSnapshot(`
       [
+        {
+          "code": "export type Bing",
+          "declaration": "type",
+          "end": 172,
+          "name": "Bing",
+          "names": [
+            "Bing",
+          ],
+          "start": 156,
+          "type": "type-declaration",
+        },
+        {
+          "code": "export declare function getWidget",
+          "declaration": "declare function",
+          "end": 222,
+          "name": "getWidget",
+          "names": [
+            "getWidget",
+          ],
+          "start": 189,
+          "type": "type-declaration",
+        },
         {
           "code": "export type { Foo } from \\"./foo\\"",
           "end": 43,
@@ -135,6 +161,18 @@ describe("findExports", () => {
           ],
           "specifier": "./bar",
           "start": 55,
+          "type": "type",
+        },
+        {
+          "code": "export type { Foo }",
+          "end": 145,
+          "exports": " Foo",
+          "name": "Foo",
+          "names": [
+            "Foo",
+          ],
+          "specifier": undefined,
+          "start": 126,
           "type": "type",
         },
       ]
