@@ -127,7 +127,18 @@ export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
 }
 
 export interface FindExportsOptions {
-  includeTypeExports?: boolean;
+  /**
+   * Whether to include type exports.
+   *
+   * @default false
+   */
+  types?: boolean;
+  /**
+   * Whether to include non-type exports.
+   *
+   * @default true
+   */
+  runtime?: boolean;
 }
 
 export function findExports(
@@ -135,22 +146,28 @@ export function findExports(
   opts: FindExportsOptions = {}
 ): ESMExport[] {
   // Find declarations like export const foo = 'bar'
-  const declaredExports: DeclarationExport[] = matchAll(EXPORT_DECAL_RE, code, {
-    type: "declaration",
-  });
+  const declaredExports: DeclarationExport[] =
+    opts.runtime === false
+      ? []
+      : matchAll(EXPORT_DECAL_RE, code, {
+          type: "declaration",
+        });
 
-  if (opts.includeTypeExports) {
+  if (opts.types) {
     declaredExports.push(
       ...matchAll(EXPORT_DECAL_TYPE_RE, code, { type: "type-declaration" })
     );
   }
 
   // Find named exports
-  const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, {
-    type: "named",
-  });
+  const namedExports: NamedExport[] =
+    opts.runtime === false
+      ? []
+      : matchAll(EXPORT_NAMED_RE, code, {
+          type: "named",
+        });
 
-  if (opts.includeTypeExports) {
+  if (opts.types) {
     namedExports.push(
       ...matchAll(EXPORT_NAMED_TYPE_RE, code, { type: "type" })
     );
@@ -164,11 +181,10 @@ export function findExports(
       .map((name) => name.replace(/^.*?\sas\s/, "").trim());
   }
 
-  const destructuredExports: NamedExport[] = matchAll(
-    EXPORT_NAMED_DESTRUCT,
-    code,
-    { type: "named" }
-  );
+  const destructuredExports: NamedExport[] =
+    opts.runtime === false
+      ? []
+      : matchAll(EXPORT_NAMED_DESTRUCT, code, { type: "named" });
   for (const namedExport of destructuredExports) {
     // @ts-expect-error groups
     namedExport.exports = namedExport.exports1 || namedExport.exports2;
@@ -185,15 +201,21 @@ export function findExports(
   }
 
   // Find export default
-  const defaultExport: DefaultExport[] = matchAll(EXPORT_DEFAULT_RE, code, {
-    type: "default",
-    name: "default",
-  });
+  const defaultExport: DefaultExport[] =
+    opts.runtime === false
+      ? []
+      : matchAll(EXPORT_DEFAULT_RE, code, {
+          type: "default",
+          name: "default",
+        });
 
   // Find export star
-  const starExports: ESMExport[] = matchAll(EXPORT_STAR_RE, code, {
-    type: "star",
-  });
+  const starExports: ESMExport[] =
+    opts.runtime === false
+      ? []
+      : matchAll(EXPORT_STAR_RE, code, {
+          type: "star",
+        });
 
   // Merge and normalize exports
   // eslint-disable-next-line unicorn/no-array-push-push

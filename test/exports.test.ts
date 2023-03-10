@@ -109,7 +109,7 @@ describe("findExports", () => {
           export type { Foo } from "./foo";
           export type { Bar } from "./bar";
         `,
-      { includeTypeExports: true }
+      { types: true }
     );
     expect(matches).toMatchInlineSnapshot(`
       [
