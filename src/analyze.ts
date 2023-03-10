@@ -28,8 +28,20 @@ export interface DynamicImport extends ESMImport {
 }
 
 export interface ESMExport {
-  _type?: "declaration" | "named" | "default" | "star";
-  type: "declaration" | "named" | "default" | "star";
+  _type?:
+    | "declaration"
+    | "named"
+    | "default"
+    | "star"
+    | "type"
+    | "type-declaration";
+  type:
+    | "declaration"
+    | "named"
+    | "default"
+    | "star"
+    | "type"
+    | "type-declaration";
   code: string;
   start: number;
   end: number;
@@ -62,8 +74,12 @@ export const DYNAMIC_IMPORT_RE =
 
 export const EXPORT_DECAL_RE =
   /\bexport\s+(?<declaration>(async function|function|let|const enum|const|enum|var|class))\s+(?<name>[\w$]+)/g;
+export const EXPORT_DECAL_TYPE_RE =
+  /\bexport\s+(?<declaration>(interface|type))\s+(?<name>[\w$]+)/g;
 const EXPORT_NAMED_RE =
   /\bexport\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
+const EXPORT_NAMED_TYPE_RE =
+  /\bexport\s+type\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
 const EXPORT_NAMED_DESTRUCT =
   /\bexport\s+(let|var|const)\s+(?:{(?<exports1>[^}]+?)[\s,]*}|\[(?<exports2>[^\]]+?)[\s,]*])\s+=/gm;
 const EXPORT_STAR_RE =
@@ -110,16 +126,36 @@ export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
   } as ParsedStaticImport;
 }
 
-export function findExports(code: string): ESMExport[] {
+export interface FindExportsOptions {
+  includeTypeExports?: boolean;
+}
+
+export function findExports(
+  code: string,
+  opts: FindExportsOptions = {}
+): ESMExport[] {
   // Find declarations like export const foo = 'bar'
   const declaredExports: DeclarationExport[] = matchAll(EXPORT_DECAL_RE, code, {
     type: "declaration",
   });
 
+  if (opts.includeTypeExports) {
+    declaredExports.push(
+      ...matchAll(EXPORT_DECAL_TYPE_RE, code, { type: "type-declaration" })
+    );
+  }
+
   // Find named exports
   const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, {
     type: "named",
   });
+
+  if (opts.includeTypeExports) {
+    namedExports.push(
+      ...matchAll(EXPORT_NAMED_TYPE_RE, code, { type: "type" })
+    );
+  }
+
   for (const namedExport of namedExports) {
     namedExport.names = namedExport.exports
       .replace(/^\r?\n?/, "")

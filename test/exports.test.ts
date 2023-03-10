@@ -103,6 +103,44 @@ describe("findExports", () => {
     expect(matches.length).to.eql(3);
   });
 
+  it("finds type exports", () => {
+    const matches = findExports(
+      `
+          export type { Foo } from "./foo";
+          export type { Bar } from "./bar";
+        `,
+      { includeTypeExports: true }
+    );
+    expect(matches).toMatchInlineSnapshot(`
+      [
+        {
+          "code": "export type { Foo } from \\"./foo\\"",
+          "end": 43,
+          "exports": " Foo",
+          "name": "Foo",
+          "names": [
+            "Foo",
+          ],
+          "specifier": "./foo",
+          "start": 11,
+          "type": "named-type",
+        },
+        {
+          "code": "export type { Bar } from \\"./bar\\"",
+          "end": 87,
+          "exports": " Bar",
+          "name": "Bar",
+          "names": [
+            "Bar",
+          ],
+          "specifier": "./bar",
+          "start": 55,
+          "type": "named-type",
+        },
+      ]
+    `);
+  });
+
   it("works with multiple named exports", () => {
     const code = `
   export { foo } from 'foo1';
@@ -212,7 +250,7 @@ export { type AType, type B as BType, foo } from 'foo'
   });
 });
 
-describe("fineExportNames", () => {
+describe("findExportNames", () => {
   it("findExportNames", () => {
     expect(
       findExportNames(`
