@@ -123,7 +123,7 @@ describe("findExports", () => {
           ],
           "specifier": "./foo",
           "start": 11,
-          "type": "named-type",
+          "type": "type",
         },
         {
           "code": "export type { Bar } from \\"./bar\\"",
@@ -135,7 +135,7 @@ describe("findExports", () => {
           ],
           "specifier": "./bar",
           "start": 55,
-          "type": "named-type",
+          "type": "type",
         },
       ]
     `);
