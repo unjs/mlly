@@ -120,7 +120,8 @@ staticTests['import { foo, type Foo } from "foo"'] = {
   namedImports: { foo: "foo" },
 };
 
-staticTests[`
+staticTests[
+  `
   // import { foo } from "foo"
   import { too } from "too"
 
@@ -131,17 +132,18 @@ staticTests[`
   const start = '/*'
   import { ioo } from "ioo"
   const end = '*/'
-`] = [
+`
+] = [
   {
     specifier: "too",
     type: "static",
-    namedImports: { too: 'too' },
+    namedImports: { too: "too" },
   },
   {
     specifier: "ioo",
     type: "static",
-    namedImports: { ioo: 'ioo' },
-  }
+    namedImports: { ioo: "ioo" },
+  },
 ];
 
 // -- Dynamic import --

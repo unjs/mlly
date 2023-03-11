@@ -72,11 +72,17 @@ const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g;
 const TYPE_RE = /^\s*?type\s/;
 
 export function findStaticImports(code: string): StaticImport[] {
-  return _filterStatement(_tryGetLocations(code, 'import'), matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }));
+  return _filterStatement(
+    _tryGetLocations(code, "import"),
+    matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" })
+  );
 }
 
 export function findDynamicImports(code: string): DynamicImport[] {
-  return _filterStatement(_tryGetLocations(code, 'import'), matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" }));
+  return _filterStatement(
+    _tryGetLocations(code, "import"),
+    matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" })
+  );
 }
 
 export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
@@ -185,7 +191,7 @@ export function findExports(code: string): ESMExport[] {
   if (exports.length === 0) {
     return [];
   }
-  const exportLocations = _tryGetLocations(code, 'export');
+  const exportLocations = _tryGetLocations(code, "export");
   if (exportLocations && exportLocations.length === 0) {
     return [];
   }
@@ -248,16 +254,22 @@ interface TokenLocation {
   end: number;
 }
 
-function _filterStatement<T extends TokenLocation>(locations: TokenLocation[] | undefined, statements: T[]): T[] {
-  return statements.filter(exp => {
-    return !locations || locations.some((location) => {
-      // AST token inside the regex match
-      return exp.start <= location.start && exp.end >= location.end;
-      // AST Token start or end is within the regex match
-      // return (exp.start <= location.start && location.start <= exp.end) ||
-      // (exp.start <= location.end && location.end <= exp.end)
-    });
-  })
+function _filterStatement<T extends TokenLocation>(
+  locations: TokenLocation[] | undefined,
+  statements: T[]
+): T[] {
+  return statements.filter((exp) => {
+    return (
+      !locations ||
+      locations.some((location) => {
+        // AST token inside the regex match
+        return exp.start <= location.start && exp.end >= location.end;
+        // AST Token start or end is within the regex match
+        // return (exp.start <= location.start && location.start <= exp.end) ||
+        // (exp.start <= location.end && location.end <= exp.end)
+      })
+    );
+  });
 }
 
 function _tryGetLocations(code: string, label: string) {
