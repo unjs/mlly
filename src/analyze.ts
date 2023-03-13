@@ -178,17 +178,14 @@ export function findExports(code: string): ESMExport[] {
   if (exports.length === 0) {
     return [];
   }
-  const exportLocations = _tryGetExportLocations(code);
+  const exportLocations = _tryGetLocations(code, "export");
   if (exportLocations && exportLocations.length === 0) {
     return [];
   }
 
   return (
-    exports
-      // Filter false positive export matches
-      .filter(
-        (exp) => !exportLocations || _isExportStatement(exportLocations, exp)
-      )
+    // Filter false positive export matches
+    _filterStatement(exportLocations, exports)
       // Prevent multiple exports of same function, only keep latest iteration of signatures
       .filter((exp, index, exports) => {
         const nextExport = exports[index + 1];
