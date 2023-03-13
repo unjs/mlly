@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.2.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.1.1...v1.2.0)
+
+
+### 🚀 Enhancements
+
+  - `findTypeExports ` for finding type exports ([#156](https://github.com/unjs/mlly/pull/156))
+
+### ❤️  Contributors
+
+- Daniel Roe <daniel@roe.dev>
+
 ## v1.1.1
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.1.0...v1.1.1)
