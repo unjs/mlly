@@ -4,7 +4,7 @@ import {
   findStaticImports,
   parseStaticImport,
   findTypeImports,
-  parseTypeImport
+  parseTypeImport,
 } from "../src";
 
 // -- Static import --
@@ -147,50 +147,50 @@ const TypeTests = {
     namedImports: {
       Foo: "Foo",
     },
-    type: "static"
+    type: "static",
   },
   'import { member,/* hello */  type Foo as Baz, Bar } from "module-name";': {
     specifier: "module-name",
     namedImports: {
       Foo: "Baz",
     },
-    type: "static"
+    type: "static",
   },
   'import type { Foo, Bar } from "module-name";': {
     specifier: "module-name",
     namedImports: {
       Foo: "Foo",
-      Bar: "Bar"
+      Bar: "Bar",
     },
-    type: "type"
+    type: "type",
   },
   'import type Foo from "module-name";': {
     specifier: "module-name",
     defaultImport: "Foo",
-    type: "type"
+    type: "type",
   },
   'import type { Foo as Baz, Bar } from "module-name";': {
     specifier: "module-name",
     namedImports: {
       Foo: "Baz",
-      Bar: "Bar"
+      Bar: "Bar",
     },
-    type: "type"
+    type: "type",
   },
   'import { type member } from "  module-name";': {
     specifier: "module-name",
     namedImports: { member: "member" },
-    type: "static"
+    type: "static",
   },
   'import { type member, type Foo as Bar } from "  module-name";': {
     specifier: "module-name",
     namedImports: {
       member: "member",
-      Foo: "Bar"
+      Foo: "Bar",
     },
-    type: "static"
+    type: "static",
   },
-}
+};
 
 describe("findStaticImports", () => {
   for (const [input, _results] of Object.entries(staticTests)) {
@@ -257,4 +257,4 @@ describe("findTypeImports", () => {
       }
     });
   }
-})
+});

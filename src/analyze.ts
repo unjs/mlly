@@ -28,7 +28,7 @@ export interface DynamicImport extends ESMImport {
 }
 
 export interface TypeImport extends ESMImport {
-  type: "type",
+  type: "type";
   imports: string;
   specifier: string;
 }
@@ -94,11 +94,15 @@ export function findDynamicImports(code: string): DynamicImport[] {
 export function findTypeImports(code: string): TypeImport[] {
   return [
     ...matchAll(IMPORT_NAMED_TYPE_RE, code, { type: "type" }),
-    ...(matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(match => /[^A-Za-z]type\s/.test(match.imports)))
-  ]
+    ...matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(
+      (match) => /[^A-Za-z]type\s/.test(match.imports)
+    ),
+  ];
 }
 
-export function parseStaticImport(matched: StaticImport | TypeImport): ParsedStaticImport {
+export function parseStaticImport(
+  matched: StaticImport | TypeImport
+): ParsedStaticImport {
   const cleanedImports = (matched.imports || "")
     .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
     .replace(/\s+/g, " ");
@@ -129,9 +133,11 @@ export function parseStaticImport(matched: StaticImport | TypeImport): ParsedSta
   } as ParsedStaticImport;
 }
 
-export function parseTypeImport(matched: TypeImport | StaticImport): ParsedStaticImport {
-  if(matched.type === 'type') {
-    return parseStaticImport(matched)
+export function parseTypeImport(
+  matched: TypeImport | StaticImport
+): ParsedStaticImport {
+  if (matched.type === "type") {
+    return parseStaticImport(matched);
   }
   const cleanedImports = (matched.imports || "")
     .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
@@ -141,29 +147,31 @@ export function parseTypeImport(matched: TypeImport | StaticImport): ParsedStati
   for (const namedImport of cleanedImports
     .match(/{([^}]*)}/)?.[1]
     ?.split(",") || []) {
-      const [, source = namedImport.trim(), importName = source] = (() => {
-        return /\s+as\s+/.test(namedImport) ? namedImport.match(/^\s*type\s+(\S*) as (\S*)\s*$/) || [] : namedImport.match(/^\s*type\s+(\S*)\s*$/) || [];
-      })()
+    const [, source = namedImport.trim(), importName = source] = (() => {
+      return /\s+as\s+/.test(namedImport)
+        ? namedImport.match(/^\s*type\s+(\S*) as (\S*)\s*$/) || []
+        : namedImport.match(/^\s*type\s+(\S*)\s*$/) || [];
+    })();
 
-      if (source && TYPE_RE.test(namedImport)) {
-        namedImports[source] = importName;
-      }
+    if (source && TYPE_RE.test(namedImport)) {
+      namedImports[source] = importName;
     }
+  }
 
-    const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
-    const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
-    const defaultImport =
-      topLevelImports
-        .split(",")
-        .find((index) => !/[*{}]/.test(index))
-        ?.trim() || undefined;
+  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
+  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
+  const defaultImport =
+    topLevelImports
+      .split(",")
+      .find((index) => !/[*{}]/.test(index))
+      ?.trim() || undefined;
 
   return {
     ...matched,
     defaultImport,
     namespacedImport,
     namedImports,
-  } as ParsedStaticImport
+  } as ParsedStaticImport;
 }
 
 export function findExports(code: string): ESMExport[] {
