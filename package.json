@@ -40,7 +40,7 @@
     "import-meta-resolve": "^2.2.2",
     "jiti": "^1.18.2",
     "prettier": "^2.8.7",
-    "typescript": "^4.9.5",
+    "typescript": "^5.0.4",
     "unbuild": "^1.2.0",
     "vitest": "^0.29.8"
   },
