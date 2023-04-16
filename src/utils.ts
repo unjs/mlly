@@ -1,6 +1,7 @@
 import { fileURLToPath as _fileURLToPath } from "node:url";
 import { promises as fsp } from "node:fs";
 import { normalizeSlash, BUILTIN_MODULES } from "./_utils";
+import { StaticImport, TypeImport } from "./analyze";
 
 export function fileURLToPath(id: string): string {
   if (typeof id === "string" && !id.startsWith("file://")) {
@@ -65,4 +66,25 @@ const ProtocolRegex = /^(?<proto>.{2,}?):.+$/;
 export function getProtocol(id: string): string | undefined {
   const proto = id.match(ProtocolRegex);
   return proto ? proto.groups.proto : undefined;
+}
+
+export function clearImports(imports: string) {
+  return (imports || "")
+    .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
+    .replace(/\s+/g, " ");
+}
+
+export function getImportNames(cleanedImports: string) {
+  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
+  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
+  const defaultImport =
+    topLevelImports
+      .split(",")
+      .find((index) => !/[*{}]/.test(index))
+      ?.trim() || undefined;
+
+  return {
+    namespacedImport,
+    defaultImport,
+  };
 }

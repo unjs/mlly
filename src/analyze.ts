@@ -1,7 +1,7 @@
 import { tokenizer } from "acorn";
 import { matchAll } from "./_utils";
 import { resolvePath, ResolveOptions } from "./resolve";
-import { loadURL } from "./utils";
+import { clearImports, getImportNames, loadURL } from "./utils";
 
 export interface ESMImport {
   type: "static" | "dynamic" | "type";
@@ -103,9 +103,7 @@ export function findTypeImports(code: string): TypeImport[] {
 export function parseStaticImport(
   matched: StaticImport | TypeImport
 ): ParsedStaticImport {
-  const cleanedImports = (matched.imports || "")
-    .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
-    .replace(/\s+/g, " ");
+  const cleanedImports = clearImports(matched.imports);
 
   const namedImports = {};
   for (const namedImport of cleanedImports
@@ -117,13 +115,7 @@ export function parseStaticImport(
       namedImports[source] = importName;
     }
   }
-  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
-  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
-  const defaultImport =
-    topLevelImports
-      .split(",")
-      .find((index) => !/[*{}]/.test(index))
-      ?.trim() || undefined;
+  const { namespacedImport, defaultImport } = getImportNames(cleanedImports);
 
   return {
     ...matched,
@@ -139,9 +131,8 @@ export function parseTypeImport(
   if (matched.type === "type") {
     return parseStaticImport(matched);
   }
-  const cleanedImports = (matched.imports || "")
-    .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
-    .replace(/\s+/g, " ");
+
+  const cleanedImports = clearImports(matched.imports);
 
   const namedImports = {};
   for (const namedImport of cleanedImports
@@ -158,13 +149,7 @@ export function parseTypeImport(
     }
   }
 
-  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
-  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
-  const defaultImport =
-    topLevelImports
-      .split(",")
-      .find((index) => !/[*{}]/.test(index))
-      ?.trim() || undefined;
+  const { namespacedImport, defaultImport } = getImportNames(cleanedImports);
 
   return {
     ...matched,
