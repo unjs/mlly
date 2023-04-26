@@ -396,7 +396,7 @@ Options are same as `evalModule`.
 - All usages of `import.meta.url` will be replaced with `url` or `from` option
 
 ```js
-import { toDataURL } from "mlly";
+import { transformModule } from "mlly";
 console.log(transformModule(`console.log(import.meta.url)`), {
   url: "test.mjs",
 });
