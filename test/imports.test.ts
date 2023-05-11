@@ -71,6 +71,12 @@ const staticTests = {
   ],
   // Edge cases
   '"import"===node.object.meta.name&&"': [],
+  'import { SpecialÜ } from "#components"': [
+    {
+      namedImports: { SpecialÜ: "SpecialÜ" },
+      specifier: "#components",
+    },
+  ],
 };
 
 staticTests[
