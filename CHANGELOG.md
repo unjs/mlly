@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.3.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.2.1...v1.3.0)
+
+
+### 🚀 Enhancements
+
+  - Update `import-meta-url` to v3 ([208b323](https://github.com/unjs/mlly/commit/208b323))
+
+### 💅 Refactors
+
+  - Remove deprecated notice from sync resolve utils ([5223f5a](https://github.com/unjs/mlly/commit/5223f5a))
+
+### 📖 Documentation
+
+  - Mention `resolveSync` and `resolvePathSync` utils ([02a5efe](https://github.com/unjs/mlly/commit/02a5efe))
+
+### 🏡 Chore
+
+  - Update dependencies ([8bf8dcd](https://github.com/unjs/mlly/commit/8bf8dcd))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.2.1
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.2.0...v1.2.1)
