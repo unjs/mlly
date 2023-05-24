@@ -1,8 +1,6 @@
 {
-  "extends": [
-    "eslint-config-unjs"
-  ],
+  "extends": ["eslint-config-unjs"],
   "rules": {
-    "unicorn/expiring-todo-comments": 0
+    "unicorn/prefer-string-replace-all": 0
   }
 }
