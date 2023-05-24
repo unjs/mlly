@@ -34,8 +34,8 @@ devDependencies:
     specifier: ^0.2.0
     version: 0.2.0(eslint@8.41.0)(typescript@5.0.4)
   import-meta-resolve:
-    specifier: ^2.2.2
-    version: 2.2.2
+    specifier: ^3.0.0
+    version: 3.0.0
   jiti:
     specifier: ^1.18.2
     version: 1.18.2
@@ -2355,8 +2355,8 @@ packages:
       resolve-from: 4.0.0
     dev: true
 
-  /import-meta-resolve@2.2.2:
-    resolution: {integrity: sha512-f8KcQ1D80V7RnqVm+/lirO9zkOxjGxhaTC1IPrBGd3MEfNgmNG67tSUO9gTi2F3Blr2Az6g1vocaxzkVnWl9MA==}
+  /import-meta-resolve@3.0.0:
+    resolution: {integrity: sha512-4IwhLhNNA8yy445rPjD/lWh++7hMDOml2eHtd58eG7h+qK3EryMuuRbsHGPikCoAgIkkDnckKfWSk2iDla/ejg==}
     dev: true
 
   /imurmurhash@0.1.4:
