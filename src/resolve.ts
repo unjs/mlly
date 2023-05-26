@@ -124,11 +124,11 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
   return pathToFileURL(realPath).toString();
 }
 
-export function resolveSync(id: string, options?: ResolveOptions): string {
+export function resolveSync(id: string, options?: ResolveOptions) {
   return _resolve(id, options);
 }
 
-export function resolve(id: string, options?: ResolveOptions): Promise<string> {
+export function resolve(id: string, options?: ResolveOptions) {
   return pcall(resolveSync, id, options);
 }
 
