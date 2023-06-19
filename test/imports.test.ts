@@ -3,6 +3,8 @@ import {
   findDynamicImports,
   findStaticImports,
   parseStaticImport,
+  findTypeImports,
+  parseTypeImport,
 } from "../src";
 
 // -- Static import --
@@ -153,6 +155,57 @@ const dynamicTests = {
   },
 };
 
+const TypeTests = {
+  'import { type Foo, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Foo",
+    },
+    type: "static",
+  },
+  'import { member,/* hello */  type Foo as Baz, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Baz",
+    },
+    type: "static",
+  },
+  'import type { Foo, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Foo",
+      Bar: "Bar",
+    },
+    type: "type",
+  },
+  'import type Foo from "module-name";': {
+    specifier: "module-name",
+    defaultImport: "Foo",
+    type: "type",
+  },
+  'import type { Foo as Baz, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Baz",
+      Bar: "Bar",
+    },
+    type: "type",
+  },
+  'import { type member } from "  module-name";': {
+    specifier: "module-name",
+    namedImports: { member: "member" },
+    type: "static",
+  },
+  'import { type member, type Foo as Bar } from "  module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      member: "member",
+      Foo: "Bar",
+    },
+    type: "static",
+  },
+};
+
 describe("findStaticImports", () => {
   for (const [input, _results] of Object.entries(staticTests)) {
     it(input.replace(/\n/g, "\\n"), () => {
@@ -188,6 +241,34 @@ describe("findDynamicImports", () => {
       const match = matches[0];
       expect(match.type).to.equal("dynamic");
       expect(match.expression.trim()).to.equal(test.expression);
+    });
+  }
+});
+
+describe("findTypeImports", () => {
+  for (const [input, _results] of Object.entries(TypeTests)) {
+    it(input.replace(/\n/g, "\\n"), () => {
+      const matches = findTypeImports(input);
+      const results = Array.isArray(_results) ? _results : [_results];
+      expect(matches.length).toEqual(results.length);
+      for (const [index, test] of results.entries()) {
+        const match = matches[index];
+        expect(match.specifier).to.equal(test.specifier);
+
+        const parsed = parseTypeImport(match);
+        if (test.type) {
+          expect(parsed.type).to.equals(test.type);
+        }
+        if (test.defaultImport) {
+          expect(parsed.defaultImport).to.equals(test.defaultImport);
+        }
+        if (test.namedImports) {
+          expect(parsed.namedImports).to.eql(test.namedImports);
+        }
+        if (test.namespacedImport) {
+          expect(parsed.namespacedImport).to.eql(test.namespacedImport);
+        }
+      }
     });
   }
 });

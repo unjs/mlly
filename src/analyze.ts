@@ -1,5 +1,5 @@
 import { tokenizer } from "acorn";
-import { matchAll } from "./_utils";
+import { matchAll, clearImports, getImportNames } from "./_utils";
 import { resolvePath, ResolveOptions } from "./resolve";
 import { loadURL } from "./utils";
 
@@ -25,6 +25,12 @@ export interface ParsedStaticImport extends StaticImport {
 export interface DynamicImport extends ESMImport {
   type: "dynamic";
   expression: string;
+}
+
+export interface TypeImport extends Omit<ESMImport, "type"> {
+  type: "type";
+  imports: string;
+  specifier: string;
 }
 
 export interface ESMExport {
@@ -59,6 +65,8 @@ export const ESM_STATIC_IMPORT_RE =
   /(?<=\s|^|;)import\s*([\s"']*(?<imports>[\p{L}\p{M}\w\t\n\r $*,/{}]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gmu;
 export const DYNAMIC_IMPORT_RE =
   /import\s*\((?<expression>(?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)/gm;
+const IMPORT_NAMED_TYPE_RE =
+  /(?<=\s|^|;)import\s*type\s+([\s"']*(?<imports>[\w\t\n\r $*,/{}]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gm;
 
 export const EXPORT_DECAL_RE =
   /\bexport\s+(?<declaration>(async function|function|let|const enum|const|enum|var|class))\s+(?<name>[\w$]+)/g;
@@ -83,10 +91,19 @@ export function findDynamicImports(code: string): DynamicImport[] {
   return matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" });
 }
 
-export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
-  const cleanedImports = (matched.imports || "")
-    .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
-    .replace(/\s+/g, " ");
+export function findTypeImports(code: string): TypeImport[] {
+  return [
+    ...matchAll(IMPORT_NAMED_TYPE_RE, code, { type: "type" }),
+    ...matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(
+      (match) => /[^A-Za-z]type\s/.test(match.imports)
+    ),
+  ];
+}
+
+export function parseStaticImport(
+  matched: StaticImport | TypeImport
+): ParsedStaticImport {
+  const cleanedImports = clearImports(matched.imports);
 
   const namedImports = {};
   for (const namedImport of cleanedImports
@@ -98,13 +115,41 @@ export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
       namedImports[source] = importName;
     }
   }
-  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
-  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
-  const defaultImport =
-    topLevelImports
-      .split(",")
-      .find((index) => !/[*{}]/.test(index))
-      ?.trim() || undefined;
+  const { namespacedImport, defaultImport } = getImportNames(cleanedImports);
+
+  return {
+    ...matched,
+    defaultImport,
+    namespacedImport,
+    namedImports,
+  } as ParsedStaticImport;
+}
+
+export function parseTypeImport(
+  matched: TypeImport | StaticImport
+): ParsedStaticImport {
+  if (matched.type === "type") {
+    return parseStaticImport(matched);
+  }
+
+  const cleanedImports = clearImports(matched.imports);
+
+  const namedImports = {};
+  for (const namedImport of cleanedImports
+    .match(/{([^}]*)}/)?.[1]
+    ?.split(",") || []) {
+    const [, source = namedImport.trim(), importName = source] = (() => {
+      return /\s+as\s+/.test(namedImport)
+        ? namedImport.match(/^\s*type\s+(\S*) as (\S*)\s*$/) || []
+        : namedImport.match(/^\s*type\s+(\S*)\s*$/) || [];
+    })();
+
+    if (source && TYPE_RE.test(namedImport)) {
+      namedImports[source] = importName;
+    }
+  }
+
+  const { namespacedImport, defaultImport } = getImportNames(cleanedImports);
 
   return {
     ...matched,
