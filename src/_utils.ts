@@ -43,3 +43,24 @@ export function matchAll(regex, string, addition) {
   }
   return matches;
 }
+
+export function clearImports(imports: string) {
+  return (imports || "")
+    .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
+    .replace(/\s+/g, " ");
+}
+
+export function getImportNames(cleanedImports: string) {
+  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
+  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
+  const defaultImport =
+    topLevelImports
+      .split(",")
+      .find((index) => !/[*{}]/.test(index))
+      ?.trim() || undefined;
+
+  return {
+    namespacedImport,
+    defaultImport,
+  };
+}
