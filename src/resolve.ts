@@ -132,11 +132,14 @@ export function resolve(id: string, options?: ResolveOptions): Promise<string> {
   return pcall(resolveSync, id, options);
 }
 
-export function resolvePathSync(id: string, options?: ResolveOptions) {
+export function resolvePathSync(id: string, options?: ResolveOptions): string {
   return fileURLToPath(resolveSync(id, options));
 }
 
-export function resolvePath(id: string, options?: ResolveOptions) {
+export function resolvePath(
+  id: string,
+  options?: ResolveOptions
+): Promise<string> {
   return pcall(resolvePathSync, id, options);
 }
 
