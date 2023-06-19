@@ -179,7 +179,7 @@ export async function resolveSubpath(path: string) {
     return path.replace(/\.[a-z]+$/, "");
   }
 
-  const { exports } = (await readPackageJSON(path)) || {};
+  const { exports } = (await readPackageJSON(path).catch(() => {})) || {};
   if (exports) {
     const resolvedSubpath = _findSubpath(subpath.replace(/^\//, "./"), exports);
     if (resolvedSubpath) {
@@ -188,7 +188,7 @@ export async function resolveSubpath(path: string) {
   }
 
   // Fallback to guessing
-  return path.replace(/\.[a-z]+$/, "");
+  return subpath.replace(/\.\w+$/, "");
 }
 
 // --- Internal ---
