@@ -79,6 +79,14 @@ const staticTests = {
       specifier: "#components",
     },
   ],
+  'import type { foo } from "bar"': [
+    {
+      type: "static",
+      defaultImport: "type",
+      namedImports: { foo: "foo" },
+      specifier: "bar",
+    },
+  ],
 };
 
 staticTests[
@@ -202,9 +210,9 @@ describe("findStaticImports", () => {
   for (const [input, _results] of Object.entries(staticTests)) {
     it(input.replace(/\n/g, "\\n"), () => {
       const matches = findStaticImports(input);
-      const results = Array.isArray(_results) ? _results : [_results];
-      expect(matches.length).toEqual(results.length);
-      for (const [index, test] of results.entries()) {
+      const expected = Array.isArray(_results) ? _results : [_results];
+      expect(expected.length).toEqual(matches.length);
+      for (const [index, test] of expected.entries()) {
         const match = matches[index];
         expect(match.type).to.equal("static");
 
