@@ -86,7 +86,10 @@ describe("parseNodeModulePath", () => {
 describe("resolveSubpath", () => {
   it("resolves correctly", async () => {
     const path = fileURLToPath(
-      new URL("fixture/node_modules/subpaths/lib/subpath.mjs", import.meta.url)
+      new URL(
+        "fixture/package/node_modules/subpaths/lib/subpath.mjs",
+        import.meta.url
+      )
     );
     const result = await resolveSubpath(path);
     expect(result).toMatchInlineSnapshot('"subpaths/subpath"');
