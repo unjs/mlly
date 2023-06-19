@@ -504,9 +504,9 @@ It returns an empty object (with partial keys) if parsing fails.
 ```js
 import { parseNodeModulePath } from "mlly";
 
-// dir: /src/a/node_modules/
-// name: lib
-// subpath: /dist/index.mjs
+// dir: "/src/a/node_modules/"
+// name: "lib"
+// subpath: "./dist/index.mjs"
 const { dir, name, subpath } = parseNodeModulePath(
   "/src/a/node_modules/lib/dist/index.mjs"
 );
@@ -519,7 +519,7 @@ Parses an absolute file path in `node_modules` and tries to reverse lookup (or g
 ```js
 import { lookupNodeModuleSubpath } from "mlly";
 
-// subpath: ./utils
+// subpath: "./utils"
 const subpath = lookupNodeModuleSubpath(
   "/src/a/node_modules/lib/dist/utils.mjs"
 );

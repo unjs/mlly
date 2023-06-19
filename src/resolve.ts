@@ -165,7 +165,7 @@ export function parseNodeModulePath(path: string) {
   return {
     dir,
     name,
-    subpath,
+    subpath: subpath ? `.${subpath}` : undefined,
   };
 }
 
@@ -176,21 +176,19 @@ export async function lookupNodeModuleSubpath(
   path = normalize(fileURLToPath(path));
   const { name, subpath } = parseNodeModulePath(path);
 
-  const _subpath = subpath ? subpath.replace(/^\//, "./") : undefined;
-
-  if (!name || !_subpath) {
-    return _subpath;
+  if (!name || !subpath) {
+    return subpath;
   }
 
   const { exports } = (await readPackageJSON(path).catch(() => {})) || {};
   if (exports) {
-    const resolvedSubpath = _findSubpath(_subpath, exports);
+    const resolvedSubpath = _findSubpath(subpath, exports);
     if (resolvedSubpath) {
       return resolvedSubpath;
     }
   }
 
-  return _subpath;
+  return subpath;
 }
 
 // --- Internal ---
@@ -201,7 +199,7 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
   }
 
   if (!subpath.startsWith(".")) {
-    subpath = `./${subpath}`;
+    subpath = subpath.startsWith("/") ? `.${subpath}` : `./${subpath}`;
   }
 
   if (subpath in exports) {
