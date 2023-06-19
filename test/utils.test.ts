@@ -70,6 +70,17 @@ describe("getProtocol", () => {
 describe("parseNodeModulePath", () => {
   const tests = [
     {
+      input: "/foo/bar",
+      output: {},
+    },
+    {
+      input: "/src/a/node_modules/thing",
+      output: {
+        dir: "/src/a/node_modules/",
+        name: "thing",
+      },
+    },
+    {
       input: "/src/a/node_modules/thing/dist/index.mjs",
       output: {
         dir: "/src/a/node_modules/",
