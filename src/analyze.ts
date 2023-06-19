@@ -4,7 +4,7 @@ import { resolvePath, ResolveOptions } from "./resolve";
 import { clearImports, getImportNames, loadURL } from "./utils";
 
 export interface ESMImport {
-  type: "static" | "dynamic" | "type";
+  type: "static" | "dynamic";
   code: string;
   start: number;
   end: number;
@@ -27,7 +27,7 @@ export interface DynamicImport extends ESMImport {
   expression: string;
 }
 
-export interface TypeImport extends ESMImport {
+export interface TypeImport extends Omit<ESMImport, "type"> {
   type: "type";
   imports: string;
   specifier: string;
