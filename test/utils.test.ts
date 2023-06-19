@@ -85,14 +85,20 @@ describe("parseNodeModulePath", () => {
 
 describe("resolveSubpath", () => {
   it("resolves correctly", async () => {
-    const path = fileURLToPath(
-      new URL(
-        "fixture/package/node_modules/subpaths/lib/subpath.mjs",
-        import.meta.url
-      )
-    );
+    const path = new URL(
+      "fixture/package/node_modules/subpaths/lib/subpath.mjs",
+      import.meta.url
+    ).toString();
     const result = await resolveSubpath(path);
     expect(result).toMatchInlineSnapshot('"subpaths/subpath"');
+  });
+  it("resolves with fallback guess", async () => {
+    const path = new URL(
+      "fixture/package/node_modules/alien/lib/subpath.json5",
+      import.meta.url
+    ).toString();
+    const result = await resolveSubpath(path);
+    expect(result).toMatchInlineSnapshot('"/lib/subpath"');
   });
   it("ignores invalid paths", async () => {
     const path = fileURLToPath(
