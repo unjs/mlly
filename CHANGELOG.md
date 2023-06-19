@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.3.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.2.1...v1.3.0)
+
+
+### 🚀 Enhancements
+
+  - Update `import-meta-url` to v3 ([208b323](https://github.com/unjs/mlly/commit/208b323))
+
+### 💅 Refactors
+
+  - Remove deprecated notice from sync resolve utils ([5223f5a](https://github.com/unjs/mlly/commit/5223f5a))
+
+### 📖 Documentation
+
+  - Mention `resolveSync` and `resolvePathSync` utils ([02a5efe](https://github.com/unjs/mlly/commit/02a5efe))
+
+### 🏡 Chore
+
+  - Update dependencies ([8bf8dcd](https://github.com/unjs/mlly/commit/8bf8dcd))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
+## v1.2.1
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.2.0...v1.2.1)
+
+
+### 🩹 Fixes
+
+  - **findStaticImports:** Allow accents in import names ([#170](https://github.com/unjs/mlly/pull/170))
+
+### 📖 Documentation
+
+  - Correct import name ([#167](https://github.com/unjs/mlly/pull/167))
+
+### 🏡 Chore
+
+  - Update lockfile ([7741f4a](https://github.com/unjs/mlly/commit/7741f4a))
+  - Fix eslint ([86dd7f4](https://github.com/unjs/mlly/commit/86dd7f4))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Mastercuber <e4d33vb85@mozmail.com>
+
 ## v1.2.0
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.1.1...v1.2.0)

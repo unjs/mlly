@@ -6,7 +6,10 @@ export function normalizeSlash(string_) {
   return string_.replace(/\\/g, "/");
 }
 
-export function pcall(function_, ...arguments_) {
+export function pcall<TFn extends (...args: any[]) => any>(
+  function_: TFn,
+  ...arguments_: Parameters<TFn>
+): Promise<ReturnType<TFn>> {
   try {
     return Promise.resolve(function_(...arguments_)).catch((error) =>
       perr(error)

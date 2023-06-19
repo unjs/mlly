@@ -40,7 +40,7 @@ Several utilities to make ESM resolution easier:
 - Supporting custom `conditions`
 - Support resolving from multiple paths or urls
 
-### `resolve`
+### `resolve` / `resolveSync`
 
 Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
 (using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve)).
@@ -48,7 +48,7 @@ Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.or
 Additionally supports resolving without extension and `/index` similar to CommonJS.
 
 ```js
-import { resolve } from "mlly";
+import { resolve, resolveSync } from "mlly";
 
 // file:///home/user/project/module.mjs
 console.log(await resolve("./module.mjs", { url: import.meta.url }));
@@ -60,12 +60,12 @@ console.log(await resolve("./module.mjs", { url: import.meta.url }));
 - `conditions`: Array of conditions used for resolution algorithm (default is `['node', 'import']`)
 - `extensions`: Array of additional extensions to check if import failed (default is `['.mjs', '.cjs', '.js', '.json']`)
 
-### `resolvePath`
+### `resolvePath` / `resolvePathSync`
 
 Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
 
 ```js
-import { resolvePath } from "mlly";
+import { resolvePath, resolveSync } from "mlly";
 
 // /home/user/project/module.mjs
 console.log(await resolvePath("./module.mjs", { url: import.meta.url }));
@@ -396,7 +396,7 @@ Options are same as `evalModule`.
 - All usages of `import.meta.url` will be replaced with `url` or `from` option
 
 ```js
-import { toDataURL } from "mlly";
+import { transformModule } from "mlly";
 console.log(transformModule(`console.log(import.meta.url)`), {
   url: "test.mjs",
 });

@@ -124,9 +124,6 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
   return pathToFileURL(realPath).toString();
 }
 
-/**
- * @deprecated please use `resolve` instead of `resolveSync`
- */
 export function resolveSync(id: string, options?: ResolveOptions): string {
   return _resolve(id, options);
 }
@@ -135,14 +132,14 @@ export function resolve(id: string, options?: ResolveOptions): Promise<string> {
   return pcall(resolveSync, id, options);
 }
 
-/**
- * @deprecated please use `resolvePath` instead of `resolvePathSync`
- */
-export function resolvePathSync(id: string, options?: ResolveOptions) {
+export function resolvePathSync(id: string, options?: ResolveOptions): string {
   return fileURLToPath(resolveSync(id, options));
 }
 
-export function resolvePath(id: string, options?: ResolveOptions) {
+export function resolvePath(
+  id: string,
+  options?: ResolveOptions
+): Promise<string> {
   return pcall(resolvePathSync, id, options);
 }
 
