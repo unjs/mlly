@@ -156,7 +156,8 @@ export function parseNodeModulePath(path: string) {
   if (!path) {
     return {};
   }
-  const match = NODE_MODULES_RE.exec(normalize(path));
+  path = normalize(fileURLToPath(path));
+  const match = NODE_MODULES_RE.exec(path);
   if (!match) {
     return {};
   }
@@ -169,46 +170,53 @@ export function parseNodeModulePath(path: string) {
 }
 
 /** Reverse engineer a subpath export if possible */
-export async function resolveSubpath(resolvedPath: string) {
-  const { pkgName, subpath } = parseNodeModulePath(resolvedPath);
+export async function resolveSubpath(path: string) {
+  path = normalize(fileURLToPath(path));
+
+  const { pkgName, subpath } = parseNodeModulePath(path);
 
   if (!pkgName || !subpath) {
-    return resolvedPath.replace(/\.[a-z]+$/, "");
+    return path.replace(/\.[a-z]+$/, "");
   }
 
-  const { exports } = (await readPackageJSON(resolvedPath)) || {};
-  const resolvedSubpath =
-    exports && findSubpath(subpath.replace(/^\//, "./"), exports);
+  const { exports } = (await readPackageJSON(path)) || {};
+  if (exports) {
+    const resolvedSubpath = _findSubpath(subpath.replace(/^\//, "./"), exports);
+    if (resolvedSubpath) {
+      return join(pkgName, resolvedSubpath);
+    }
+  }
 
-  // Fall back to guessing
-  return resolvedSubpath
-    ? join(pkgName, resolvedSubpath)
-    : resolvedPath.replace(/\.[a-z]+$/, "");
+  // Fallback to guessing
+  return path.replace(/\.[a-z]+$/, "");
 }
 
 // --- Internal ---
 
-function flattenExports(
+function _findSubpath(path: string, exports: PackageJson["exports"]) {
+  if (typeof exports === "string") {
+    exports = { ".": exports };
+  }
+
+  const relativePath = path.startsWith(".") ? path : `./${path}`;
+  if (relativePath in exports) {
+    return relativePath;
+  }
+
+  const flattenedExports = _flattenExports(exports);
+  const [foundPath] =
+    flattenedExports.find(([_, resolved]) => resolved === path) || [];
+
+  return foundPath;
+}
+
+function _flattenExports(
   exports: Exclude<PackageJson["exports"], string>,
   path?: string
 ) {
   return Object.entries(exports).flatMap(([key, value]) =>
     typeof value === "string"
       ? [[path ?? key, value]]
-      : flattenExports(value, path ?? key)
+      : _flattenExports(value, path ?? key)
   );
-}
-
-function findSubpath(path: string, exports: PackageJson["exports"]) {
-  const relativePath = path.startsWith(".") ? path : "./" + path;
-  const _exports = typeof exports === "string" ? { ".": exports } : exports;
-
-  if (relativePath in _exports) {
-    return relativePath;
-  }
-
-  const flattenedExports = flattenExports(_exports);
-  const [foundPath] =
-    flattenedExports.find(([_, resolved]) => resolved === path) || [];
-  return foundPath;
 }
