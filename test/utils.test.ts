@@ -75,8 +75,8 @@ describe("parseNodeModulePath", () => {
     ];
     for (const path of paths) {
       expect(parseNodeModulePath(path)).toEqual({
-        baseDir: expect.stringContaining("/src/a/node_modules/"),
-        pkgName: "thing",
+        dir: expect.stringContaining("/src/a/node_modules/"),
+        name: "thing",
         subpath: "/dist/index.mjs",
       });
     }

@@ -161,10 +161,10 @@ export function parseNodeModulePath(path: string) {
   if (!match) {
     return {};
   }
-  const [, baseDir, pkgName, subpath] = match;
+  const [, dir, name, subpath] = match;
   return {
-    baseDir,
-    pkgName,
+    dir,
+    name,
     subpath,
   };
 }
@@ -174,11 +174,11 @@ export async function lookupNodeModuleSubpath(
   path: string
 ): Promise<string | undefined> {
   path = normalize(fileURLToPath(path));
-  const { pkgName, subpath } = parseNodeModulePath(path);
+  const { name, subpath } = parseNodeModulePath(path);
 
   const _subpath = subpath ? subpath.replace(/^\//, "./") : undefined;
 
-  if (!pkgName || !_subpath) {
+  if (!name || !_subpath) {
     return _subpath;
   }
 
