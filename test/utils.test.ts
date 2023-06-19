@@ -1,5 +1,13 @@
+import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import { isNodeBuiltin, sanitizeFilePath, getProtocol } from "../src";
+
+import {
+  isNodeBuiltin,
+  sanitizeFilePath,
+  getProtocol,
+  parseNodeModulePath,
+  resolveSubpath,
+} from "../src";
 
 describe("isNodeBuiltin", () => {
   const cases = {
@@ -56,5 +64,38 @@ describe("getProtocol", () => {
     expect(getProtocol("file://src/a.ts")).to.equal("file");
     expect(getProtocol("file://C:/src/a.ts")).to.equal("file");
     expect(getProtocol("file:///C:/src/a.ts")).to.equal("file");
+  });
+});
+
+describe("parseNodeModulePath", () => {
+  it("parses paths", () => {
+    const paths = [
+      "/src/a/node_modules/thing/dist/index.mjs",
+      "C:\\src\\a\\node_modules\\thing\\dist\\index.mjs",
+    ];
+    for (const path of paths) {
+      expect(parseNodeModulePath(path)).toEqual({
+        baseDir: expect.stringContaining("/src/a/node_modules/"),
+        pkgName: "thing",
+        subpath: "/dist/index.mjs",
+      });
+    }
+  });
+});
+
+describe("resolveSubpath", () => {
+  it("resolves correctly", async () => {
+    const path = fileURLToPath(
+      new URL("fixture/node_modules/subpaths/lib/subpath.mjs", import.meta.url)
+    );
+    const result = await resolveSubpath(path);
+    expect(result).toMatchInlineSnapshot('"subpaths/subpath"');
+  });
+  it("ignores invalid paths", async () => {
+    const path = fileURLToPath(
+      new URL("fixture/subpaths/lib/subpath.mjs", import.meta.url)
+    );
+    const result = await resolveSubpath(path);
+    expect(result).toEqual(path.replace(".mjs", ""));
   });
 });
