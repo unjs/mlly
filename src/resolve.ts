@@ -170,42 +170,47 @@ export function parseNodeModulePath(path: string) {
 }
 
 /** Reverse engineer a subpath export if possible */
-export async function resolveSubpath(path: string) {
+export async function lookupNodeModuleSubpath(
+  path: string
+): Promise<string | undefined> {
   path = normalize(fileURLToPath(path));
-
   const { pkgName, subpath } = parseNodeModulePath(path);
 
-  if (!pkgName || !subpath) {
-    return path.replace(/\.[a-z]+$/, "");
+  const _subpath = subpath ? subpath.replace(/^\//, "./") : undefined;
+
+  if (!pkgName || !_subpath) {
+    return _subpath;
   }
 
   const { exports } = (await readPackageJSON(path).catch(() => {})) || {};
   if (exports) {
-    const resolvedSubpath = _findSubpath(subpath.replace(/^\//, "./"), exports);
+    const resolvedSubpath = _findSubpath(_subpath, exports);
     if (resolvedSubpath) {
-      return join(pkgName, resolvedSubpath);
+      return resolvedSubpath;
     }
   }
 
-  // Fallback to guessing
-  return subpath;
+  return _subpath;
 }
 
 // --- Internal ---
 
-function _findSubpath(path: string, exports: PackageJson["exports"]) {
+function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
   if (typeof exports === "string") {
     exports = { ".": exports };
   }
 
-  const relativePath = path.startsWith(".") ? path : `./${path}`;
-  if (relativePath in exports) {
-    return relativePath;
+  if (!subpath.startsWith(".")) {
+    subpath = `./${subpath}`;
+  }
+
+  if (subpath in exports) {
+    return subpath;
   }
 
   const flattenedExports = _flattenExports(exports);
   const [foundPath] =
-    flattenedExports.find(([_, resolved]) => resolved === path) || [];
+    flattenedExports.find(([_, resolved]) => resolved === subpath) || [];
 
   return foundPath;
 }

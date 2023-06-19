@@ -6,7 +6,7 @@ import {
   sanitizeFilePath,
   getProtocol,
   parseNodeModulePath,
-  resolveSubpath,
+  lookupNodeModuleSubpath,
 } from "../src";
 
 describe("isNodeBuiltin", () => {
@@ -83,28 +83,32 @@ describe("parseNodeModulePath", () => {
   });
 });
 
-describe("resolveSubpath", () => {
-  it("resolves correctly", async () => {
-    const path = new URL(
-      "fixture/package/node_modules/subpaths/lib/subpath.mjs",
-      import.meta.url
-    ).toString();
-    const result = await resolveSubpath(path);
-    expect(result).toMatchInlineSnapshot('"subpaths/subpath"');
-  });
-  it("resolves with fallback guess", async () => {
-    const path = new URL(
-      "fixture/package/node_modules/alien/lib/subpath.json5",
-      import.meta.url
-    ).toString();
-    const result = await resolveSubpath(path);
-    expect(result).toMatchInlineSnapshot('"/lib/subpath.json5"');
-  });
-  it("ignores invalid paths", async () => {
-    const path = fileURLToPath(
-      new URL("fixture/subpaths/lib/subpath.mjs", import.meta.url)
-    );
-    const result = await resolveSubpath(path);
-    expect(result).toEqual(path.replace(".mjs", ""));
-  });
+describe("lookupNodeModuleSubpath", () => {
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const r = (p: string) => new URL(p, import.meta.url).toString();
+
+  const tests = [
+    {
+      name: "resolves with exports field",
+      input: r("fixture/package/node_modules/subpaths/lib/subpath.mjs"),
+      output: "./subpath",
+    },
+    {
+      name: "resolves with fallback subpath guess",
+      input: r("fixture/package/node_modules/alien/lib/subpath.json5"),
+      output: "./lib/subpath.json5",
+    },
+    {
+      name: "ignores invalid paths",
+      input: r("/foo/bar/lib/subpath.mjs"),
+      output: undefined,
+    },
+  ];
+
+  for (const t of tests) {
+    it(t.name, async () => {
+      const result = await lookupNodeModuleSubpath(t.input);
+      expect(result).toBe(t.output);
+    });
+  }
 });
