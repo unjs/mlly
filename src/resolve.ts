@@ -188,7 +188,7 @@ export async function resolveSubpath(path: string) {
   }
 
   // Fallback to guessing
-  return subpath.replace(/\.\w+$/, "");
+  return subpath;
 }
 
 // --- Internal ---

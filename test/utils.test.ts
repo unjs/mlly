@@ -98,7 +98,7 @@ describe("resolveSubpath", () => {
       import.meta.url
     ).toString();
     const result = await resolveSubpath(path);
-    expect(result).toMatchInlineSnapshot('"/lib/subpath"');
+    expect(result).toMatchInlineSnapshot('"/lib/subpath.json5"');
   });
   it("ignores invalid paths", async () => {
     const path = fileURLToPath(
