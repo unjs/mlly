@@ -68,19 +68,29 @@ describe("getProtocol", () => {
 });
 
 describe("parseNodeModulePath", () => {
-  it("parses paths", () => {
-    const paths = [
-      "/src/a/node_modules/thing/dist/index.mjs",
-      "C:\\src\\a\\node_modules\\thing\\dist\\index.mjs",
-    ];
-    for (const path of paths) {
-      expect(parseNodeModulePath(path)).toEqual({
-        dir: expect.stringContaining("/src/a/node_modules/"),
+  const tests = [
+    {
+      input: "/src/a/node_modules/thing/dist/index.mjs",
+      output: {
+        dir: "/src/a/node_modules/",
         name: "thing",
-        subpath: "/dist/index.mjs",
-      });
-    }
-  });
+        subpath: "./dist/index.mjs",
+      },
+    },
+    {
+      input: "C:\\src\\a\\node_modules\\thing\\dist\\index.mjs",
+      output: {
+        dir: "C:/src/a/node_modules/",
+        name: "thing",
+        subpath: "./dist/index.mjs",
+      },
+    },
+  ];
+  for (const t of tests) {
+    it(t.input, () => {
+      expect(parseNodeModulePath(t.input)).toMatchObject(t.output);
+    });
+  }
 });
 
 describe("lookupNodeModuleSubpath", () => {
