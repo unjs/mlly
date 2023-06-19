@@ -124,6 +124,16 @@ describe("lookupNodeModuleSubpath", () => {
       input: r("/foo/bar/lib/subpath.mjs"),
       output: undefined,
     },
+    {
+      name: "resolves main export",
+      input: r("fixture/package/node_modules/subpaths/foo/bar.mjs"),
+      output: "./foo/bar.mjs",
+    },
+    {
+      name: "resolves main export",
+      input: r("fixture/package/node_modules/subpaths/"),
+      output: "./",
+    },
   ];
 
   for (const t of tests) {
