@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.4.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.3.0...v1.4.0)
+
+
+### 🚀 Enhancements
+
+  - `findTypeImports` for finding type imports ([#163](https://github.com/unjs/mlly/pull/163))
+  - Add `parseNodeModulePath` and `lookupNodeModuleSubpath` utils ([#89](https://github.com/unjs/mlly/pull/89))
+
+### 🩹 Fixes
+
+  - Fix `resolvePath` return type ([#172](https://github.com/unjs/mlly/pull/172))
+  - **findStaticImports:** Support special chars in import specifiers ([#169](https://github.com/unjs/mlly/pull/169))
+
+### 🏡 Chore
+
+  - **release:** V1.3.0 ([26063d3](https://github.com/unjs/mlly/commit/26063d3))
+  - Update dependencies ([e075161](https://github.com/unjs/mlly/commit/e075161))
+  - Lint ([7237b0b](https://github.com/unjs/mlly/commit/7237b0b))
+
+### ✅ Tests
+
+  - Add edge case test for `findStaticImports` ([f0b120b](https://github.com/unjs/mlly/commit/f0b120b))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Lsh 
+- Aaron Bassett <arbassett4@outlook.com>
+
 ## v1.3.0
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.2.1...v1.3.0)
