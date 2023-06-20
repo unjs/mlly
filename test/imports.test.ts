@@ -102,7 +102,7 @@ const c = ['.mjs', '.cjs', '.js', '.json']
 staticTests[
   `import {
   member1,
-  // test
+  // @hello.123
   member2
 } from "module-name";`
 ] = {
