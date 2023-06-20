@@ -1,8 +1,9 @@
 import { existsSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { joinURL } from "ufo";
-import { isAbsolute } from "pathe";
+import { isAbsolute, join, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
+import { PackageJson, readPackageJSON } from "pkg-types";
 import { fileURLToPath, normalizeid } from "./utils";
 import { pcall, BUILTIN_MODULES } from "./_utils";
 
@@ -147,4 +148,78 @@ export function createResolve(defaults?: ResolveOptions) {
   return (id: string, url?: ResolveOptions["url"]) => {
     return resolve(id, { url, ...defaults });
   };
+}
+
+const NODE_MODULES_RE = /^(.+\/node_modules\/)([^/@]+|@[^/]+\/[^/]+)(\/?.*?)?$/;
+
+export function parseNodeModulePath(path: string) {
+  if (!path) {
+    return {};
+  }
+  path = normalize(fileURLToPath(path));
+  const match = NODE_MODULES_RE.exec(path);
+  if (!match) {
+    return {};
+  }
+  const [, dir, name, subpath] = match;
+  return {
+    dir,
+    name,
+    subpath: subpath ? `.${subpath}` : undefined,
+  };
+}
+
+/** Reverse engineer a subpath export if possible */
+export async function lookupNodeModuleSubpath(
+  path: string
+): Promise<string | undefined> {
+  path = normalize(fileURLToPath(path));
+  const { name, subpath } = parseNodeModulePath(path);
+
+  if (!name || !subpath) {
+    return subpath;
+  }
+
+  const { exports } = (await readPackageJSON(path).catch(() => {})) || {};
+  if (exports) {
+    const resolvedSubpath = _findSubpath(subpath, exports);
+    if (resolvedSubpath) {
+      return resolvedSubpath;
+    }
+  }
+
+  return subpath;
+}
+
+// --- Internal ---
+
+function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
+  if (typeof exports === "string") {
+    exports = { ".": exports };
+  }
+
+  if (!subpath.startsWith(".")) {
+    subpath = subpath.startsWith("/") ? `.${subpath}` : `./${subpath}`;
+  }
+
+  if (subpath in exports) {
+    return subpath;
+  }
+
+  const flattenedExports = _flattenExports(exports);
+  const [foundPath] =
+    flattenedExports.find(([_, resolved]) => resolved === subpath) || [];
+
+  return foundPath;
+}
+
+function _flattenExports(
+  exports: Exclude<PackageJson["exports"], string>,
+  path?: string
+) {
+  return Object.entries(exports).flatMap(([key, value]) =>
+    typeof value === "string"
+      ? [[path ?? key, value]]
+      : _flattenExports(value, path ?? key)
+  );
 }

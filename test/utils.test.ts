@@ -1,5 +1,13 @@
+import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import { isNodeBuiltin, sanitizeFilePath, getProtocol } from "../src";
+
+import {
+  isNodeBuiltin,
+  sanitizeFilePath,
+  getProtocol,
+  parseNodeModulePath,
+  lookupNodeModuleSubpath,
+} from "../src";
 
 describe("isNodeBuiltin", () => {
   const cases = {
@@ -57,4 +65,81 @@ describe("getProtocol", () => {
     expect(getProtocol("file://C:/src/a.ts")).to.equal("file");
     expect(getProtocol("file:///C:/src/a.ts")).to.equal("file");
   });
+});
+
+describe("parseNodeModulePath", () => {
+  const tests = [
+    {
+      input: "/foo/bar",
+      output: {},
+    },
+    {
+      input: "/src/a/node_modules/thing",
+      output: {
+        dir: "/src/a/node_modules/",
+        name: "thing",
+      },
+    },
+    {
+      input: "/src/a/node_modules/thing/dist/index.mjs",
+      output: {
+        dir: "/src/a/node_modules/",
+        name: "thing",
+        subpath: "./dist/index.mjs",
+      },
+    },
+    {
+      input: "C:\\src\\a\\node_modules\\thing\\dist\\index.mjs",
+      output: {
+        dir: "C:/src/a/node_modules/",
+        name: "thing",
+        subpath: "./dist/index.mjs",
+      },
+    },
+  ];
+  for (const t of tests) {
+    it(t.input, () => {
+      expect(parseNodeModulePath(t.input)).toMatchObject(t.output);
+    });
+  }
+});
+
+describe("lookupNodeModuleSubpath", () => {
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const r = (p: string) => new URL(p, import.meta.url).toString();
+
+  const tests = [
+    {
+      name: "resolves with exports field",
+      input: r("fixture/package/node_modules/subpaths/lib/subpath.mjs"),
+      output: "./subpath",
+    },
+    {
+      name: "resolves with fallback subpath guess",
+      input: r("fixture/package/node_modules/alien/lib/subpath.json5"),
+      output: "./lib/subpath.json5",
+    },
+    {
+      name: "ignores invalid paths",
+      input: r("/foo/bar/lib/subpath.mjs"),
+      output: undefined,
+    },
+    {
+      name: "resolves main export",
+      input: r("fixture/package/node_modules/subpaths/foo/bar.mjs"),
+      output: "./foo/bar.mjs",
+    },
+    {
+      name: "resolves main export",
+      input: r("fixture/package/node_modules/subpaths/"),
+      output: "./",
+    },
+  ];
+
+  for (const t of tests) {
+    it(t.name, async () => {
+      const result = await lookupNodeModuleSubpath(t.input);
+      expect(result).toBe(t.output);
+    });
+  }
 });

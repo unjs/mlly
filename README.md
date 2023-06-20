@@ -491,6 +491,40 @@ import { sanitizeFilePath } from "mlly";
 console.log(sanitizeFilePath("C:\\te#st\\[...slug].jsx"));
 ```
 
+### `parseNodeModulePath`
+
+Parses an absolute file path in `node_modules` to three segments:
+
+- `dir`: Path to main directory of package
+- `name`: Package name
+- `subpath`: The optional package subpath
+
+It returns an empty object (with partial keys) if parsing fails.
+
+```js
+import { parseNodeModulePath } from "mlly";
+
+// dir: "/src/a/node_modules/"
+// name: "lib"
+// subpath: "./dist/index.mjs"
+const { dir, name, subpath } = parseNodeModulePath(
+  "/src/a/node_modules/lib/dist/index.mjs"
+);
+```
+
+### `lookupNodeModuleSubpath`
+
+Parses an absolute file path in `node_modules` and tries to reverse lookup (or guess) the original package exports subpath for it.
+
+```js
+import { lookupNodeModuleSubpath } from "mlly";
+
+// subpath: "./utils"
+const subpath = lookupNodeModuleSubpath(
+  "/src/a/node_modules/lib/dist/utils.mjs"
+);
+```
+
 ## License
 
 [MIT](./LICENSE) - Made with ❤️
