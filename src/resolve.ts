@@ -1,7 +1,7 @@
 import { existsSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { joinURL } from "ufo";
-import { isAbsolute, join, normalize } from "pathe";
+import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
 import { PackageJson, readPackageJSON } from "pkg-types";
 import { fileURLToPath, normalizeid } from "./utils";
@@ -208,6 +208,7 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
 
   const flattenedExports = _flattenExports(exports);
   const [foundPath] =
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     flattenedExports.find(([_, resolved]) => resolved === subpath) || [];
 
   return foundPath;
