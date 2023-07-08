@@ -22,7 +22,7 @@ describe("findExports", () => {
       type: "named",
     },
     "export default foo": {
-      type: "default",
+      type: "namedDefault",
       name: "default",
       names: ["default"],
     },

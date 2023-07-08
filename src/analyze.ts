@@ -34,8 +34,8 @@ export interface TypeImport extends Omit<ESMImport, "type"> {
 }
 
 export interface ESMExport {
-  _type?: "declaration" | "named" | "default" | "star";
-  type: "declaration" | "named" | "default" | "star";
+  _type?: "declaration" | "named" | "default" | "namedDefault" | "star";
+  type: "declaration" | "named" | "default" | "namedDefault" | "star";
   code: string;
   start: number;
   end: number;
@@ -80,7 +80,12 @@ const EXPORT_NAMED_DESTRUCT =
   /\bexport\s+(let|var|const)\s+(?:{(?<exports1>[^}]+?)[\s,]*}|\[(?<exports2>[^\]]+?)[\s,]*])\s+=/gm;
 const EXPORT_STAR_RE =
   /\bexport\s*(\*)(\s*as\s+(?<name>[\w$]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
-const EXPORT_DEFAULT_RE = /\bexport\s+default\s+/g;
+// updated export default to prevent duplication when named export deafult happen
+const EXPORT_DEFAULT_RE =
+  /\bexport\s+default\s+(async function|function|class|true|false|(\W\D)|\d)/g;
+// named export default
+const EXPORT_NAMED_DEFAULT_RE =
+  /\bexport\s+default\s+(?!async function|function|class|true|false|\W|\d)\w*/g;
 const TYPE_RE = /^\s*?type\s/;
 
 export function findStaticImports(code: string): StaticImport[] {
@@ -177,6 +182,7 @@ export function findExports(code: string): ESMExport[] {
     code,
     { type: "named" }
   );
+
   for (const namedExport of destructuredExports) {
     // @ts-expect-error groups
     namedExport.exports = namedExport.exports1 || namedExport.exports2;
@@ -198,6 +204,20 @@ export function findExports(code: string): ESMExport[] {
     name: "default",
   });
 
+  // Find export default
+  const namedDefaultExport: DefaultExport[] = matchAll(
+    EXPORT_NAMED_DEFAULT_RE,
+    code,
+    {
+      type: "namedDefault",
+      code,
+    }
+  ).map((exp) => {
+    exp.name = "default";
+
+    return exp;
+  });
+
   // Find export star
   const starExports: ESMExport[] = matchAll(EXPORT_STAR_RE, code, {
     type: "star",
@@ -210,6 +230,7 @@ export function findExports(code: string): ESMExport[] {
     ...namedExports,
     ...destructuredExports,
     ...defaultExport,
+    ...namedDefaultExport,
     ...starExports,
   ]);
 
@@ -295,7 +316,11 @@ function normalizeExports(exports: ESMExport[]) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0];
     }
-    if (exp.name === "default" && exp.type !== "default") {
+    if (
+      exp.name === "default" &&
+      exp.type !== "default" &&
+      exp.type !== "namedDefault"
+    ) {
       exp._type = exp.type;
       exp.type = "default";
     }
