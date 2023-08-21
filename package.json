@@ -32,17 +32,17 @@
     "ufo": "^1.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.4.10",
-    "@vitest/coverage-v8": "^0.34.1",
+    "@types/node": "^20.5.1",
+    "@vitest/coverage-v8": "^0.34.2",
     "changelogen": "^0.5.4",
     "eslint": "^8.47.0",
     "eslint-config-unjs": "^0.2.1",
     "import-meta-resolve": "^3.0.0",
-    "jiti": "^1.19.1",
+    "jiti": "^1.19.3",
     "prettier": "^2.8.8",
     "typescript": "^5.1.6",
     "unbuild": "^1.2.1",
-    "vitest": "^0.34.1"
+    "vitest": "^0.34.2"
   },
   "packageManager": "pnpm@8.6.12"
 }
