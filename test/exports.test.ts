@@ -220,7 +220,7 @@ describe("findExportNames", () => {
     export const foo = 'bar'
     export { bar, baz }
     export default something
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       [
         "foo",
@@ -258,8 +258,8 @@ describe("resolveModuleExportNames", () => {
   it("star exports", async () => {
     expect(
       await resolveModuleExportNames(
-        new URL("fixture/exports.mjs", import.meta.url).toString()
-      )
+        new URL("fixture/exports.mjs", import.meta.url).toString(),
+      ),
     ).toMatchInlineSnapshot(`
       [
         "foo",
@@ -286,8 +286,8 @@ describe("resolveModuleExportNames", () => {
   it("star exports with package", async () => {
     expect(
       await resolveModuleExportNames(
-        new URL("fixture/package/exports.mjs", import.meta.url).toString()
-      )
+        new URL("fixture/package/exports.mjs", import.meta.url).toString(),
+      ),
     ).toMatchInlineSnapshot(`
       [
         "StaticRouter",
@@ -316,7 +316,7 @@ describe("findTypeExports", () => {
           export type { Qux }
           export type Bing = Qux
           export declare function getWidget(n: number): Widget
-        `
+        `,
     );
     expect(matches).toMatchInlineSnapshot(`
       [

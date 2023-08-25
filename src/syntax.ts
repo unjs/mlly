@@ -50,7 +50,7 @@ const validNodeImportDefaults: ValidNodeImportOptions = {
 
 export async function isValidNodeImport(
   id: string,
-  _options: ValidNodeImportOptions = {}
+  _options: ValidNodeImportOptions = {},
 ): Promise<boolean> {
   if (isNodeBuiltin(id)) {
     return true;
