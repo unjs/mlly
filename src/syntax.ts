@@ -94,5 +94,5 @@ export async function isValidNodeImport(
     (await fsp.readFile(resolvedPath, "utf8").catch(() => {})) ||
     "";
 
-  return hasCJSSyntax(code) || !hasESMSyntax(code);
+  return !hasESMSyntax(code);
 }
