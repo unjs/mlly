@@ -95,13 +95,13 @@ export function findTypeImports(code: string): TypeImport[] {
   return [
     ...matchAll(IMPORT_NAMED_TYPE_RE, code, { type: "type" }),
     ...matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(
-      (match) => /[^A-Za-z]type\s/.test(match.imports)
+      (match) => /[^A-Za-z]type\s/.test(match.imports),
     ),
   ];
 }
 
 export function parseStaticImport(
-  matched: StaticImport | TypeImport
+  matched: StaticImport | TypeImport,
 ): ParsedStaticImport {
   const cleanedImports = clearImports(matched.imports);
 
@@ -126,7 +126,7 @@ export function parseStaticImport(
 }
 
 export function parseTypeImport(
-  matched: TypeImport | StaticImport
+  matched: TypeImport | StaticImport,
 ): ParsedStaticImport {
   if (matched.type === "type") {
     return parseStaticImport(matched);
@@ -169,13 +169,13 @@ export function findExports(code: string): ESMExport[] {
   const namedExports: NamedExport[] = normalizeNamedExports(
     matchAll(EXPORT_NAMED_RE, code, {
       type: "named",
-    })
+    }),
   );
 
   const destructuredExports: NamedExport[] = matchAll(
     EXPORT_NAMED_DESTRUCT,
     code,
-    { type: "named" }
+    { type: "named" },
   );
   for (const namedExport of destructuredExports) {
     // @ts-expect-error groups
@@ -188,7 +188,7 @@ export function findExports(code: string): ESMExport[] {
         name
           .replace(/^.*?\s*:\s*/, "")
           .replace(/\s*=\s*.*$/, "")
-          .trim()
+          .trim(),
       );
   }
 
@@ -226,7 +226,7 @@ export function findExports(code: string): ESMExport[] {
     exports
       // Filter false positive export matches
       .filter(
-        (exp) => !exportLocations || _isExportStatement(exportLocations, exp)
+        (exp) => !exportLocations || _isExportStatement(exportLocations, exp),
       )
       // Prevent multiple exports of same function, only keep latest iteration of signatures
       .filter((exp, index, exports) => {
@@ -246,14 +246,14 @@ export function findTypeExports(code: string): ESMExport[] {
   const declaredExports: DeclarationExport[] = matchAll(
     EXPORT_DECAL_TYPE_RE,
     code,
-    { type: "declaration" }
+    { type: "declaration" },
   );
 
   // Find named exports
   const namedExports: NamedExport[] = normalizeNamedExports(
     matchAll(EXPORT_NAMED_TYPE_RE, code, {
       type: "named",
-    })
+    }),
   );
 
   // Merge and normalize exports
@@ -275,7 +275,7 @@ export function findTypeExports(code: string): ESMExport[] {
     exports
       // Filter false positive export matches
       .filter(
-        (exp) => !exportLocations || _isExportStatement(exportLocations, exp)
+        (exp) => !exportLocations || _isExportStatement(exportLocations, exp),
       )
       // Prevent multiple exports of same function, only keep latest iteration of signatures
       .filter((exp, index, exports) => {
@@ -325,7 +325,7 @@ export function findExportNames(code: string): string[] {
 
 export async function resolveModuleExportNames(
   id: string,
-  options?: ResolveOptions
+  options?: ResolveOptions,
 ): Promise<string[]> {
   const url = await resolvePath(id, options);
   const code = await loadURL(url);
@@ -333,7 +333,7 @@ export async function resolveModuleExportNames(
 
   // Explicit named exports
   const exportNames = new Set(
-    exports.flatMap((exp) => exp.names).filter(Boolean)
+    exports.flatMap((exp) => exp.names).filter(Boolean),
   );
 
   // Recursive * exports

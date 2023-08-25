@@ -101,7 +101,7 @@ import { resolveImports } from "mlly";
 
 // import foo from 'file:///home/user/project/bar.mjs'
 console.log(
-  await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url })
+  await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }),
 );
 ```
 
@@ -216,7 +216,7 @@ console.log(
   findStaticImports(`
 // Empty line
 import foo, { bar /* foo */ } from 'baz'
-`)
+`),
 );
 ```
 
@@ -276,7 +276,7 @@ import { findDynamicImports } from "mlly";
 console.log(
   findDynamicImports(`
 const foo = await import('bar')
-`)
+`),
 );
 ```
 
@@ -290,7 +290,7 @@ console.log(
 export const foo = 'bar'
 export { bar, baz }
 export default something
-`)
+`),
 );
 ```
 
@@ -331,7 +331,7 @@ console.log(
 export const foo = 'bar'
 export { bar, baz }
 export default something
-`)
+`),
 );
 ```
 
@@ -369,7 +369,7 @@ await evalModule(
   import { reverse } from './utils.mjs'
   console.log(reverse('!emosewa si sj'))
 `,
-  { url: import.meta.url }
+  { url: import.meta.url },
 );
 ```
 
@@ -453,7 +453,7 @@ console.log(
   toDataURL(`
   // This is an example
   console.log('Hello world')
-`)
+`),
 );
 ```
 
@@ -508,7 +508,7 @@ import { parseNodeModulePath } from "mlly";
 // name: "lib"
 // subpath: "./dist/index.mjs"
 const { dir, name, subpath } = parseNodeModulePath(
-  "/src/a/node_modules/lib/dist/index.mjs"
+  "/src/a/node_modules/lib/dist/index.mjs",
 );
 ```
 
@@ -521,7 +521,7 @@ import { lookupNodeModuleSubpath } from "mlly";
 
 // subpath: "./utils"
 const subpath = lookupNodeModuleSubpath(
-  "/src/a/node_modules/lib/dist/utils.mjs"
+  "/src/a/node_modules/lib/dist/utils.mjs",
 );
 ```
 

@@ -26,7 +26,7 @@ export interface ResolveOptions {
 function _tryModuleResolve(
   id: string,
   url: URL,
-  conditions: any
+  conditions: any,
 ): any | undefined {
   try {
     return moduleResolve(id, url, conditions);
@@ -77,7 +77,7 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
         // If url is directory
         new URL(joinURL(url.pathname, "_index.js"), url),
         // TODO: Remove in next major version?
-        new URL("node_modules", url)
+        new URL("node_modules", url),
       );
     }
   }
@@ -95,7 +95,7 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
         resolved = _tryModuleResolve(
           id + prefix + extension,
           url,
-          conditionsSet
+          conditionsSet,
         );
         if (resolved) {
           break;
@@ -113,7 +113,7 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
   // Throw error if not found
   if (!resolved) {
     const error = new Error(
-      `Cannot find module ${id} imported from ${urls.join(", ")}`
+      `Cannot find module ${id} imported from ${urls.join(", ")}`,
     );
     // @ts-ignore
     error.code = "ERR_MODULE_NOT_FOUND";
@@ -139,7 +139,7 @@ export function resolvePathSync(id: string, options?: ResolveOptions): string {
 
 export function resolvePath(
   id: string,
-  options?: ResolveOptions
+  options?: ResolveOptions,
 ): Promise<string> {
   return pcall(resolvePathSync, id, options);
 }
@@ -171,7 +171,7 @@ export function parseNodeModulePath(path: string) {
 
 /** Reverse engineer a subpath export if possible */
 export async function lookupNodeModuleSubpath(
-  path: string
+  path: string,
 ): Promise<string | undefined> {
   path = normalize(fileURLToPath(path));
   const { name, subpath } = parseNodeModulePath(path);
@@ -216,11 +216,11 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
 
 function _flattenExports(
   exports: Exclude<PackageJson["exports"], string>,
-  path?: string
+  path?: string,
 ) {
   return Object.entries(exports).flatMap(([key, value]) =>
     typeof value === "string"
       ? [[path ?? key, value]]
-      : _flattenExports(value, path ?? key)
+      : _flattenExports(value, path ?? key),
   );
 }

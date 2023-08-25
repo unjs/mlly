@@ -9,8 +9,6 @@
     "paths": {
       "mlly": ["./"]
     },
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   }
 }
