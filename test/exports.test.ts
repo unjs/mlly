@@ -50,6 +50,8 @@ describe("findExports", () => {
       specifier: "./path",
     },
     "export async function foo ()": { type: "declaration", names: ["foo"] },
+    "export async function* foo ()": { type: "declaration", names: ["foo"] },
+    "export async function *foo ()": { type: "declaration", names: ["foo"] },
     "export const $foo = () => {}": { type: "declaration", names: ["$foo"] },
     "export { foo as default }": {
       type: "default",
