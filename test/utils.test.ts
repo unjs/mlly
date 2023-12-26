@@ -133,11 +133,17 @@ describe("lookupNodeModuleSubpath", () => {
       input: r("fixture/package/node_modules/subpaths/"),
       output: "./",
     },
+    {
+      name: "resolves main export",
+      input: r("fixture/package/node_modules/graphql/src/index.js"),
+      output: "import",
+    },
   ];
 
   for (const t of tests) {
     it(t.name, async () => {
       const result = await lookupNodeModuleSubpath(t.input);
+      console.log(result);
       expect(result).toBe(t.output);
     });
   }
