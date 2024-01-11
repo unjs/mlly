@@ -61,6 +61,11 @@ const staticTests = {
     isMixed: false,
   },
   "export class": { hasESM: true, hasCJS: false, isMixed: false },
+  "const start = '/* ';import foo from 'bar';const end = ' */'": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
   // CJS
   "exports.c={}": { hasESM: false, hasCJS: true, isMixed: false },
   "const b=true;module.exports={b};": {
@@ -82,6 +87,9 @@ const staticTests = {
     isMixed: false,
   },
   "const a={};": { hasESM: false, hasCJS: false, isMixed: false },
+};
+
+const staticTestsWithComments = {
   '// They\'re exposed using "export import" so that types are passed along as expected\nmodule.exports={};':
     { hasESM: false, hasCJS: true, isMixed: false },
 };
@@ -90,6 +98,16 @@ describe("detectSyntax", () => {
   for (const [input, result] of Object.entries(staticTests)) {
     it(input, () => {
       expect(detectSyntax(input)).to.deep.equal(result);
+    });
+  }
+});
+
+describe("detectSyntax (with comment)", () => {
+  for (const [input, result] of Object.entries(staticTestsWithComments)) {
+    it(input, () => {
+      expect(detectSyntax(input, { stripComments: true })).to.deep.equal(
+        result,
+      );
     });
   }
 });
