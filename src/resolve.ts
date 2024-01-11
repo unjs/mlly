@@ -206,21 +206,23 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
     return subpath;
   }
 
-  const flattenedExports = _flattenExports(exports);
-  const [foundPath] =
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    flattenedExports.find(([_, resolved]) => resolved === subpath) || [];
-
-  return foundPath;
+  return _flattenExports(exports).find((p) => p.fsPath === subpath)?.subpath;
 }
 
 function _flattenExports(
   exports: Exclude<PackageJson["exports"], string>,
-  path?: string,
-) {
-  return Object.entries(exports).flatMap(([key, value]) =>
-    typeof value === "string"
-      ? [[path ?? key, value]]
-      : _flattenExports(value, path ?? key),
-  );
+  parentSubpath = "./",
+): { subpath: string; fsPath: string; condition?: string }[] {
+  return Object.entries(exports).flatMap(([key, value]) => {
+    const [subpath, condition] = key.startsWith(".")
+      ? [key.slice(1), undefined]
+      : [undefined, key];
+    const _subPath = joinURL(parentSubpath, subpath);
+    // eslint-disable-next-line unicorn/prefer-ternary
+    if (typeof value === "string") {
+      return [{ subpath: _subPath, fsPath: value, condition }];
+    } else {
+      return _flattenExports(value, _subPath);
+    }
+  });
 }
