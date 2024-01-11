@@ -469,6 +469,10 @@ import myModule from "my-module";
 console.log(interopDefault(myModule));
 ```
 
+**Options:**
+
+- `preferNamespace`: In case that `default` value exists but is not extendable (when is string for example), return input as-is (default is `false`, meaning `default`'s value is prefered even if cannot be extended)
+
 ### `sanitizeURIComponent`
 
 Replace reserved characters from a segment of URI to make it compatible with [rfc2396](https://datatracker.ietf.org/doc/html/rfc2396).

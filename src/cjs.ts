@@ -31,7 +31,10 @@ export function createCommonJS(url: string): CommonjsContext {
   } as CommonjsContext;
 }
 
-export function interopDefault(sourceModule: any): any {
+export function interopDefault(
+  sourceModule: any,
+  opts: { preferNamespace?: boolean } = {},
+): any {
   if (!isObject(sourceModule) || !("default" in sourceModule)) {
     return sourceModule;
   }
@@ -40,7 +43,7 @@ export function interopDefault(sourceModule: any): any {
     return sourceModule;
   }
   if (typeof defaultValue !== "object") {
-    return defaultValue;
+    return opts.preferNamespace ? sourceModule : defaultValue;
   }
   for (const key in sourceModule) {
     if (key === "default") {
