@@ -10,13 +10,13 @@ const ESM_RE =
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
 export function hasESMSyntax(code: string): boolean {
-  return ESM_RE.test(code.replace(/\/\*.+?\*\/|\/\/.*(?=[nr])/g, ''));
+  return ESM_RE.test(code.replace(/\/\*.+?\*\/|\/\/.*(?=[nr])/g, ""));
 }
 
 const CJS_RE =
   /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 export function hasCJSSyntax(code: string): boolean {
-  return CJS_RE.test(code.replace(/\/\*.+?\*\/|\/\/.*(?=[nr])/g, ''));
+  return CJS_RE.test(code.replace(/\/\*.+?\*\/|\/\/.*(?=[nr])/g, ""));
 }
 
 export function detectSyntax(code: string) {

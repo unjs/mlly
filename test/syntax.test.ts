@@ -82,7 +82,8 @@ const staticTests = {
     isMixed: false,
   },
   "const a={};": { hasESM: false, hasCJS: false, isMixed: false },
-  "// They're exposed using \"export import\" so that types are passed along as expected\nmodule.exports={};": { hasESM: false, hasCJS: true , isMixed: false }
+  '// They\'re exposed using "export import" so that types are passed along as expected\nmodule.exports={};':
+    { hasESM: false, hasCJS: true, isMixed: false },
 };
 
 describe("detectSyntax", () => {
