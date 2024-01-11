@@ -175,6 +175,7 @@ export async function lookupNodeModuleSubpath(
 ): Promise<string | undefined> {
   path = normalize(fileURLToPath(path));
   const { name, subpath } = parseNodeModulePath(path);
+
   if (!name || !subpath) {
     return subpath;
   }
