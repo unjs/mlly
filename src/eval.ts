@@ -11,7 +11,7 @@ const EVAL_ESM_IMPORT_RE =
 
 export async function loadModule(
   id: string,
-  options: EvaluateOptions = {}
+  options: EvaluateOptions = {},
 ): Promise<any> {
   const url = await resolve(id, options);
   const code = await loadURL(url);
@@ -20,14 +20,14 @@ export async function loadModule(
 
 export async function evalModule(
   code: string,
-  options: EvaluateOptions = {}
+  options: EvaluateOptions = {},
 ): Promise<any> {
   const transformed = await transformModule(code, options);
   const dataURL = toDataURL(transformed);
   return import(dataURL).catch((error) => {
     error.stack = error.stack.replace(
       new RegExp(dataURL, "g"),
-      options.url || "_mlly_eval_"
+      options.url || "_mlly_eval_",
     );
     throw error;
   });
@@ -35,7 +35,7 @@ export async function evalModule(
 
 export function transformModule(
   code: string,
-  options?: EvaluateOptions
+  options?: EvaluateOptions,
 ): Promise<string> {
   // Convert JSON to module
   if (options.url && options.url.endsWith(".json")) {
@@ -52,7 +52,7 @@ export function transformModule(
 
 export async function resolveImports(
   code: string,
-  options?: EvaluateOptions
+  options?: EvaluateOptions,
 ): Promise<string> {
   const imports = [...code.matchAll(EVAL_ESM_IMPORT_RE)].map((m) => m[0]);
   if (imports.length === 0) {
@@ -69,12 +69,12 @@ export async function resolveImports(
         url = toDataURL(await transformModule(code, { url }));
       }
       resolved.set(id, url);
-    })
+    }),
   );
 
   const re = new RegExp(
     uniqueImports.map((index) => `(${index})`).join("|"),
-    "g"
+    "g",
   );
   return code.replace(re, (id) => resolved.get(id));
 }

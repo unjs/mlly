@@ -50,6 +50,8 @@ describe("findExports", () => {
       specifier: "./path",
     },
     "export async function foo ()": { type: "declaration", names: ["foo"] },
+    "export async function* foo ()": { type: "declaration", names: ["foo"] },
+    "export async function *foo ()": { type: "declaration", names: ["foo"] },
     "export const $foo = () => {}": { type: "declaration", names: ["$foo"] },
     "export { foo as default }": {
       type: "default",
@@ -220,7 +222,7 @@ describe("findExportNames", () => {
     export const foo = 'bar'
     export { bar, baz }
     export default something
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       [
         "foo",
@@ -258,8 +260,8 @@ describe("resolveModuleExportNames", () => {
   it("star exports", async () => {
     expect(
       await resolveModuleExportNames(
-        new URL("fixture/exports.mjs", import.meta.url).toString()
-      )
+        new URL("fixture/exports.mjs", import.meta.url).toString(),
+      ),
     ).toMatchInlineSnapshot(`
       [
         "foo",
@@ -286,8 +288,8 @@ describe("resolveModuleExportNames", () => {
   it("star exports with package", async () => {
     expect(
       await resolveModuleExportNames(
-        new URL("fixture/package/exports.mjs", import.meta.url).toString()
-      )
+        new URL("fixture/package/exports.mjs", import.meta.url).toString(),
+      ),
     ).toMatchInlineSnapshot(`
       [
         "StaticRouter",
@@ -316,7 +318,7 @@ describe("findTypeExports", () => {
           export type { Qux }
           export type Bing = Qux
           export declare function getWidget(n: number): Widget
-        `
+        `,
     );
     expect(matches).toMatchInlineSnapshot(`
       [
@@ -343,7 +345,7 @@ describe("findTypeExports", () => {
           "type": "declaration",
         },
         {
-          "code": "export type { Foo } from \\"./foo\\"",
+          "code": "export type { Foo } from "./foo"",
           "end": 43,
           "exports": " Foo",
           "name": "Foo",
@@ -355,7 +357,7 @@ describe("findTypeExports", () => {
           "type": "named",
         },
         {
-          "code": "export type { Bar } from \\"./bar\\"",
+          "code": "export type { Bar } from "./bar"",
           "end": 87,
           "exports": " Bar",
           "name": "Bar",

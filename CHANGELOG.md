@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.4.2
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.4.1...v1.4.2)
+
+### 🩹 Fixes
+
+- **findExports:** Support generator ([#189](https://github.com/unjs/mlly/pull/189))
+
+### 🏡 Chore
+
+- Update lockfile ([ad68cb7](https://github.com/unjs/mlly/commit/ad68cb7))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Anthony Fu <anthonyfu117@hotmail.com>
+
+## v1.4.1
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.4.0...v1.4.1)
+
+### 🩹 Fixes
+
+- **isValidNodeImport:** Detect invalid cjs modules ([#187](https://github.com/unjs/mlly/pull/187))
+
+### 🏡 Chore
+
+- Update dependencies ([1a25f45](https://github.com/unjs/mlly/commit/1a25f45))
+- Add autofix ci ([b7adabf](https://github.com/unjs/mlly/commit/b7adabf))
+
+### 🎨 Styles
+
+- Format with prettier v3 ([914493c](https://github.com/unjs/mlly/commit/914493c))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.4.0
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.3.0...v1.4.0)
