@@ -35,24 +35,30 @@ export function interopDefault(sourceModule: any): any {
   if (!isObject(sourceModule) || !("default" in sourceModule)) {
     return sourceModule;
   }
-  const newModule = sourceModule.default;
+  const defaultValue = sourceModule.default;
+  if (defaultValue === undefined || defaultValue === null) {
+    return sourceModule;
+  }
+  if (typeof defaultValue !== "object") {
+    return defaultValue;
+  }
   for (const key in sourceModule) {
     if (key === "default") {
       try {
-        if (!(key in newModule)) {
-          Object.defineProperty(newModule, key, {
+        if (!(key in defaultValue)) {
+          Object.defineProperty(defaultValue, key, {
             enumerable: false,
             configurable: false,
             get() {
-              return newModule;
+              return defaultValue;
             },
           });
         }
       } catch {}
     } else {
       try {
-        if (!(key in newModule)) {
-          Object.defineProperty(newModule, key, {
+        if (!(key in defaultValue)) {
+          Object.defineProperty(defaultValue, key, {
             enumerable: true,
             configurable: true,
             get() {
@@ -63,5 +69,5 @@ export function interopDefault(sourceModule: any): any {
       } catch {}
     }
   }
-  return newModule;
+  return defaultValue;
 }
