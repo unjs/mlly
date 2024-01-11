@@ -87,6 +87,13 @@ const staticTests = {
       specifier: "bar",
     },
   ],
+  "function a(){}import baz, { x, y as z } from 'baz'": [
+    {
+      defaultImport: "baz",
+      namedImports: { x: "x", y: "z" },
+      specifier: "baz",
+    },
+  ],
 };
 
 staticTests[
@@ -239,7 +246,7 @@ describe("findStaticImports", () => {
     it(input.replace(/\n/g, "\\n"), () => {
       const matches = findStaticImports(input);
       const expected = Array.isArray(_results) ? _results : [_results];
-      expect(expected.length).toEqual(matches.length);
+      expect(matches.length).toEqual(expected.length);
       for (const [index, test] of expected.entries()) {
         const match = matches[index];
         expect(match.type).to.equal("static");
