@@ -89,11 +89,17 @@ const EXPORT_NAMED_DEFAULT_RE =
 const TYPE_RE = /^\s*?type\s/;
 
 export function findStaticImports(code: string): StaticImport[] {
-  return matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" });
+  return _filterStatement(
+    _tryGetLocations(code, "import"),
+    matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }),
+  );
 }
 
 export function findDynamicImports(code: string): DynamicImport[] {
-  return matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" });
+  return _filterStatement(
+    _tryGetLocations(code, "import"),
+    matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" }),
+  );
 }
 
 export function findTypeImports(code: string): TypeImport[] {
@@ -211,7 +217,7 @@ export function findExports(code: string): ESMExport[] {
     {
       type: "namedDefault",
       code,
-    }
+    },
   ).map((exp) => {
     exp.name = "default";
 
@@ -238,17 +244,14 @@ export function findExports(code: string): ESMExport[] {
   if (exports.length === 0) {
     return [];
   }
-  const exportLocations = _tryGetExportLocations(code);
+  const exportLocations = _tryGetLocations(code, "export");
   if (exportLocations && exportLocations.length === 0) {
     return [];
   }
 
   return (
-    exports
-      // Filter false positive export matches
-      .filter(
-        (exp) => !exportLocations || _isExportStatement(exportLocations, exp),
-      )
+    // Filter false positive export matches
+    _filterStatement(exportLocations, exports)
       // Prevent multiple exports of same function, only keep latest iteration of signatures
       .filter((exp, index, exports) => {
         const nextExport = exports[index + 1];
@@ -287,17 +290,14 @@ export function findTypeExports(code: string): ESMExport[] {
   if (exports.length === 0) {
     return [];
   }
-  const exportLocations = _tryGetExportLocations(code);
+  const exportLocations = _tryGetLocations(code, "export");
   if (exportLocations && exportLocations.length === 0) {
     return [];
   }
 
   return (
-    exports
-      // Filter false positive export matches
-      .filter(
-        (exp) => !exportLocations || _isExportStatement(exportLocations, exp),
-      )
+    // Filter false positive export matches
+    _filterStatement(exportLocations, exports)
       // Prevent multiple exports of same function, only keep latest iteration of signatures
       .filter((exp, index, exports) => {
         const nextExport = exports[index + 1];
@@ -384,23 +384,31 @@ interface TokenLocation {
   end: number;
 }
 
-function _isExportStatement(exportsLocation: TokenLocation[], exp: ESMExport) {
-  return exportsLocation.some((location) => {
-    // AST token inside the regex match
-    return exp.start <= location.start && exp.end >= location.end;
-    // AST Token start or end is within the regex match
-    // return (exp.start <= location.start && location.start <= exp.end) ||
-    // (exp.start <= location.end && location.end <= exp.end)
+function _filterStatement<T extends TokenLocation>(
+  locations: TokenLocation[] | undefined,
+  statements: T[],
+): T[] {
+  return statements.filter((exp) => {
+    return (
+      !locations ||
+      locations.some((location) => {
+        // AST token inside the regex match
+        return exp.start <= location.start && exp.end >= location.end;
+        // AST Token start or end is within the regex match
+        // return (exp.start <= location.start && location.start <= exp.end) ||
+        // (exp.start <= location.end && location.end <= exp.end)
+      })
+    );
   });
 }
 
-function _tryGetExportLocations(code: string) {
+function _tryGetLocations(code: string, label: string) {
   try {
-    return _getExportLocations(code);
+    return _getLocations(code, label);
   } catch {}
 }
 
-function _getExportLocations(code: string) {
+function _getLocations(code: string, label: string) {
   const tokens = tokenizer(code, {
     ecmaVersion: "latest",
     sourceType: "module",
@@ -410,7 +418,7 @@ function _getExportLocations(code: string) {
   });
   const locations: TokenLocation[] = [];
   for (const token of tokens) {
-    if (token.type.label === "export") {
+    if (token.type.label === label) {
       locations.push({
         start: token.start,
         end: token.end,
