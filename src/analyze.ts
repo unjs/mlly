@@ -40,6 +40,7 @@ export interface ESMExport {
   start: number;
   end: number;
   name?: string;
+  defaultName?: string;
   names: string[];
   specifier?: string;
 }
