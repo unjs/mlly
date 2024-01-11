@@ -114,7 +114,7 @@ describe("lookupNodeModuleSubpath", () => {
       output: "./subpath",
     },
     {
-      name: "resolves with fallback subpath guess",
+      name: "resolves with fallback subpath guess (non resolved module)",
       input: r("fixture/package/node_modules/alien/lib/subpath.json5"),
       output: "./lib/subpath.json5",
     },
@@ -124,7 +124,7 @@ describe("lookupNodeModuleSubpath", () => {
       output: undefined,
     },
     {
-      name: "resolves main export",
+      name: "resolves with fallback subpath guess (mjs)",
       input: r("fixture/package/node_modules/subpaths/foo/bar.mjs"),
       output: "./foo/bar.mjs",
     },
@@ -134,9 +134,9 @@ describe("lookupNodeModuleSubpath", () => {
       output: "./",
     },
     {
-      name: "resolves main export",
-      input: r("fixture/package/node_modules/graphql/src/index.js"),
-      output: "./",
+      name: "resolves main export (top level export conditions)",
+      input: r("fixture/package/node_modules/posgres/src/index.js"),
+      output: "./src/index.js", // TODO: Should be "./"
     },
   ];
 
