@@ -82,6 +82,10 @@ describe("findExports", () => {
     "export const [ a, b ] = foo": { type: "named", names: ["a", "b"] },
     "export const [\na\n, b ] = foo": { type: "named", names: ["a", "b"] },
     "export const [ a:b,\nc = 1] = foo": { type: "named", names: ["b", "c"] },
+    "export const foo = 1, bar,baz=3;": {
+      type: "declaration",
+      names: ["foo", "bar", "baz"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
