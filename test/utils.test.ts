@@ -136,7 +136,7 @@ describe("lookupNodeModuleSubpath", () => {
     {
       name: "resolves main export",
       input: r("fixture/package/node_modules/graphql/src/index.js"),
-      output: "import",
+      output: "./",
     },
   ];
 

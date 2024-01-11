@@ -219,9 +219,11 @@ function _flattenExports(
   exports: Exclude<PackageJson["exports"], string>,
   path?: string,
 ) {
-  return Object.entries(exports).flatMap(([key, value]) =>
-    typeof value === "string"
-      ? [[path ?? key, value]]
-      : _flattenExports(value, path ?? key),
-  );
+  return Object.entries(exports).flatMap(([key, value]) => {
+    const subpath =
+      path ?? (key.startsWith(".") ? key : "./"); /* key is export condition */
+    return typeof value === "string"
+      ? [[subpath, value]]
+      : _flattenExports(value, subpath);
+  });
 }
