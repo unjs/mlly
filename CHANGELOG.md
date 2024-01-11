@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.5.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.4.2...v1.5.0)
+
+### 🚀 Enhancements
+
+- Make `stripComments` optional for syntax detection ([#217](https://github.com/unjs/mlly/pull/217))
+- **findExports:** Extract name of default exports ([#179](https://github.com/unjs/mlly/pull/179))
+- **interopDefault:** Support `preferNamespace` ([5d23c98](https://github.com/unjs/mlly/commit/5d23c98))
+
+### 🩹 Fixes
+
+- Strip comment for syntax detection ([#196](https://github.com/unjs/mlly/pull/196))
+- **analyze:** Ignore conmments for imports detection ([#155](https://github.com/unjs/mlly/pull/155))
+- **lookupNodeModuleSubpath:** Handle conditions and nested exports ([#210](https://github.com/unjs/mlly/pull/210))
+- **analyze:** Allow `import` statement after `}` ([#166](https://github.com/unjs/mlly/pull/166))
+- **interopDefault:** Skip nullish values for `default` and explicitly return non-objects as-is ([14eb72d](https://github.com/unjs/mlly/commit/14eb72d))
+- **findExports:** Support multiple variables in single export ([#211](https://github.com/unjs/mlly/pull/211))
+
+### 🌊 Types
+
+- **fileURLToPath:** Accept url as input ([34f6026](https://github.com/unjs/mlly/commit/34f6026))
+
+### 🏡 Chore
+
+- Update deps and lockfile ([7c8af63](https://github.com/unjs/mlly/commit/7c8af63))
+- Add `defaultName` type to `ESMExport` ([4acaeaf](https://github.com/unjs/mlly/commit/4acaeaf))
+- Update `import-meta-resolve` to v4 ([#215](https://github.com/unjs/mlly/pull/215))
+- Add badges ([78d052b](https://github.com/unjs/mlly/commit/78d052b))
+
+### ✅ Tests
+
+- Add tests for resolve ([8c1bead](https://github.com/unjs/mlly/commit/8c1bead))
+- Add more tests for resolve ([#15](https://github.com/unjs/mlly/pull/15))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Mehmet <hi@productdevbook.com>
+- Máté Nagy ([@mateenagy](http://github.com/mateenagy))
+- Lishaobos 
+- Julien Huang ([@huang-julien](http://github.com/huang-julien))
+
 ## v1.4.2
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.4.1...v1.4.2)
