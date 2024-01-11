@@ -2,7 +2,7 @@ import { fileURLToPath as _fileURLToPath } from "node:url";
 import { promises as fsp } from "node:fs";
 import { normalizeSlash, BUILTIN_MODULES } from "./_utils";
 
-export function fileURLToPath(id: string): string {
+export function fileURLToPath(id: string | URL): string {
   if (typeof id === "string" && !id.startsWith("file://")) {
     return normalizeSlash(id);
   }
