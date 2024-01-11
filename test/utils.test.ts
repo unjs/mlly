@@ -108,35 +108,43 @@ describe("lookupNodeModuleSubpath", () => {
   const r = (p: string) => new URL(p, import.meta.url).toString();
 
   const tests = [
+    // Resolve with exports
     {
-      name: "resolves with exports field",
-      input: r("fixture/package/node_modules/subpaths/lib/subpath.mjs"),
+      name: "resolves with exports field (root)",
+      input: r("fixture/package/node_modules/subpaths/dist/index.mjs"),
+      output: "./",
+    },
+    {
+      name: "resolves with exports field (subpath)",
+      input: r("fixture/package/node_modules/subpaths/dist/subpath.mjs"),
       output: "./subpath",
     },
     {
-      name: "resolves with fallback subpath guess (non resolved module)",
+      name: "resolves with exports field (with conditions)",
+      input: r("fixture/package/node_modules/postgres/src/index.js"),
+      output: "./",
+    },
+    // Fallbacks
+    {
+      name: "resolves with fallback (non resolved module)",
       input: r("fixture/package/node_modules/alien/lib/subpath.json5"),
       output: "./lib/subpath.json5",
     },
+    {
+      name: "resolves with fallback subpath guess (non existing file)",
+      input: r("fixture/package/node_modules/subpaths/foo/bar.mjs"),
+      output: "./foo/bar.mjs",
+    },
+    // Invalid
     {
       name: "ignores invalid paths",
       input: r("/foo/bar/lib/subpath.mjs"),
       output: undefined,
     },
     {
-      name: "resolves with fallback subpath guess (mjs)",
-      input: r("fixture/package/node_modules/subpaths/foo/bar.mjs"),
-      output: "./foo/bar.mjs",
-    },
-    {
       name: "resolves main export",
       input: r("fixture/package/node_modules/subpaths/"),
       output: "./",
-    },
-    {
-      name: "resolves main export (top level export conditions)",
-      input: r("fixture/package/node_modules/posgres/src/index.js"),
-      output: "./src/index.js", // TODO: Should be "./"
     },
   ];
 
