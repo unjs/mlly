@@ -22,7 +22,7 @@ describe("findExports", () => {
       type: "named",
     },
     "export default foo": {
-      type: "namedDefault",
+      type: "default",
       name: "default",
       names: ["default"],
     },
@@ -53,6 +53,12 @@ describe("findExports", () => {
     "export async function* foo ()": { type: "declaration", names: ["foo"] },
     "export async function *foo ()": { type: "declaration", names: ["foo"] },
     "export const $foo = () => {}": { type: "declaration", names: ["$foo"] },
+    "export default something": {
+      type: "default",
+      name: "default",
+      defaultName: "something",
+      names: ["default"],
+    },
     "export { foo as default }": {
       type: "default",
       name: "default",
@@ -94,6 +100,9 @@ describe("findExports", () => {
       }
       if (test.specifier) {
         expect(match.specifier).toEqual(test.specifier);
+      }
+      if (test.defaultName) {
+        expect(match.defaultName).toEqual(test.defaultName);
       }
     });
   }
