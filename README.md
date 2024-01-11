@@ -1,5 +1,9 @@
 # mlly
 
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![Codecov][codecov-src]][codecov-href]
+
 > Missing [ECMAScript module](https://nodejs.org/api/esm.html) utils for Node.js
 
 While ESM Modules are evolving in Node.js ecosystem, there are still
@@ -343,7 +347,7 @@ Resolves module and reads its contents to extract possible export names using st
 import { resolveModuleExportNames } from "mlly";
 
 // ["basename", "dirname", ... ]
-console.log(await resolveModuleExportNames("pathe"));
+console.log(await resolveModuleExportNames("mlly"));
 ```
 
 ## Evaluating Modules
@@ -531,4 +535,13 @@ const subpath = lookupNodeModuleSubpath(
 
 ## License
 
-[MIT](./LICENSE) - Made with ❤️
+[MIT](./LICENSE) - Made with 💛
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/mlly?style=flat&colorA=18181B&colorB=F0DB4F
+[npm-version-href]: https://npmjs.com/package/mlly
+[npm-downloads-src]: https://img.shields.io/npm/dm/mlly?style=flat&colorA=18181B&colorB=F0DB4F
+[npm-downloads-href]: https://npmjs.com/package/mlly
+[codecov-src]: https://img.shields.io/codecov/c/gh/unjs/mlly/main?style=flat&colorA=18181B&colorB=F0DB4F
+[codecov-href]: https://codecov.io/gh/unjs/mlly
