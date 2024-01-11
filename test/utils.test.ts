@@ -143,7 +143,6 @@ describe("lookupNodeModuleSubpath", () => {
   for (const t of tests) {
     it(t.name, async () => {
       const result = await lookupNodeModuleSubpath(t.input);
-      console.log(result);
       expect(result).toBe(t.output);
     });
   }
