@@ -206,9 +206,7 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
     return subpath;
   }
 
-  const _flatExports = _flattenExports(exports);
-  console.log(subpath, "in", _flatExports);
-  return _flatExports.find((p) => p.fsPath === subpath)?.subpath;
+  return _flattenExports(exports).find((p) => p.fsPath === subpath)?.subpath;
 }
 
 function _flattenExports(
