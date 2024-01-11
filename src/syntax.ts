@@ -7,16 +7,19 @@ import { isNodeBuiltin, getProtocol } from "./utils";
 const ESM_RE =
   /([\s;]|^)(import[\s\w*,{}]*from|import\s*["'*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m;
 
+const CJS_RE =
+  /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
+
+const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
+
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
 export function hasESMSyntax(code: string): boolean {
-  return ESM_RE.test(code);
+  return ESM_RE.test(code.replace(COMMENT_RE, ""));
 }
 
-const CJS_RE =
-  /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 export function hasCJSSyntax(code: string): boolean {
-  return CJS_RE.test(code);
+  return CJS_RE.test(code.replace(COMMENT_RE, ""));
 }
 
 export function detectSyntax(code: string) {
