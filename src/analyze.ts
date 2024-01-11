@@ -34,13 +34,12 @@ export interface TypeImport extends Omit<ESMImport, "type"> {
 }
 
 export interface ESMExport {
-  _type?: "declaration" | "named" | "default" | "namedDefault" | "star";
-  type: "declaration" | "named" | "default" | "namedDefault" | "star";
+  _type?: "declaration" | "named" | "default" | "star";
+  type: "declaration" | "named" | "default" | "star";
   code: string;
   start: number;
   end: number;
   name?: string;
-  defaultName?: string;
   names: string[];
   specifier?: string;
 }
@@ -185,7 +184,6 @@ export function findExports(code: string): ESMExport[] {
     code,
     { type: "named" },
   );
-
   for (const namedExport of destructuredExports) {
     // @ts-expect-error groups
     namedExport.exports = namedExport.exports1 || namedExport.exports2;
