@@ -7,21 +7,42 @@ import { isNodeBuiltin, getProtocol } from "./utils";
 const ESM_RE =
   /([\s;]|^)(import[\s\w*,{}]*from|import\s*["'*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m;
 
+const CJS_RE =
+  /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
+
+const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
+
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
-export function hasESMSyntax(code: string): boolean {
+export type DetectSyntaxOptions = { stripComments?: boolean };
+
+export function hasESMSyntax(
+  code: string,
+  opts: DetectSyntaxOptions = {},
+): boolean {
+  if (opts.stripComments) {
+    code = code.replace(COMMENT_RE, "");
+  }
   return ESM_RE.test(code);
 }
 
-const CJS_RE =
-  /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
-export function hasCJSSyntax(code: string): boolean {
+export function hasCJSSyntax(
+  code: string,
+  opts: DetectSyntaxOptions = {},
+): boolean {
+  if (opts.stripComments) {
+    code = code.replace(COMMENT_RE, "");
+  }
   return CJS_RE.test(code);
 }
 
-export function detectSyntax(code: string) {
-  const hasESM = hasESMSyntax(code);
-  const hasCJS = hasCJSSyntax(code);
+export function detectSyntax(code: string, opts: DetectSyntaxOptions = {}) {
+  if (opts.stripComments) {
+    code = code.replace(COMMENT_RE, "");
+  }
+  // We strip comments once hence not passing opts down to hasESMSyntax and hasCJSSyntax
+  const hasESM = hasESMSyntax(code, {});
+  const hasCJS = hasCJSSyntax(code, {});
 
   return {
     hasESM,

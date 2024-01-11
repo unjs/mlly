@@ -136,6 +136,32 @@ staticTests['import { foo, type Foo } from "foo"'] = {
   namedImports: { foo: "foo" },
 };
 
+staticTests[
+  `
+  // import { foo } from "foo"
+  import { too } from "too"
+
+  /**
+   * import { zoo } from "zoo"
+   */
+
+  const start = '/*'
+  import { ioo } from "ioo"
+  const end = '*/'
+`
+] = [
+  {
+    specifier: "too",
+    type: "static",
+    namedImports: { too: "too" },
+  },
+  {
+    specifier: "ioo",
+    type: "static",
+    namedImports: { ioo: "ioo" },
+  },
+];
+
 // -- Dynamic import --
 const dynamicTests = {
   'const { test, /* here */, another, } = await import ( "module-name" );': {
@@ -153,6 +179,8 @@ const dynamicTests = {
   'import("abc").then(r => r.default)': {
     expression: '"abc"',
   },
+  '// import("abc").then(r => r.default)': [],
+  '/* import("abc").then(r => r.default) */': [],
 };
 
 const TypeTests = {
@@ -237,10 +265,12 @@ describe("findDynamicImports", () => {
   for (const [input, test] of Object.entries(dynamicTests)) {
     it(input.replace(/\n/g, "\\n"), () => {
       const matches = findDynamicImports(input);
-      expect(matches.length).to.equal(1);
+      expect(matches.length).to.equal(Array.isArray(test) ? test.length : 1);
       const match = matches[0];
-      expect(match.type).to.equal("dynamic");
-      expect(match.expression.trim()).to.equal(test.expression);
+      if (match) {
+        expect(match.type).to.equal("dynamic");
+        expect(match.expression.trim()).to.equal(test.expression);
+      }
     });
   }
 });

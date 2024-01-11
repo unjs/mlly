@@ -53,6 +53,12 @@ describe("findExports", () => {
     "export async function* foo ()": { type: "declaration", names: ["foo"] },
     "export async function *foo ()": { type: "declaration", names: ["foo"] },
     "export const $foo = () => {}": { type: "declaration", names: ["$foo"] },
+    "export default something": {
+      type: "default",
+      name: "default",
+      defaultName: "something",
+      names: ["default"],
+    },
     "export { foo as default }": {
       type: "default",
       name: "default",
@@ -94,6 +100,9 @@ describe("findExports", () => {
       }
       if (test.specifier) {
         expect(match.specifier).toEqual(test.specifier);
+      }
+      if (test.defaultName) {
+        expect(match.defaultName).toEqual(test.defaultName);
       }
     });
   }
@@ -345,7 +354,7 @@ describe("findTypeExports", () => {
           "type": "declaration",
         },
         {
-          "code": "export type { Foo } from \\"./foo\\"",
+          "code": "export type { Foo } from "./foo"",
           "end": 43,
           "exports": " Foo",
           "name": "Foo",
@@ -357,7 +366,7 @@ describe("findTypeExports", () => {
           "type": "named",
         },
         {
-          "code": "export type { Bar } from \\"./bar\\"",
+          "code": "export type { Bar } from "./bar"",
           "end": 87,
           "exports": " Bar",
           "name": "Bar",
