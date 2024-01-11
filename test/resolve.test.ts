@@ -6,6 +6,8 @@ import { resolveSync, resolvePathSync } from "../src";
 const tests = [
   // Resolve to path
   { input: "ufo", action: "resolves" },
+  { input: "./fixture/cjs.mjs", action: "resolves" },
+  { input: "./fixture/foo", action: "resolves" },
   // Return same input as-is
   { input: "https://foo.com/a/b.js?a=1", action: "same" },
   // Throw error
