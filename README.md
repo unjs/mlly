@@ -40,7 +40,7 @@ Several utilities to make ESM resolution easier:
 - Supporting custom `conditions`
 - Support resolving from multiple paths or urls
 
-### `resolve`
+### `resolve` / `resolveSync`
 
 Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.org/dist/latest-v14.x/docs/api/esm.html#esm_resolver_algorithm)
 (using [wooorm/import-meta-resolve](https://github.com/wooorm/import-meta-resolve)).
@@ -48,7 +48,7 @@ Resolve a module by respecting [ECMAScript Resolver algorithm](https://nodejs.or
 Additionally supports resolving without extension and `/index` similar to CommonJS.
 
 ```js
-import { resolve } from "mlly";
+import { resolve, resolveSync } from "mlly";
 
 // file:///home/user/project/module.mjs
 console.log(await resolve("./module.mjs", { url: import.meta.url }));
@@ -60,12 +60,12 @@ console.log(await resolve("./module.mjs", { url: import.meta.url }));
 - `conditions`: Array of conditions used for resolution algorithm (default is `['node', 'import']`)
 - `extensions`: Array of additional extensions to check if import failed (default is `['.mjs', '.cjs', '.js', '.json']`)
 
-### `resolvePath`
+### `resolvePath` / `resolvePathSync`
 
 Similar to `resolve` but returns a path instead of URL using `fileURLToPath`.
 
 ```js
-import { resolvePath } from "mlly";
+import { resolvePath, resolveSync } from "mlly";
 
 // /home/user/project/module.mjs
 console.log(await resolvePath("./module.mjs", { url: import.meta.url }));
@@ -101,7 +101,7 @@ import { resolveImports } from "mlly";
 
 // import foo from 'file:///home/user/project/bar.mjs'
 console.log(
-  await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url })
+  await resolveImports(`import foo from './bar.mjs'`, { url: import.meta.url }),
 );
 ```
 
@@ -216,7 +216,7 @@ console.log(
   findStaticImports(`
 // Empty line
 import foo, { bar /* foo */ } from 'baz'
-`)
+`),
 );
 ```
 
@@ -276,7 +276,7 @@ import { findDynamicImports } from "mlly";
 console.log(
   findDynamicImports(`
 const foo = await import('bar')
-`)
+`),
 );
 ```
 
@@ -290,7 +290,7 @@ console.log(
 export const foo = 'bar'
 export { bar, baz }
 export default something
-`)
+`),
 );
 ```
 
@@ -331,7 +331,7 @@ console.log(
 export const foo = 'bar'
 export { bar, baz }
 export default something
-`)
+`),
 );
 ```
 
@@ -369,7 +369,7 @@ await evalModule(
   import { reverse } from './utils.mjs'
   console.log(reverse('!emosewa si sj'))
 `,
-  { url: import.meta.url }
+  { url: import.meta.url },
 );
 ```
 
@@ -396,7 +396,7 @@ Options are same as `evalModule`.
 - All usages of `import.meta.url` will be replaced with `url` or `from` option
 
 ```js
-import { toDataURL } from "mlly";
+import { transformModule } from "mlly";
 console.log(transformModule(`console.log(import.meta.url)`), {
   url: "test.mjs",
 });
@@ -453,7 +453,7 @@ console.log(
   toDataURL(`
   // This is an example
   console.log('Hello world')
-`)
+`),
 );
 ```
 
@@ -489,6 +489,40 @@ import { sanitizeFilePath } from "mlly";
 
 // C:/te_st/_...slug_.jsx'
 console.log(sanitizeFilePath("C:\\te#st\\[...slug].jsx"));
+```
+
+### `parseNodeModulePath`
+
+Parses an absolute file path in `node_modules` to three segments:
+
+- `dir`: Path to main directory of package
+- `name`: Package name
+- `subpath`: The optional package subpath
+
+It returns an empty object (with partial keys) if parsing fails.
+
+```js
+import { parseNodeModulePath } from "mlly";
+
+// dir: "/src/a/node_modules/"
+// name: "lib"
+// subpath: "./dist/index.mjs"
+const { dir, name, subpath } = parseNodeModulePath(
+  "/src/a/node_modules/lib/dist/index.mjs",
+);
+```
+
+### `lookupNodeModuleSubpath`
+
+Parses an absolute file path in `node_modules` and tries to reverse lookup (or guess) the original package exports subpath for it.
+
+```js
+import { lookupNodeModuleSubpath } from "mlly";
+
+// subpath: "./utils"
+const subpath = lookupNodeModuleSubpath(
+  "/src/a/node_modules/lib/dist/utils.mjs",
+);
 ```
 
 ## License

@@ -3,6 +3,8 @@ import {
   findDynamicImports,
   findStaticImports,
   parseStaticImport,
+  findTypeImports,
+  parseTypeImport,
 } from "../src";
 
 // -- Static import --
@@ -71,6 +73,20 @@ const staticTests = {
   ],
   // Edge cases
   '"import"===node.object.meta.name&&"': [],
+  'import { SpecialÜ } from "#components"': [
+    {
+      namedImports: { SpecialÜ: "SpecialÜ" },
+      specifier: "#components",
+    },
+  ],
+  'import type { foo } from "bar"': [
+    {
+      type: "static",
+      defaultImport: "type",
+      namedImports: { foo: "foo" },
+      specifier: "bar",
+    },
+  ],
 };
 
 staticTests[
@@ -86,7 +102,7 @@ const c = ['.mjs', '.cjs', '.js', '.json']
 staticTests[
   `import {
   member1,
-  // test
+  // @hello.123
   member2
 } from "module-name";`
 ] = {
@@ -167,13 +183,64 @@ const dynamicTests = {
   '/* import("abc").then(r => r.default) */': [],
 };
 
+const TypeTests = {
+  'import { type Foo, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Foo",
+    },
+    type: "static",
+  },
+  'import { member,/* hello */  type Foo as Baz, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Baz",
+    },
+    type: "static",
+  },
+  'import type { Foo, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Foo",
+      Bar: "Bar",
+    },
+    type: "type",
+  },
+  'import type Foo from "module-name";': {
+    specifier: "module-name",
+    defaultImport: "Foo",
+    type: "type",
+  },
+  'import type { Foo as Baz, Bar } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      Foo: "Baz",
+      Bar: "Bar",
+    },
+    type: "type",
+  },
+  'import { type member } from "  module-name";': {
+    specifier: "module-name",
+    namedImports: { member: "member" },
+    type: "static",
+  },
+  'import { type member, type Foo as Bar } from "  module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      member: "member",
+      Foo: "Bar",
+    },
+    type: "static",
+  },
+};
+
 describe("findStaticImports", () => {
   for (const [input, _results] of Object.entries(staticTests)) {
     it(input.replace(/\n/g, "\\n"), () => {
       const matches = findStaticImports(input);
-      const results = Array.isArray(_results) ? _results : [_results];
-      expect(matches.length).toEqual(results.length);
-      for (const [index, test] of results.entries()) {
+      const expected = Array.isArray(_results) ? _results : [_results];
+      expect(expected.length).toEqual(matches.length);
+      for (const [index, test] of expected.entries()) {
         const match = matches[index];
         expect(match.type).to.equal("static");
 
@@ -203,6 +270,34 @@ describe("findDynamicImports", () => {
       if (match) {
         expect(match.type).to.equal("dynamic");
         expect(match.expression.trim()).to.equal(test.expression);
+      }
+    });
+  }
+});
+
+describe("findTypeImports", () => {
+  for (const [input, _results] of Object.entries(TypeTests)) {
+    it(input.replace(/\n/g, "\\n"), () => {
+      const matches = findTypeImports(input);
+      const results = Array.isArray(_results) ? _results : [_results];
+      expect(matches.length).toEqual(results.length);
+      for (const [index, test] of results.entries()) {
+        const match = matches[index];
+        expect(match.specifier).to.equal(test.specifier);
+
+        const parsed = parseTypeImport(match);
+        if (test.type) {
+          expect(parsed.type).to.equals(test.type);
+        }
+        if (test.defaultImport) {
+          expect(parsed.defaultImport).to.equals(test.defaultImport);
+        }
+        if (test.namedImports) {
+          expect(parsed.namedImports).to.eql(test.namedImports);
+        }
+        if (test.namespacedImport) {
+          expect(parsed.namespacedImport).to.eql(test.namespacedImport);
+        }
       }
     });
   }

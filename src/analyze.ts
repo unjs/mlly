@@ -1,5 +1,5 @@
 import { tokenizer } from "acorn";
-import { matchAll } from "./_utils";
+import { matchAll, clearImports, getImportNames } from "./_utils";
 import { resolvePath, ResolveOptions } from "./resolve";
 import { loadURL } from "./utils";
 
@@ -25,6 +25,12 @@ export interface ParsedStaticImport extends StaticImport {
 export interface DynamicImport extends ESMImport {
   type: "dynamic";
   expression: string;
+}
+
+export interface TypeImport extends Omit<ESMImport, "type"> {
+  type: "type";
+  imports: string;
+  specifier: string;
 }
 
 export interface ESMExport {
@@ -56,12 +62,14 @@ export interface DefaultExport extends ESMExport {
 }
 
 export const ESM_STATIC_IMPORT_RE =
-  /(?<=\s|^|;)import\s*([\s"']*(?<imports>[\w\t\n\r $*,/{}]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gm;
+  /(?<=\s|^|;)import\s*([\s"']*(?<imports>[\p{L}\p{M}\w\t\n\r $*,/{}@.]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gmu;
 export const DYNAMIC_IMPORT_RE =
   /import\s*\((?<expression>(?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)/gm;
+const IMPORT_NAMED_TYPE_RE =
+  /(?<=\s|^|;)import\s*type\s+([\s"']*(?<imports>[\w\t\n\r $*,/{}]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gm;
 
 export const EXPORT_DECAL_RE =
-  /\bexport\s+(?<declaration>(async function|function|let|const enum|const|enum|var|class))\s+(?<name>[\w$]+)/g;
+  /\bexport\s+(?<declaration>(async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)/g;
 export const EXPORT_DECAL_TYPE_RE =
   /\bexport\s+(?<declaration>(interface|type|declare (async function|function|let|const enum|const|enum|var|class)))\s+(?<name>[\w$]+)/g;
 const EXPORT_NAMED_RE =
@@ -78,21 +86,30 @@ const TYPE_RE = /^\s*?type\s/;
 export function findStaticImports(code: string): StaticImport[] {
   return _filterStatement(
     _tryGetLocations(code, "import"),
-    matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" })
+    matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }),
   );
 }
 
 export function findDynamicImports(code: string): DynamicImport[] {
   return _filterStatement(
     _tryGetLocations(code, "import"),
-    matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" })
+    matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" }),
   );
 }
 
-export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
-  const cleanedImports = (matched.imports || "")
-    .replace(/(\/\/[^\n]*\n|\/\*.*\*\/)/g, "")
-    .replace(/\s+/g, " ");
+export function findTypeImports(code: string): TypeImport[] {
+  return [
+    ...matchAll(IMPORT_NAMED_TYPE_RE, code, { type: "type" }),
+    ...matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(
+      (match) => /[^A-Za-z]type\s/.test(match.imports),
+    ),
+  ];
+}
+
+export function parseStaticImport(
+  matched: StaticImport | TypeImport,
+): ParsedStaticImport {
+  const cleanedImports = clearImports(matched.imports);
 
   const namedImports = {};
   for (const namedImport of cleanedImports
@@ -104,13 +121,41 @@ export function parseStaticImport(matched: StaticImport): ParsedStaticImport {
       namedImports[source] = importName;
     }
   }
-  const topLevelImports = cleanedImports.replace(/{([^}]*)}/, "");
-  const namespacedImport = topLevelImports.match(/\* as \s*(\S*)/)?.[1];
-  const defaultImport =
-    topLevelImports
-      .split(",")
-      .find((index) => !/[*{}]/.test(index))
-      ?.trim() || undefined;
+  const { namespacedImport, defaultImport } = getImportNames(cleanedImports);
+
+  return {
+    ...matched,
+    defaultImport,
+    namespacedImport,
+    namedImports,
+  } as ParsedStaticImport;
+}
+
+export function parseTypeImport(
+  matched: TypeImport | StaticImport,
+): ParsedStaticImport {
+  if (matched.type === "type") {
+    return parseStaticImport(matched);
+  }
+
+  const cleanedImports = clearImports(matched.imports);
+
+  const namedImports = {};
+  for (const namedImport of cleanedImports
+    .match(/{([^}]*)}/)?.[1]
+    ?.split(",") || []) {
+    const [, source = namedImport.trim(), importName = source] = (() => {
+      return /\s+as\s+/.test(namedImport)
+        ? namedImport.match(/^\s*type\s+(\S*) as (\S*)\s*$/) || []
+        : namedImport.match(/^\s*type\s+(\S*)\s*$/) || [];
+    })();
+
+    if (source && TYPE_RE.test(namedImport)) {
+      namedImports[source] = importName;
+    }
+  }
+
+  const { namespacedImport, defaultImport } = getImportNames(cleanedImports);
 
   return {
     ...matched,
@@ -130,13 +175,13 @@ export function findExports(code: string): ESMExport[] {
   const namedExports: NamedExport[] = normalizeNamedExports(
     matchAll(EXPORT_NAMED_RE, code, {
       type: "named",
-    })
+    }),
   );
 
   const destructuredExports: NamedExport[] = matchAll(
     EXPORT_NAMED_DESTRUCT,
     code,
-    { type: "named" }
+    { type: "named" },
   );
   for (const namedExport of destructuredExports) {
     // @ts-expect-error groups
@@ -149,7 +194,7 @@ export function findExports(code: string): ESMExport[] {
         name
           .replace(/^.*?\s*:\s*/, "")
           .replace(/\s*=\s*.*$/, "")
-          .trim()
+          .trim(),
       );
   }
 
@@ -204,14 +249,14 @@ export function findTypeExports(code: string): ESMExport[] {
   const declaredExports: DeclarationExport[] = matchAll(
     EXPORT_DECAL_TYPE_RE,
     code,
-    { type: "declaration" }
+    { type: "declaration" },
   );
 
   // Find named exports
   const namedExports: NamedExport[] = normalizeNamedExports(
     matchAll(EXPORT_NAMED_TYPE_RE, code, {
       type: "named",
-    })
+    }),
   );
 
   // Merge and normalize exports
@@ -280,7 +325,7 @@ export function findExportNames(code: string): string[] {
 
 export async function resolveModuleExportNames(
   id: string,
-  options?: ResolveOptions
+  options?: ResolveOptions,
 ): Promise<string[]> {
   const url = await resolvePath(id, options);
   const code = await loadURL(url);
@@ -288,7 +333,7 @@ export async function resolveModuleExportNames(
 
   // Explicit named exports
   const exportNames = new Set(
-    exports.flatMap((exp) => exp.names).filter(Boolean)
+    exports.flatMap((exp) => exp.names).filter(Boolean),
   );
 
   // Recursive * exports
@@ -316,7 +361,7 @@ interface TokenLocation {
 
 function _filterStatement<T extends TokenLocation>(
   locations: TokenLocation[] | undefined,
-  statements: T[]
+  statements: T[],
 ): T[] {
   return statements.filter((exp) => {
     return (
