@@ -345,7 +345,7 @@ describe("findTypeExports", () => {
           "type": "declaration",
         },
         {
-          "code": "export type { Foo } from \\"./foo\\"",
+          "code": "export type { Foo } from "./foo"",
           "end": 43,
           "exports": " Foo",
           "name": "Foo",
@@ -357,7 +357,7 @@ describe("findTypeExports", () => {
           "type": "named",
         },
         {
-          "code": "export type { Bar } from \\"./bar\\"",
+          "code": "export type { Bar } from "./bar"",
           "end": 87,
           "exports": " Bar",
           "name": "Bar",
