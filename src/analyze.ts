@@ -63,7 +63,13 @@ export interface DefaultExport extends ESMExport {
   type: "default";
 }
 
-export const DECLARATION_TYPES: ESMExport['declarationType'][] = ['interface', 'type', 'enum', 'const', 'function']
+export const DECLARATION_TYPES: ESMExport["declarationType"][] = [
+  "interface",
+  "type",
+  "enum",
+  "const",
+  "function",
+];
 
 export const ESM_STATIC_IMPORT_RE =
   /(?<=\s|^|;|\})import\s*([\s"']*(?<imports>[\p{L}\p{M}\w\t\n\r $*,/{}@.]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gmu;
@@ -320,8 +326,10 @@ function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
     if (!exp.names && exp.name) {
       exp.names = [exp.name];
     }
-    if (exp.type === 'declaration') {
-      exp.declarationType = DECLARATION_TYPES.find(d => exp.declaration.includes(d))
+    if (exp.type === "declaration") {
+      exp.declarationType = DECLARATION_TYPES.find((d) =>
+        exp.declaration.includes(d),
+      );
     }
   }
   return exports;
