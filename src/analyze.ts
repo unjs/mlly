@@ -36,6 +36,7 @@ export interface TypeImport extends Omit<ESMImport, "type"> {
 export interface ESMExport {
   _type?: "declaration" | "named" | "default" | "star";
   type: "declaration" | "named" | "default" | "star";
+  declarationType?: "interface" | "type" | "enum" | "const" | "function";
   code: string;
   start: number;
   end: number;
@@ -61,6 +62,8 @@ export interface NamedExport extends ESMExport {
 export interface DefaultExport extends ESMExport {
   type: "default";
 }
+
+export const DECLARATION_TYPES: ESMExport['declarationType'][] = ['interface', 'type', 'enum', 'const', 'function']
 
 export const ESM_STATIC_IMPORT_RE =
   /(?<=\s|^|;|\})import\s*([\s"']*(?<imports>[\p{L}\p{M}\w\t\n\r $*,/{}@.]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gmu;
@@ -305,7 +308,7 @@ export function findTypeExports(code: string): ESMExport[] {
   );
 }
 
-function normalizeExports(exports: ESMExport[]) {
+function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0];
@@ -316,6 +319,9 @@ function normalizeExports(exports: ESMExport[]) {
     }
     if (!exp.names && exp.name) {
       exp.names = [exp.name];
+    }
+    if (exp.type === 'declaration') {
+      exp.declarationType = DECLARATION_TYPES.find(d => exp.declaration.includes(d))
     }
   }
   return exports;

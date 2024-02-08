@@ -338,6 +338,7 @@ describe("findTypeExports", () => {
         {
           "code": "export type Bing",
           "declaration": "type",
+          "declarationType": "type",
           "end": 172,
           "name": "Bing",
           "names": [
@@ -349,6 +350,7 @@ describe("findTypeExports", () => {
         {
           "code": "export declare function getWidget",
           "declaration": "declare function",
+          "declarationType": "function",
           "end": 222,
           "name": "getWidget",
           "names": [
