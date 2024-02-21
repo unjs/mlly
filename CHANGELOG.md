@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.5.0...v1.6.0)
+
+### 🚀 Enhancements
+
+- Add declaration type in ESMExport ([#227](https://github.com/unjs/mlly/pull/227))
+- **utils:** Add `pathToFileURL` ([cdcbcb7](https://github.com/unjs/mlly/commit/cdcbcb7))
+
+### 🔥 Performance
+
+- **resolver:** Stat absolute paths once in fast path ([#229](https://github.com/unjs/mlly/pull/229))
+- **resolver:** Remove intermediate `pcall` util ([#230](https://github.com/unjs/mlly/pull/230))
+- **resolve:** Enable fast path for file urls ([#231](https://github.com/unjs/mlly/pull/231))
+
+### 🩹 Fixes
+
+- **resolver:** Strictly check input ([778bd73](https://github.com/unjs/mlly/commit/778bd73))
+
+### 💅 Refactors
+
+- **resolver:** Use pathToFileURL from mlly ([982a7a9](https://github.com/unjs/mlly/commit/982a7a9))
+- Strict type checks ([77ebe50](https://github.com/unjs/mlly/commit/77ebe50))
+
+### 🏡 Chore
+
+- Lint ([3a932b8](https://github.com/unjs/mlly/commit/3a932b8))
+- Update ci script ([08f02d7](https://github.com/unjs/mlly/commit/08f02d7))
+
+### ✅ Tests
+
+- **resolver:** Add test for node bultins ([58407dd](https://github.com/unjs/mlly/commit/58407dd))
+- **fileURLToPath, pathToFileURL:** Add windows specific tests ([bfa2bbe](https://github.com/unjs/mlly/commit/bfa2bbe))
+
+### 🤖 CI
+
+- Update scripts ([48acc8d](https://github.com/unjs/mlly/commit/48acc8d))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Pooya ([@pi0](http://github.com/pi0))
+- Tamago
+
 ## v1.5.0
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.4.2...v1.5.0)
