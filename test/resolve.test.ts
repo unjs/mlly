@@ -38,10 +38,15 @@ describe("resolveSync", () => {
   }
 
   it("follows symlinks", () => {
-    const resolved = resolveSync("./fixture/hello-linked", {
+    const resolved = resolveSync("./fixture/hello.link", {
       url: import.meta.url,
     });
     expect(fileURLToPath(resolved)).match(/fixture\/hello\.mjs$/);
+
+    const resolved2 = resolveSync("./fixture/test.link.txt", {
+      url: import.meta.url,
+    });
+    expect(fileURLToPath(resolved2)).match(/fixture\/test.txt$/);
   });
 });
 
