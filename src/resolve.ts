@@ -5,7 +5,7 @@ import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
 import { PackageJson, readPackageJSON } from "pkg-types";
 import { fileURLToPath, normalizeid } from "./utils";
-import { pcall, BUILTIN_MODULES } from "./_utils";
+import { BUILTIN_MODULES } from "./_utils";
 
 const DEFAULT_CONDITIONS_SET = new Set(["node", "import"]);
 const DEFAULT_URL = pathToFileURL(process.cwd());
@@ -136,7 +136,11 @@ export function resolveSync(id: string, options?: ResolveOptions): string {
 }
 
 export function resolve(id: string, options?: ResolveOptions): Promise<string> {
-  return pcall(resolveSync, id, options);
+  try {
+    return Promise.resolve(resolveSync(id, options));
+  } catch (error) {
+    return Promise.reject(error);
+  }
 }
 
 export function resolvePathSync(id: string, options?: ResolveOptions): string {
@@ -147,7 +151,11 @@ export function resolvePath(
   id: string,
   options?: ResolveOptions,
 ): Promise<string> {
-  return pcall(resolvePathSync, id, options);
+  try {
+    return Promise.resolve(resolvePathSync(id, options));
+  } catch (error) {
+    return Promise.reject(error);
+  }
 }
 
 export function createResolve(defaults?: ResolveOptions) {
