@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isWindows } from 'std-env'
+import { isWindows } from "std-env";
 import {
   isNodeBuiltin,
   sanitizeFilePath,
@@ -159,15 +159,17 @@ describe("lookupNodeModuleSubpath", () => {
 });
 
 describe("fileURLToPath", () => {
-  const tests = isWindows ? [
-    ["file:///C:/path/", "C:/path/"],
-    ["file://nas/foo.txt", "//nas/foo.txt"],
-    ["file://C:/你好.txt", "C:/你好.txt"],
-    ["file://C:/hello world", "C:/hello world"],
-  ] as const : [
-    ["file:///你好.txt", "/你好.txt"],
-    ["file:///hello world", "/hello world"],
-  ] as const;
+  const tests = isWindows
+    ? ([
+        ["file:///C:/path/", "C:/path/"],
+        ["file://nas/foo.txt", "//nas/foo.txt"],
+        ["file://C:/你好.txt", "C:/你好.txt"],
+        ["file://C:/hello world", "C:/hello world"],
+      ] as const)
+    : ([
+        ["file:///你好.txt", "/你好.txt"],
+        ["file:///hello world", "/hello world"],
+      ] as const);
   for (const [input, output] of tests) {
     it(`${input} should resolve to ${output}`, () => {
       expect(fileURLToPath(input)).toBe(output);
@@ -176,13 +178,15 @@ describe("fileURLToPath", () => {
 });
 
 describe("pathToFileURL", () => {
-  const tests = isWindows ? [
-    ["/foo#1", /file:\/\/\/\w:\/foo%231/ ],
-    ["/some/path%.c", /file:\/\/\/\w:\/some\/path%25.c/],
-  ] as const :[
-    ["/foo#1", "file:///foo%231"],
-    ["/some/path%.c", "file:///some/path%25.c"],
-  ] as const;
+  const tests = isWindows
+    ? ([
+        ["/foo#1", /file:\/\/\/\w:\/foo%231/],
+        ["/some/path%.c", /file:\/{3}\w:\/some\/path%25.c/],
+      ] as const)
+    : ([
+        ["/foo#1", "file:///foo%231"],
+        ["/some/path%.c", "file:///some/path%25.c"],
+      ] as const);
   for (const [input, output] of tests) {
     it(`${input} should resolve to ${output}`, () => {
       expect(pathToFileURL(input)).toMatch(output);
