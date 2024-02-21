@@ -80,7 +80,7 @@ export async function isValidNodeImport(
   const options = { ...validNodeImportDefaults, ..._options };
 
   const proto = getProtocol(id);
-  if (proto && !options.allowedProtocols.includes(proto)) {
+  if (proto && !options.allowedProtocols?.includes(proto)) {
     return false;
   }
 

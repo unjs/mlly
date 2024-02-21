@@ -5,10 +5,11 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "checkJs": true,
+    "strict": true,
+    "skipLibCheck": true,
     "paths": {
-      "mlly": ["./"]
+      "mlly": ["./"],
     },
-    "types": ["node"]
-  }
+    "types": ["node"],
+  },
 }

@@ -20,9 +20,9 @@ describe("isNodeBuiltin", () => {
     "fs/fake": true, // invalid import
   };
 
-  for (const id in cases) {
-    it(`'${id}': ${cases[id]}`, () => {
-      expect(isNodeBuiltin(id)).to.equal(cases[id]);
+  for (const [input, output] of Object.entries(cases)) {
+    it(`'${input}': ${output}`, () => {
+      expect(isNodeBuiltin(input)).to.equal(output);
     });
   }
 
@@ -43,10 +43,10 @@ describe("sanitizeFilePath", () => {
     "Foo.vue&vue&type=script&setup=true&generic=T%20extends%20any%2C%20O%20extends%20T%3CZ%7Ca%3E&lang":
       "Foo.vue_vue_type_script_setup_true_generic_T_extends_any__O_extends_T_Z_a__lang",
     "": "",
-  };
-  for (const id in cases) {
-    it(`'${id}': ${cases[id]}`, () => {
-      expect(sanitizeFilePath(id)).to.equal(cases[id]);
+  } as const;
+  for (const [input, output] of Object.entries(cases)) {
+    it(`'${input}': ${output}`, () => {
+      expect(sanitizeFilePath(input)).to.equal(output);
     });
   }
 

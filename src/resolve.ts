@@ -28,8 +28,8 @@ function _tryModuleResolve(
 ): URL | undefined {
   try {
     return moduleResolve(id, url, conditions);
-  } catch (error) {
-    if (!NOT_FOUND_ERRORS.has(error.code)) {
+  } catch (error: any) {
+    if (!NOT_FOUND_ERRORS.has(error?.code)) {
       throw error;
     }
   }
@@ -66,8 +66,8 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
       if (stat.isFile()) {
         return pathToFileURL(id);
       }
-    } catch (error) {
-      if (error.code !== "ENOENT") {
+    } catch (error: any) {
+      if (error?.code !== "ENOENT") {
         throw error;
       }
     }
@@ -80,10 +80,10 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
 
   // Search paths
   const _urls: URL[] = (
-    Array.isArray(options.url) ? options.url : [options.url]
+    (Array.isArray(options.url) ? options.url : [options.url]) as URL[]
   )
     .filter(Boolean)
-    .map((url) => new URL(normalizeid(url!.toString())));
+    .map((url) => new URL(normalizeid(url.toString())));
   if (_urls.length === 0) {
     _urls.push(new URL(pathToFileURL(process.cwd())));
   }
@@ -226,7 +226,7 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
     subpath = subpath.startsWith("/") ? `.${subpath}` : `./${subpath}`;
   }
 
-  if (subpath in exports) {
+  if (subpath in (exports || {})) {
     return subpath;
   }
 
@@ -234,13 +234,13 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
 }
 
 function _flattenExports(
-  exports: Exclude<PackageJson["exports"], string>,
+  exports: Exclude<PackageJson["exports"], string> = {},
   parentSubpath = "./",
 ): { subpath: string; fsPath: string; condition?: string }[] {
   return Object.entries(exports).flatMap(([key, value]) => {
     const [subpath, condition] = key.startsWith(".")
       ? [key.slice(1), undefined]
-      : [undefined, key];
+      : ["", key];
     const _subPath = joinURL(parentSubpath, subpath);
     // eslint-disable-next-line unicorn/prefer-ternary
     if (typeof value === "string") {

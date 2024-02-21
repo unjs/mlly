@@ -24,6 +24,8 @@ jobs:
       - run: pnpm install
       - run: pnpm lint
         if: matrix.os == 'ubuntu-latest'
+      - run: test:types
+        if: matrix.os == 'ubuntu-latest'
       - run: pnpm build
         if: matrix.os == 'ubuntu-latest'
       - run: pnpm vitest --coverage

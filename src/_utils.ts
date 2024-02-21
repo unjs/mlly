@@ -2,15 +2,15 @@ import { builtinModules } from "node:module";
 
 export const BUILTIN_MODULES = new Set(builtinModules);
 
-export function normalizeSlash(string_) {
-  return string_.replace(/\\/g, "/");
+export function normalizeSlash(path: string): string {
+  return path.replace(/\\/g, "/");
 }
 
-export function isObject(value) {
+export function isObject(value: unknown): boolean {
   return value !== null && typeof value === "object";
 }
 
-export function matchAll(regex, string, addition) {
+export function matchAll(regex: RegExp, string: string, addition: any) {
   const matches = [];
   for (const match of string.matchAll(regex)) {
     matches.push({
@@ -18,7 +18,7 @@ export function matchAll(regex, string, addition) {
       ...match.groups,
       code: match[0],
       start: match.index,
-      end: match.index + match[0].length,
+      end: (match.index || 0) + match[0].length,
     });
   }
   return matches;

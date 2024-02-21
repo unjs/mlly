@@ -35,7 +35,7 @@ export async function evalModule(
 
 export function transformModule(
   code: string,
-  options?: EvaluateOptions,
+  options: EvaluateOptions = {},
 ): Promise<string> {
   // Convert JSON to module
   if (options.url && options.url.endsWith(".json")) {

@@ -71,5 +71,5 @@ const ProtocolRegex = /^(?<proto>.{2,}?):.+$/;
 
 export function getProtocol(id: string): string | undefined {
   const proto = id.match(ProtocolRegex);
-  return proto ? proto.groups.proto : undefined;
+  return proto ? proto.groups?.proto : undefined;
 }

@@ -9,7 +9,17 @@ import {
 
 // -- Static import --
 
-const staticTests = {
+type MaybeArray<T> = T | T[];
+const staticTests: Record<
+  string,
+  MaybeArray<{
+    specifier: string;
+    defaultImport?: string;
+    namespacedImport?: string;
+    namedImports?: Record<string, string>;
+    type?: string;
+  }>
+> = {
   'import defaultMember from "module-name";': {
     specifier: "module-name",
     defaultImport: "defaultMember",
@@ -188,7 +198,7 @@ const dynamicTests = {
   },
   '// import("abc").then(r => r.default)': [],
   '/* import("abc").then(r => r.default) */': [],
-};
+} as const;
 
 const TypeTests = {
   'import { type Foo, Bar } from "module-name";': {
@@ -276,7 +286,7 @@ describe("findDynamicImports", () => {
       const match = matches[0];
       if (match) {
         expect(match.type).to.equal("dynamic");
-        expect(match.expression.trim()).to.equal(test.expression);
+        expect(match.expression.trim()).to.equal((test as any).expression);
       }
     });
   }

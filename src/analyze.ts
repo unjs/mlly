@@ -122,13 +122,13 @@ export function parseStaticImport(
 ): ParsedStaticImport {
   const cleanedImports = clearImports(matched.imports);
 
-  const namedImports = {};
-  for (const namedImport of cleanedImports
-    .match(/{([^}]*)}/)?.[1]
-    ?.split(",") || []) {
-    const [, source = namedImport.trim(), importName = source] =
-      namedImport.match(/^\s*(\S*) as (\S*)\s*$/) || [];
-    if (source && !TYPE_RE.test(source)) {
+  const namedImports: Record<string, string> = {};
+  const _matches = cleanedImports.match(/{([^}]*)}/)?.[1]?.split(",") || [];
+  for (const namedImport of _matches) {
+    const _match = namedImport.match(/^\s*(\S*) as (\S*)\s*$/);
+    const source = _match?.[1] || namedImport.trim();
+    const importName = _match?.[2] || source;
+    if (!TYPE_RE.test(source)) {
       namedImports[source] = importName;
     }
   }
@@ -151,16 +151,14 @@ export function parseTypeImport(
 
   const cleanedImports = clearImports(matched.imports);
 
-  const namedImports = {};
-  for (const namedImport of cleanedImports
-    .match(/{([^}]*)}/)?.[1]
-    ?.split(",") || []) {
-    const [, source = namedImport.trim(), importName = source] = (() => {
-      return /\s+as\s+/.test(namedImport)
-        ? namedImport.match(/^\s*type\s+(\S*) as (\S*)\s*$/) || []
-        : namedImport.match(/^\s*type\s+(\S*)\s*$/) || [];
-    })();
-
+  const namedImports: Record<string, string> = {};
+  const _matches = cleanedImports.match(/{([^}]*)}/)?.[1]?.split(",") || [];
+  for (const namedImport of _matches) {
+    const _match = /\s+as\s+/.test(namedImport)
+      ? namedImport.match(/^\s*type\s+(\S*) as (\S*)\s*$/)
+      : namedImport.match(/^\s*type\s+(\S*)\s*$/);
+    const source = _match?.[1] || namedImport.trim();
+    const importName = _match?.[2] || source;
     if (source && TYPE_RE.test(namedImport)) {
       namedImports[source] = importName;
     }
@@ -326,7 +324,7 @@ function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
     if (!exp.names && exp.name) {
       exp.names = [exp.name];
     }
-    if (exp.type === "declaration") {
+    if (exp.type === "declaration" && exp.declaration) {
       exp.declarationType = exp.declaration.replace(
         /^declare\s*/,
         "",
@@ -368,14 +366,15 @@ export async function resolveModuleExportNames(
 
   // Recursive * exports
   for (const exp of exports) {
-    if (exp.type === "star") {
-      const subExports = await resolveModuleExportNames(exp.specifier, {
-        ...options,
-        url,
-      });
-      for (const subExport of subExports) {
-        exportNames.add(subExport);
-      }
+    if (exp.type !== "star" || !exp.specifier) {
+      continue;
+    }
+    const subExports = await resolveModuleExportNames(exp.specifier, {
+      ...options,
+      url,
+    });
+    for (const subExport of subExports) {
+      exportNames.add(subExport);
     }
   }
 

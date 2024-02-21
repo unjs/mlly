@@ -16,14 +16,19 @@ export function createCommonJS(url: string): CommonjsContext {
   const __dirname = dirname(__filename);
 
   // Lazy require
-  let _nativeRequire;
-  const getNativeRequire = () =>
-    _nativeRequire || (_nativeRequire = createRequire(url));
-  function require(id) {
+  let _nativeRequire: typeof require;
+  const getNativeRequire = () => {
+    if (!_nativeRequire) {
+      _nativeRequire = createRequire(url);
+    }
+    return _nativeRequire;
+  };
+  function require(id: string): any {
     return getNativeRequire()(id);
   }
-  require.resolve = (id, options) => getNativeRequire().resolve(id, options);
-
+  require.resolve = function requireResolve(id: string, options: any): string {
+    return getNativeRequire().resolve(id, options);
+  };
   return {
     __filename,
     __dirname,
