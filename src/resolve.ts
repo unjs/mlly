@@ -1,4 +1,4 @@
-import { existsSync, realpathSync } from "node:fs";
+import { statSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { joinURL } from "ufo";
 import { isAbsolute, normalize } from "pathe";
@@ -27,7 +27,7 @@ function _tryModuleResolve(
   id: string,
   url: URL,
   conditions: any,
-): any | undefined {
+): URL | undefined {
   try {
     return moduleResolve(id, url, conditions);
   } catch (error) {
@@ -49,10 +49,17 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
   }
 
   // Skip resolve for absolute paths
-  if (isAbsolute(id) && existsSync(id)) {
-    // Resolve realPath and normalize slash
-    const realPath = realpathSync(fileURLToPath(id));
-    return pathToFileURL(realPath).toString();
+  if (isAbsolute(id)) {
+    try {
+      const stat = statSync(id);
+      if (stat.isFile()) {
+        return pathToFileURL(id).toString();
+      }
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
   }
 
   // Condition set
@@ -82,7 +89,7 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
     }
   }
 
-  let resolved;
+  let resolved: URL | undefined;
   for (const url of urls) {
     // Try simple resolve
     resolved = _tryModuleResolve(id, url, conditionsSet);
@@ -120,9 +127,8 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
     throw error;
   }
 
-  // Resolve realPath and normalize slash
-  const realPath = realpathSync(fileURLToPath(resolved));
-  return pathToFileURL(realPath).toString();
+  // Normalize (TODO: simplify)
+  return pathToFileURL(fileURLToPath(resolved)).toString();
 }
 
 export function resolveSync(id: string, options?: ResolveOptions): string {
