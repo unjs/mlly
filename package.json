@@ -41,6 +41,7 @@
     "import-meta-resolve": "^4.0.0",
     "jiti": "^1.21.0",
     "prettier": "^3.2.4",
+    "std-env": "^3.7.0",
     "typescript": "^5.3.3",
     "unbuild": "^2.0.0",
     "vitest": "^1.2.2"

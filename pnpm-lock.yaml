@@ -43,6 +43,9 @@ devDependencies:
   prettier:
     specifier: ^3.2.4
     version: 3.2.4
+  std-env:
+    specifier: ^3.7.0
+    version: 3.7.0
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
