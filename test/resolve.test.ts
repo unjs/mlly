@@ -48,6 +48,12 @@ describe("resolveSync", () => {
     });
     expect(fileURLToPath(resolved2)).match(/fixture\/test.txt$/);
   });
+
+  it("resolves node built-ints", () => {
+    expect(resolveSync("node:fs")).toBe("node:fs");
+    expect(resolveSync("fs")).toBe("node:fs");
+    expect(resolveSync("node:foo")).toBe("node:foo");
+  });
 });
 
 describe("resolvePathSync", () => {
