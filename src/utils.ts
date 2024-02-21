@@ -1,4 +1,7 @@
-import { fileURLToPath as _fileURLToPath } from "node:url";
+import {
+  fileURLToPath as _fileURLToPath,
+  pathToFileURL as _pathToFileURL,
+} from "node:url";
 import { promises as fsp } from "node:fs";
 import { normalizeSlash, BUILTIN_MODULES } from "./_utils";
 
@@ -7,6 +10,10 @@ export function fileURLToPath(id: string | URL): string {
     return normalizeSlash(id);
   }
   return normalizeSlash(_fileURLToPath(id));
+}
+
+export function pathToFileURL(id: string | URL): string {
+  return _pathToFileURL(fileURLToPath(id)).toString();
 }
 
 // https://datatracker.ietf.org/doc/html/rfc2396

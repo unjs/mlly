@@ -6,6 +6,8 @@ import {
   getProtocol,
   parseNodeModulePath,
   lookupNodeModuleSubpath,
+  fileURLToPath,
+  pathToFileURL,
 } from "../src";
 
 describe("isNodeBuiltin", () => {
@@ -152,6 +154,32 @@ describe("lookupNodeModuleSubpath", () => {
     it(t.name, async () => {
       const result = await lookupNodeModuleSubpath(t.input);
       expect(result).toBe(t.output);
+    });
+  }
+});
+
+describe("fileURLToPath", () => {
+  const tests = [
+    // ["file:///C:/path/", "C:\\path\\"], // TODO
+    // ["file://nas/foo.txt", "\\\\nas\\foo.txt"], // TODO
+    ["file:///你好.txt", "/你好.txt"],
+    ["file:///hello world", "/hello world"],
+  ] as const;
+  for (const t of tests) {
+    it(`${t[0]} should resolve to ${t[1]}`, () => {
+      expect(fileURLToPath(t[0])).toBe(t[1]);
+    });
+  }
+});
+
+describe("pathToFileURL", () => {
+  const tests = [
+    ["/foo#1", "file:///foo%231"],
+    ["/some/path%.c", "file:///some/path%25.c"],
+  ] as const;
+  for (const t of tests) {
+    it(`${t[0]} should resolve to ${t[1]}`, () => {
+      expect(pathToFileURL(t[0])).toBe(t[1]);
     });
   }
 });

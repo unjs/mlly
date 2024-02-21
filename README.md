@@ -424,6 +424,20 @@ console.log(fileURLToPath("file:///foo/bar.js"));
 console.log(fileURLToPath("file:///C:/path/"));
 ```
 
+### `pathToFileURL`
+
+Similar to [url.pathToFileURL](https://nodejs.org/api/url.html#urlpathtofileurlpath) but also handles `URL` input and returns a **string** with `file://` protocol.
+
+```js
+import { pathToFileURL } from "mlly";
+
+// /foo/bar.js
+console.log(pathToFileURL("foo/bar.js"));
+
+// C:/path
+console.log(pathToFileURL("C:\\path"));
+```
+
 ### `normalizeid`
 
 Ensures id has either of `node:`, `data:`, `http:`, `https:` or `file:` protocols.

@@ -1,7 +1,6 @@
 import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import { resolveSync, resolvePathSync } from "../src";
+import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 
 const tests = [
   // Resolve to path
