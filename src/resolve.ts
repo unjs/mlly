@@ -48,7 +48,12 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
     return "node:" + id;
   }
 
-  // Skip resolve for absolute paths
+  // Enable fast path for file urls
+  if (id.startsWith("file:")) {
+    id = fileURLToPath(id);
+  }
+
+  // Skip resolve for absolute paths (fast path)
   if (isAbsolute(id)) {
     try {
       const stat = statSync(id);
