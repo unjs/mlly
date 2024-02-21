@@ -37,7 +37,15 @@ function _tryModuleResolve(
   }
 }
 
-function _resolve(id: string, options: ResolveOptions = {}): string {
+function _resolve(id: string | URL, options: ResolveOptions = {}): string {
+  if (typeof id !== "string") {
+    if (id instanceof URL) {
+      id = fileURLToPath(id);
+    } else {
+      throw new TypeError("input must be a `string` or `URL`");
+    }
+  }
+
   // Skip if already has a protocol
   if (/(node|data|http|https):/.test(id)) {
     return id;
@@ -49,7 +57,7 @@ function _resolve(id: string, options: ResolveOptions = {}): string {
   }
 
   // Enable fast path for file urls
-  if (id.startsWith("file:")) {
+  if (id.startsWith("file://")) {
     id = fileURLToPath(id);
   }
 
