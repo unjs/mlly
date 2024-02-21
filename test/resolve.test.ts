@@ -36,6 +36,13 @@ describe("resolveSync", () => {
       }
     });
   }
+
+  it("follows symlinks", () => {
+    const resolved = resolveSync("./fixture/hello-linked", {
+      url: import.meta.url,
+    });
+    expect(fileURLToPath(resolved)).match(/fixture\/hello\.mjs$/);
+  });
 });
 
 describe("resolvePathSync", () => {
