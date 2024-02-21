@@ -36,6 +36,15 @@ export interface TypeImport extends Omit<ESMImport, "type"> {
 export interface ESMExport {
   _type?: "declaration" | "named" | "default" | "star";
   type: "declaration" | "named" | "default" | "star";
+  declarationType?:
+    | "let"
+    | "var"
+    | "const"
+    | "enum"
+    | "const enum"
+    | "class"
+    | "function"
+    | "async function";
   code: string;
   start: number;
   end: number;
@@ -305,7 +314,7 @@ export function findTypeExports(code: string): ESMExport[] {
   );
 }
 
-function normalizeExports(exports: ESMExport[]) {
+function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
   for (const exp of exports) {
     if (!exp.name && exp.names && exp.names.length === 1) {
       exp.name = exp.names[0];
@@ -316,6 +325,12 @@ function normalizeExports(exports: ESMExport[]) {
     }
     if (!exp.names && exp.name) {
       exp.names = [exp.name];
+    }
+    if (exp.type === "declaration") {
+      exp.declarationType = exp.declaration.replace(
+        /^declare\s*/,
+        "",
+      ) as ESMExport["declarationType"];
     }
   }
   return exports;

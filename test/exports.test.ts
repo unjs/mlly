@@ -325,72 +325,167 @@ describe("findTypeExports", () => {
   it("finds type exports", () => {
     const matches = findTypeExports(
       `
-          export type { Foo } from "./foo";
-          export type { Bar } from "./bar";
-          interface Qux {}
+          export interface Qux {}
+
           export type { Qux }
           export type Bing = Qux
+          export type { Foo } from "./foo";
+          export type { Bar } from "./bar";
+
+          export declare let foo: string
+          export declare var bar: string
+          export declare const baz: string
+          export declare enum Qux { A, B, C }
+          export declare const enum Qux { A, B, C }
+          export declare class Foo {}
           export declare function getWidget(n: number): Widget
+          export declare async function loadWidget(n: number): Promise<Widget>
         `,
     );
     expect(matches).toMatchInlineSnapshot(`
       [
         {
+          "code": "export interface Qux",
+          "declaration": "interface",
+          "declarationType": "interface",
+          "end": 31,
+          "name": "Qux",
+          "names": [
+            "Qux",
+          ],
+          "start": 11,
+          "type": "declaration",
+        },
+        {
           "code": "export type Bing",
           "declaration": "type",
-          "end": 172,
+          "declarationType": "type",
+          "end": 92,
           "name": "Bing",
           "names": [
             "Bing",
           ],
-          "start": 156,
+          "start": 76,
+          "type": "declaration",
+        },
+        {
+          "code": "export declare let foo",
+          "declaration": "declare let",
+          "declarationType": "let",
+          "end": 220,
+          "name": "foo",
+          "names": [
+            "foo",
+          ],
+          "start": 198,
+          "type": "declaration",
+        },
+        {
+          "code": "export declare var bar",
+          "declaration": "declare var",
+          "declarationType": "var",
+          "end": 261,
+          "name": "bar",
+          "names": [
+            "bar",
+          ],
+          "start": 239,
+          "type": "declaration",
+        },
+        {
+          "code": "export declare const baz",
+          "declaration": "declare const",
+          "declarationType": "const",
+          "end": 304,
+          "name": "baz",
+          "names": [
+            "baz",
+          ],
+          "start": 280,
+          "type": "declaration",
+        },
+        {
+          "code": "export declare const enum Qux",
+          "declaration": "declare const enum",
+          "declarationType": "const enum",
+          "end": 398,
+          "name": "Qux",
+          "names": [
+            "Qux",
+          ],
+          "start": 369,
+          "type": "declaration",
+        },
+        {
+          "code": "export declare class Foo",
+          "declaration": "declare class",
+          "declarationType": "class",
+          "end": 445,
+          "name": "Foo",
+          "names": [
+            "Foo",
+          ],
+          "start": 421,
           "type": "declaration",
         },
         {
           "code": "export declare function getWidget",
           "declaration": "declare function",
-          "end": 222,
+          "declarationType": "function",
+          "end": 492,
           "name": "getWidget",
           "names": [
             "getWidget",
           ],
-          "start": 189,
+          "start": 459,
           "type": "declaration",
         },
         {
-          "code": "export type { Foo } from "./foo"",
-          "end": 43,
-          "exports": " Foo",
-          "name": "Foo",
+          "code": "export declare async function loadWidget",
+          "declaration": "declare async function",
+          "declarationType": "async function",
+          "end": 562,
+          "name": "loadWidget",
           "names": [
-            "Foo",
+            "loadWidget",
           ],
-          "specifier": "./foo",
-          "start": 11,
-          "type": "named",
-        },
-        {
-          "code": "export type { Bar } from "./bar"",
-          "end": 87,
-          "exports": " Bar",
-          "name": "Bar",
-          "names": [
-            "Bar",
-          ],
-          "specifier": "./bar",
-          "start": 55,
-          "type": "named",
+          "start": 522,
+          "type": "declaration",
         },
         {
           "code": "export type { Qux }",
-          "end": 145,
+          "end": 65,
           "exports": " Qux",
           "name": "Qux",
           "names": [
             "Qux",
           ],
           "specifier": undefined,
-          "start": 126,
+          "start": 46,
+          "type": "named",
+        },
+        {
+          "code": "export type { Foo } from "./foo"",
+          "end": 141,
+          "exports": " Foo",
+          "name": "Foo",
+          "names": [
+            "Foo",
+          ],
+          "specifier": "./foo",
+          "start": 109,
+          "type": "named",
+        },
+        {
+          "code": "export type { Bar } from "./bar"",
+          "end": 185,
+          "exports": " Bar",
+          "name": "Bar",
+          "names": [
+            "Bar",
+          ],
+          "specifier": "./bar",
+          "start": 153,
           "type": "named",
         },
       ]
