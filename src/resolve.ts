@@ -1,14 +1,12 @@
 import { statSync } from "node:fs";
-import { pathToFileURL } from "node:url";
 import { joinURL } from "ufo";
 import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
 import { PackageJson, readPackageJSON } from "pkg-types";
-import { fileURLToPath, normalizeid } from "./utils";
+import { fileURLToPath, pathToFileURL, normalizeid } from "./utils";
 import { BUILTIN_MODULES } from "./_utils";
 
 const DEFAULT_CONDITIONS_SET = new Set(["node", "import"]);
-const DEFAULT_URL = pathToFileURL(process.cwd());
 const DEFAULT_EXTENSIONS = [".mjs", ".cjs", ".js", ".json"];
 const NOT_FOUND_ERRORS = new Set([
   "ERR_MODULE_NOT_FOUND",
@@ -66,7 +64,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     try {
       const stat = statSync(id);
       if (stat.isFile()) {
-        return pathToFileURL(id).toString();
+        return pathToFileURL(id);
       }
     } catch (error) {
       if (error.code !== "ENOENT") {
@@ -85,9 +83,9 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     Array.isArray(options.url) ? options.url : [options.url]
   )
     .filter(Boolean)
-    .map((u) => new URL(normalizeid(u.toString())));
+    .map((url) => new URL(normalizeid(url!.toString())));
   if (_urls.length === 0) {
-    _urls.push(DEFAULT_URL);
+    _urls.push(new URL(pathToFileURL(process.cwd())));
   }
   const urls = [..._urls];
   for (const url of _urls) {
@@ -140,8 +138,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     throw error;
   }
 
-  // Normalize (TODO: simplify)
-  return pathToFileURL(fileURLToPath(resolved)).toString();
+  return pathToFileURL(resolved);
 }
 
 export function resolveSync(id: string, options?: ResolveOptions): string {
