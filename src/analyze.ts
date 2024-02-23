@@ -128,7 +128,7 @@ export function parseStaticImport(
     const _match = namedImport.match(/^\s*(\S*) as (\S*)\s*$/);
     const source = _match?.[1] || namedImport.trim();
     const importName = _match?.[2] || source;
-    if (!TYPE_RE.test(source)) {
+    if (source && !TYPE_RE.test(source)) {
       namedImports[source] = importName;
     }
   }
