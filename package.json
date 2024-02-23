@@ -1,6 +1,6 @@
 {
   "name": "mlly",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Missing ECMAScript module utils for Node.js",
   "repository": "unjs/mlly",
   "license": "MIT",

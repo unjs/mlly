@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.1
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.6.0...v1.6.1)
+
+### 🩹 Fixes
+
+- **parseStaticImport:** Omit empty import names ([#232](https://github.com/unjs/mlly/pull/232))
+
+### ❤️ Contributors
+
+- Patryk Tomczyk
+
 ## v1.6.0
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.5.0...v1.6.0)
