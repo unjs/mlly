@@ -49,6 +49,12 @@ const staticTests: Record<
         member3: "alias3",
       },
     },
+  'import { memberFormattedWithPrettier, } from "module-name";': {
+    specifier: "module-name",
+    namedImports: {
+      memberFormattedWithPrettier: "memberFormattedWithPrettier",
+    },
+  },
   'import { member1, /* member0point5, */ member2 as alias2, member3 as alias3 } from "module-name";':
     {
       specifier: "module-name",
