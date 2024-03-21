@@ -30,10 +30,10 @@
     "acorn": "^8.11.3",
     "pathe": "^1.1.2",
     "pkg-types": "^1.0.3",
-    "ufo": "^1.5.1"
+    "ufo": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.11.30",
     "@vitest/coverage-v8": "^1.4.0",
     "changelogen": "^0.5.5",
     "eslint": "^8.57.0",
@@ -42,9 +42,9 @@
     "jiti": "^1.21.0",
     "prettier": "^3.2.5",
     "std-env": "^3.7.0",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "unbuild": "^2.0.0",
     "vitest": "^1.4.0"
   },
-  "packageManager": "pnpm@8.15.4"
+  "packageManager": "pnpm@8.15.5"
 }
