@@ -63,6 +63,12 @@ export interface ValidNodeImportOptions extends ResolveOptions {
    * Default: ['node', 'file', 'data']
    */
   allowedProtocols?: Array<string>;
+  /**
+   * Whether to strip comments from the code before checking for ESM syntax.
+   *
+   * Default: false
+   */
+  stripCommentsFromCode?: boolean;
 }
 
 const validNodeImportDefaults: ValidNodeImportOptions = {
@@ -115,5 +121,5 @@ export async function isValidNodeImport(
     (await fsp.readFile(resolvedPath, "utf8").catch(() => {})) ||
     "";
 
-  return !hasESMSyntax(code);
+  return !hasESMSyntax(code, { stripComments: options.stripCommentsFromCode });
 }
