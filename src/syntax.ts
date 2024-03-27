@@ -68,7 +68,7 @@ export interface ValidNodeImportOptions extends ResolveOptions {
    *
    * Default: false
    */
-  stripCommentsFromCode?: boolean;
+  stripComments?: boolean;
 }
 
 const validNodeImportDefaults: ValidNodeImportOptions = {
@@ -121,5 +121,5 @@ export async function isValidNodeImport(
     (await fsp.readFile(resolvedPath, "utf8").catch(() => {})) ||
     "";
 
-  return !hasESMSyntax(code, { stripComments: options.stripCommentsFromCode });
+  return !hasESMSyntax(code, { stripComments: options.stripComments });
 }
