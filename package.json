@@ -33,7 +33,7 @@
     "ufo": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.12.2",
+    "@types/node": "^20.12.4",
     "@vitest/coverage-v8": "^1.4.0",
     "changelogen": "^0.5.5",
     "eslint": "^8.57.0",
@@ -42,7 +42,7 @@
     "jiti": "^1.21.0",
     "prettier": "^3.2.5",
     "std-env": "^3.7.0",
-    "typescript": "^5.4.3",
+    "typescript": "^5.4.4",
     "unbuild": "^2.0.0",
     "vitest": "^1.4.0"
   },
