@@ -3,14 +3,34 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "./utils";
 import { isObject } from "./_utils";
 
+/**
+ * Represents the context of a CommonJS environment, providing node-like module resolution capabilities within a module.
+ */
 export interface CommonjsContext {
+  /**
+   * The absolute path to the current module file.
+   */
   __filename: string;
+
+  /**
+   * The directory name of the current module.
+   */
   __dirname: string;
   // TODO!
   // eslint-disable-next-line no-undef
+  /**
+   * A function to require modules as in CommonJS.
+   */
   require: NodeRequire;
 }
 
+/**
+ * Creates a CommonJS context for a given module URL, enabling `require`, `__filename` and `__dirname` support similar to Node.js.
+ * This function dynamically generates a `require` function that is context-aware and bound to the location of the given module URL.
+ *
+ * @param {string} url - The URL of the module file to create a context for.
+ * @returns {CommonjsContext} A context object containing `__filename`, `__dirname` and a custom `require` function. See {@link CommonjsContext}.
+ */
 export function createCommonJS(url: string): CommonjsContext {
   const __filename = fileURLToPath(url);
   const __dirname = dirname(__filename);

@@ -14,8 +14,24 @@ const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
 
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
-export type DetectSyntaxOptions = { stripComments?: boolean };
+/**
+ * Options for detecting syntax within a code string.
+ */
+export type DetectSyntaxOptions = {
+  /**
+   * Indicates whether comments should be stripped from the code before syntax checking.
+   * @default false
+   */
+  stripComments?: boolean
+};
 
+/**
+ * Determines if a given code string contains ECMAScript module syntax.
+ *
+ * @param {string} code - The source code to analyse.
+ * @param {DetectSyntaxOptions} opts - See {@link DetectSyntaxOptions}.
+ * @returns {boolean} `true` if the code contains ESM syntax, otherwise `false`.
+ */
 export function hasESMSyntax(
   code: string,
   opts: DetectSyntaxOptions = {},
@@ -26,6 +42,13 @@ export function hasESMSyntax(
   return ESM_RE.test(code);
 }
 
+/**
+ * Determines if a given string of code contains CommonJS syntax.
+ *
+ * @param {string} code - The source code to analyse.
+ * @param {DetectSyntaxOptions} opts - See {@link DetectSyntaxOptions}.
+ * @returns {boolean} `true` if the code contains CommonJS syntax, `false` otherwise.
+ */
 export function hasCJSSyntax(
   code: string,
   opts: DetectSyntaxOptions = {},
@@ -36,6 +59,13 @@ export function hasCJSSyntax(
   return CJS_RE.test(code);
 }
 
+/**
+ * Analyses the supplied code to determine if it contains ECMAScript module syntax, CommonJS syntax, or both.
+ *
+ * @param {string} code - The source code to analyse.
+ * @param {DetectSyntaxOptions} opts - See {@link DetectSyntaxOptions}.
+ * @returns {object} An object indicating the presence of ESM syntax (`hasESM`), CJS syntax (`hasCJS`) and whether both syntaxes are present (`isMixed`).
+ */
 export function detectSyntax(code: string, opts: DetectSyntaxOptions = {}) {
   if (opts.stripComments) {
     code = code.replace(COMMENT_RE, "");
@@ -60,13 +90,14 @@ export interface ValidNodeImportOptions extends ResolveOptions {
   /**
    * Protocols that are allowed as valid node imports.
    *
-   * Default: ['node', 'file', 'data']
+   * @default ['node', 'file', 'data']
+   *
    */
   allowedProtocols?: Array<string>;
   /**
    * Whether to strip comments from the code before checking for ESM syntax.
    *
-   * Default: false
+   * @default false
    */
   stripComments?: boolean;
 }
@@ -75,6 +106,13 @@ const validNodeImportDefaults: ValidNodeImportOptions = {
   allowedProtocols: ["node", "file", "data"],
 };
 
+/**
+ * Validates whether a given identifier represents a valid node import, based on its protocol, file extension, and optionally its contents.
+ *
+ * @param {string} id - The identifier or URL of the import to validate.
+ * @param {ValidNodeImportOptions} _options - Options for resolving and validating the import. See {@link ValidNodeImportOptions}.
+ * @returns {Promise<boolean>} A promise that resolves to `true` if the import is valid, otherwise `false`.
+ */
 export async function isValidNodeImport(
   id: string,
   _options: ValidNodeImportOptions = {},

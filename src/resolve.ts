@@ -16,8 +16,19 @@ const NOT_FOUND_ERRORS = new Set([
 ]);
 
 export interface ResolveOptions {
+  /**
+   * A URL, path or array of URLs/paths to resolve against.
+   */
   url?: string | URL | (string | URL)[];
+
+  /**
+   * File extensions to consider when resolving modules.
+   */
   extensions?: string[];
+
+  /**
+   * Conditions to consider when resolving package exports.
+   */
   conditions?: string[];
 }
 
@@ -141,10 +152,24 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   return pathToFileURL(resolved);
 }
 
+/**
+ * Synchronously resolves a module path based on the options provided.
+ *
+ * @param {string} id - The identifier or path of the module to resolve.
+ * @param {ResolveOptions} [options] - Options to resolve the module. See {@link ResolveOptions}.
+ * @returns {string} The resolved URL as a string.
+ */
 export function resolveSync(id: string, options?: ResolveOptions): string {
   return _resolve(id, options);
 }
 
+/**
+ * Asynchronously resolves a module path based on the given options.
+ *
+ * @param {string} id - The identifier or path of the module to resolve.
+ * @param {ResolveOptions} [options] - Options for resolving the module. See {@link ResolveOptions}.
+ * @returns {Promise<string>} A promise to resolve the URL as a string.
+ */
 export function resolve(id: string, options?: ResolveOptions): Promise<string> {
   try {
     return Promise.resolve(resolveSync(id, options));
@@ -153,10 +178,24 @@ export function resolve(id: string, options?: ResolveOptions): Promise<string> {
   }
 }
 
+/**
+ * Synchronously resolves a module path to a local file path based on the given options.
+ *
+ * @param {string} id - The identifier or path of the module to resolve.
+ * @param {ResolveOptions} [options] - Options to resolve the module. See {@link ResolveOptions}.
+ * @returns {string} The resolved file path.
+ */
 export function resolvePathSync(id: string, options?: ResolveOptions): string {
   return fileURLToPath(resolveSync(id, options));
 }
 
+/**
+ * Asynchronously resolves a module path to a local file path based on the options provided.
+ *
+ * @param {string} id - The identifier or path of the module to resolve.
+ * @param {ResolveOptions} [options] - Options for resolving the module. See {@link ResolveOptions}.
+ * @returns {Promise<string>} A promise to resolve to the file path.
+ */
 export function resolvePath(
   id: string,
   options?: ResolveOptions,
@@ -168,6 +207,12 @@ export function resolvePath(
   }
 }
 
+/**
+ * Creates a resolver function with default options that can be used to resolve module identifiers.
+ *
+ * @param {ResolveOptions} [defaults] - Default options to use for all resolutions. See {@link ResolveOptions}.
+ * @returns {Function} A resolver function that takes an identifier and an optional URL, and resolves the identifier using the default options and the given URL.
+ */
 export function createResolve(defaults?: ResolveOptions) {
   return (id: string, url?: ResolveOptions["url"]) => {
     return resolve(id, { url, ...defaults });
@@ -176,6 +221,12 @@ export function createResolve(defaults?: ResolveOptions) {
 
 const NODE_MODULES_RE = /^(.+\/node_modules\/)([^/@]+|@[^/]+\/[^/]+)(\/?.*?)?$/;
 
+/**
+ * Parses a node module path to extract the directory, name, and subpath.
+ *
+ * @param {string} path - The path to parse.
+ * @returns {Object} An object containing the directory, module name, and subpath of the node module.
+ */
 export function parseNodeModulePath(path: string) {
   if (!path) {
     return {};
@@ -193,7 +244,12 @@ export function parseNodeModulePath(path: string) {
   };
 }
 
-/** Reverse engineer a subpath export if possible */
+/**
+ * Attempts to reverse engineer a subpath export within a node module.
+ *
+ * @param {string} path - The path within the node module.
+ * @returns {Promise<string | undefined>} A promise that resolves to the detected subpath or undefined if not found.
+ */
 export async function lookupNodeModuleSubpath(
   path: string,
 ): Promise<string | undefined> {
