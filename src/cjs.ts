@@ -51,31 +51,17 @@ export function interopDefault(
     return opts.preferNamespace ? sourceModule : defaultValue;
   }
   for (const key in sourceModule) {
-    if (key === "default") {
-      try {
-        if (!(key in defaultValue)) {
-          Object.defineProperty(defaultValue, key, {
-            enumerable: false,
-            configurable: false,
-            get() {
-              return defaultValue;
-            },
-          });
-        }
-      } catch {}
-    } else {
-      try {
-        if (!(key in defaultValue)) {
-          Object.defineProperty(defaultValue, key, {
-            enumerable: true,
-            configurable: true,
-            get() {
-              return sourceModule[key];
-            },
-          });
-        }
-      } catch {}
-    }
+    try {
+      if (!(key in defaultValue)) {
+        Object.defineProperty(defaultValue, key, {
+          enumerable: key !== "default",
+          configurable: key !== "default",
+          get() {
+            return sourceModule[key];
+          },
+        });
+      }
+    } catch {}
   }
   return defaultValue;
 }
