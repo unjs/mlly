@@ -29,7 +29,7 @@
   "dependencies": {
     "acorn": "^8.11.3",
     "pathe": "^1.1.2",
-    "pkg-types": "^1.0.3",
+    "pkg-types": "^1.1.0",
     "ufo": "^1.5.3"
   },
   "devDependencies": {
