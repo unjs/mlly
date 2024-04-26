@@ -86,6 +86,18 @@ describe("findExports", () => {
       type: "declaration",
       names: ["foo", "bar", "baz"],
     },
+    "export const foo = [ 1, bar, baz ];": {
+      type: "declaration",
+      names: ["foo"],
+    },
+    "export const foo = [ 1, bar ], baz = 2;": {
+      type: "declaration",
+      names: ["foo", "baz"],
+    },
+    "export const foo = { bar, bar1: [ qux , qux1 ] }, baz = 2;": {
+      type: "declaration",
+      names: ["foo", "baz"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
