@@ -7,7 +7,7 @@ import { loadURL } from "./utils";
  * Represents a general structure for ECMAScript module imports.
  */
 export interface ESMImport {
-   /**
+  /**
    * Specifies the type of import: "static" for static imports and "dynamic" for dynamic imports.
    */
   type: "static" | "dynamic";
@@ -149,7 +149,7 @@ export interface ESMExport {
    * The starting position (index) of the export declaration in the source code.
    */
   start: number;
- 
+
   /**
    * The end position (index) of the export declaration in the source code.
    */
@@ -388,7 +388,7 @@ export function parseTypeImport(
 /**
  * Identifies all export statements in the supplied source code and categorises them into different types such as declarations, named, default and star exports.
  * This function processes the code to capture different forms of export statements and normalise their representation for further processing.
- * 
+ *
  * @param {string} code - The source code containing the export statements to be analysed.
  * @returns {ESMExport[]} An array of {@link ESMExport} objects representing each export found, properly categorised and structured.
  */
@@ -487,7 +487,7 @@ export function findExports(code: string): ESMExport[] {
 /**
  * Searches specifically for type-related exports in TypeScript code, such as exported interfaces, types, and declarations prefixed with 'declare'.
  * This function uses specialised regular expressions to identify type exports and normalises them for consistency.
- * 
+ *
  * @param {string} code - The TypeScript source code to search for type exports.
  * @returns {ESMExport[]} An array of {@link ESMExport} objects representing each type export found.
  */

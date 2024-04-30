@@ -22,7 +22,7 @@ export type DetectSyntaxOptions = {
    * Indicates whether comments should be stripped from the code before syntax checking.
    * @default false
    */
-  stripComments?: boolean
+  stripComments?: boolean;
 };
 
 /**
