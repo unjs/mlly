@@ -259,8 +259,7 @@ const IMPORT_NAMED_TYPE_RE =
  * @example `export const num = 1, str = 'hello'; export class Example {}`
  */
 export const EXPORT_DECAL_RE =
-  /\bexport\s+(?<declaration>(async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,\s*[\w$]+)*/g;
-
+  /\bexport\s+(?<declaration>(async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,\s*[\s\w:[\]{}]*[\w$\]}]+)*/g;
 /**
  * Regular expression to match export declarations specifically for types, interfaces, and type aliases in TypeScript.
  * @example `export type Result = { success: boolean; }; export interface User { name: string; age: number; };`
@@ -403,9 +402,13 @@ export function findExports(code: string): ESMExport[] {
       | string
       | undefined;
     if (extraNamesStr) {
-      const extraNames = matchAll(/,\s*(?<name>\w+)/g, extraNamesStr, {}).map(
-        (m) => m.name,
-      );
+      const extraNames = matchAll(
+        /({.*?})|(\[.*?])|(,\s*(?<name>\w+))/g,
+        extraNamesStr,
+        {},
+      )
+        .map((m) => m.name)
+        .filter(Boolean);
       declaredExport.names = [declaredExport.name, ...extraNames];
     }
     delete (declaredExport as any).extraNames;
