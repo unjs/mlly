@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.6.1...v1.7.0)
+
+### 🚀 Enhancements
+
+- **isValidNodeImport:** Support `stripComments` option ([#236](https://github.com/unjs/mlly/pull/236))
+
+### 🩹 Fixes
+
+- **findExports:** Find declaration export with inline object or array ([#247](https://github.com/unjs/mlly/pull/247))
+
+### 💅 Refactors
+
+- **interopDefault:** Simplify implementation ([#243](https://github.com/unjs/mlly/pull/243))
+
+### 📖 Documentation
+
+- Added jsdocs to exported functions and types ([#241](https://github.com/unjs/mlly/pull/241))
+
+### 🏡 Chore
+
+- Update to eslint v9 ([3c64544](https://github.com/unjs/mlly/commit/3c64544))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- ShunJun <zsj_hz@126.com>
+- Max ([@onmax](http://github.com/onmax))
+- Sukka <isukkaw@gmail.com>
+- Julien Huang <julien.huang@outlook.fr>
+
 ## v1.6.1
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.6.0...v1.6.1)
