@@ -17,7 +17,7 @@ export interface CommonjsContext {
    */
   __dirname: string;
   // TODO!
-  // eslint-disable-next-line no-undef
+
   /**
    * A function to require modules as in CommonJS.
    */
@@ -81,7 +81,9 @@ export function interopDefault(
           },
         });
       }
-    } catch {}
+    } catch {
+      // Ignore error
+    }
   }
   return defaultValue;
 }

@@ -1,6 +1,6 @@
 import { tokenizer } from "acorn";
 import { matchAll, clearImports, getImportNames } from "./_utils";
-import { resolvePath, ResolveOptions } from "./resolve";
+import { resolvePath, type ResolveOptions } from "./resolve";
 import { loadURL } from "./utils";
 
 /**
@@ -453,7 +453,7 @@ export function findExports(code: string): ESMExport[] {
   });
 
   // Merge and normalize exports
-  // eslint-disable-next-line unicorn/no-array-push-push
+
   const exports: ESMExport[] = normalizeExports([
     ...declaredExports,
     ...namedExports,
@@ -652,7 +652,9 @@ function _filterStatement<T extends TokenLocation>(
 function _tryGetLocations(code: string, label: string) {
   try {
     return _getLocations(code, label);
-  } catch {}
+  } catch {
+    // Ignore error
+  }
 }
 
 function _getLocations(code: string, label: string) {

@@ -106,7 +106,6 @@ describe("parseNodeModulePath", () => {
 });
 
 describe("lookupNodeModuleSubpath", () => {
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   const r = (p: string) => new URL(p, import.meta.url).toString();
 
   const tests = [

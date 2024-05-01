@@ -70,7 +70,7 @@ describe("findExports", () => {
       specifier: "./other",
       name: "foo",
     },
-    // eslint-disable-next-line no-template-curly-in-string
+
     "const a = `<div${JSON.stringify({ class: 42 })}>`;\nexport default true;":
       { type: "default", name: "default", names: ["default"] },
     "export const enum foo { a = 'xx' }": {

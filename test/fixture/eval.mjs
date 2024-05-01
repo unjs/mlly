@@ -20,6 +20,6 @@ console.log(
   ),
 );
 
-await loadModule("./eval-err.mjs", { url: import.meta.url }).catch((e) =>
-  console.error(e),
+await loadModule("./eval-err.mjs", { url: import.meta.url }).catch((error) =>
+  console.error(error),
 );

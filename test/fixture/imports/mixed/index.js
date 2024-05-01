@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-module */
 export const isCrtAvailable = () => {
   try {
     if (
@@ -8,5 +7,7 @@ export const isCrtAvailable = () => {
     ) {
       return ["md/crt-avail"];
     }
-  } catch {}
+  } catch {
+    // Ignore error
+  }
 };
