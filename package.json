@@ -29,11 +29,11 @@
   "dependencies": {
     "acorn": "^8.11.3",
     "pathe": "^1.1.2",
-    "pkg-types": "^1.1.0",
+    "pkg-types": "^1.1.1",
     "ufo": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.12.10",
+    "@types/node": "^20.12.11",
     "@vitest/coverage-v8": "^1.6.0",
     "changelogen": "^0.5.5",
     "eslint": "^9.2.0",
