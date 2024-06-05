@@ -259,7 +259,7 @@ const TypeTests = {
 
 describe("findStaticImports", () => {
   for (const [input, _results] of Object.entries(staticTests)) {
-    it(input.replace(/\n/g, "\\n"), () => {
+    it(input.replace(/\n/g, String.raw`\n`), () => {
       const matches = findStaticImports(input);
       const expected = Array.isArray(_results) ? _results : [_results];
       expect(matches.length).toEqual(expected.length);
@@ -286,7 +286,7 @@ describe("findStaticImports", () => {
 
 describe("findDynamicImports", () => {
   for (const [input, test] of Object.entries(dynamicTests)) {
-    it(input.replace(/\n/g, "\\n"), () => {
+    it(input.replace(/\n/g, String.raw`\n`), () => {
       const matches = findDynamicImports(input);
       expect(matches.length).to.equal(Array.isArray(test) ? test.length : 1);
       const match = matches[0];
@@ -300,7 +300,7 @@ describe("findDynamicImports", () => {
 
 describe("findTypeImports", () => {
   for (const [input, _results] of Object.entries(TypeTests)) {
-    it(input.replace(/\n/g, "\\n"), () => {
+    it(input.replace(/\n/g, String.raw`\n`), () => {
       const matches = findTypeImports(input);
       const results = Array.isArray(_results) ? _results : [_results];
       expect(matches.length).toEqual(results.length);

@@ -90,7 +90,7 @@ describe("parseNodeModulePath", () => {
       },
     },
     {
-      input: "C:\\src\\a\\node_modules\\thing\\dist\\index.mjs",
+      input: String.raw`C:\src\a\node_modules\thing\dist\index.mjs`,
       output: {
         dir: "C:/src/a/node_modules/",
         name: "thing",

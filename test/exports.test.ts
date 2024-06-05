@@ -101,7 +101,7 @@ describe("findExports", () => {
   };
 
   for (const [input, test] of Object.entries(tests)) {
-    it(input.replace(/\n/g, "\\n"), () => {
+    it(input.replace(/\n/g, String.raw`\n`), () => {
       const matches = findExports(input);
       expect(matches.length).toEqual(1);
       const match = matches[0];
