@@ -50,4 +50,25 @@ describe("interopDefault", () => {
       }
     });
   }
+
+  it("function as default", () => {
+    const mod = {
+      default: () => {},
+      x: 123,
+    };
+
+    // Default behavior
+    const interop = interopDefault(mod);
+    expect(typeof interop).toBe("function");
+    expect(interop).toBe(mod.default);
+    expect(interop.x).toBe(123);
+    expect(interop.default).toBe(mod.default);
+
+    // With preferNamespace
+    const interopNS = interopDefault(mod, { preferNamespace: true });
+    expect(typeof interopNS).toBe("object");
+    expect(interopNS).toBe(mod);
+    expect(interopNS.x).toBe(123);
+    expect(interopNS.default).toBe(mod.default);
+  });
 });

@@ -67,7 +67,11 @@ export function interopDefault(
   if (defaultValue === undefined || defaultValue === null) {
     return sourceModule;
   }
-  if (typeof defaultValue !== "object") {
+  const _defaultType = typeof defaultValue;
+  if (
+    _defaultType !== "object" &&
+    !(_defaultType === "function" && !opts.preferNamespace)
+  ) {
     return opts.preferNamespace ? sourceModule : defaultValue;
   }
   for (const key in sourceModule) {
