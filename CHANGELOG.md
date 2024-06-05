@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.1
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.7.0...v1.7.1)
+
+### 🩹 Fixes
+
+- **interopDefault:** Assign props to default function export ([#258](https://github.com/unjs/mlly/pull/258))
+
+### 🏡 Chore
+
+- Update deps ([5a4a2e5](https://github.com/unjs/mlly/commit/5a4a2e5))
+- Update eslint ([7299e58](https://github.com/unjs/mlly/commit/7299e58))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.7.0
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.6.1...v1.7.0)
