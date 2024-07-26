@@ -46,32 +46,25 @@ function _tryModuleResolve(
   }
 }
 
-function safeImportMetaResolve(url) {
+function safeImportMetaResolve(path) {
   try {
-    let path = url;
-    if (typeof path === "object" && path instanceof URL) {
-      path = path.pathname;
-    }
-
     // Yarn PnP support -- resolve the path to Yarn's virtual file system
     if (typeof import.meta.resolve === "function") {
-      const result = import.meta.resolve(path);
+      const resolvedPath = import.meta.resolve(path);
 
-      if (result instanceof Promise) {
+      if (typeof resolvedPath === "string") {
         // Older implementations of resolve use a promise; it's a hassle to
-        // support this, and they're old anyway, so just support the modern
+        // support this, and they're old anyway, so support only the modern
         // synchronous resolve
-        return path;
+        return resolvedPath;
       }
-
-      return url;
     }
 
     // If there's no resolve, then we can't be using Yarn PnP, so nothing to
     // do anyway
-    return url;
+    return path;
   } catch (_error) {
-    return url;
+    return path;
   }
 }
 
@@ -148,7 +141,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
       break;
     }
     // Try Yarn PnP support
-    resolved = _tryModuleResolve(id, safeImportMetaResolve(url), conditionsSet);
+    resolved = _tryModuleResolve(safeImportMetaResolve(id), url, conditionsSet);
     if (resolved) {
       break;
     }
