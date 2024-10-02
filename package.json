@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.16.5",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^2.1.2",
     "changelogen": "^0.5.5",
     "eslint": "^9.10.0",
     "eslint-config-unjs": "^0.3.2",
@@ -44,7 +44,7 @@
     "std-env": "^3.7.0",
     "typescript": "^5.5.4",
     "unbuild": "^2.0.0",
-    "vitest": "^1.6.0"
+    "vitest": "^2.1.2"
   },
   "packageManager": "pnpm@9.9.0"
 }
