@@ -10,7 +10,8 @@ const ESM_RE =
 const CJS_RE =
   /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 
-const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
+const MULTI_LINE_COMMENT_RE = /\/\*.+?\*\//gs;
+const SINGLE_LINE_COMMENT_RE = /\/\/.*/g;
 
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
@@ -37,7 +38,9 @@ export function hasESMSyntax(
   opts: DetectSyntaxOptions = {},
 ): boolean {
   if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+    code = code
+      .replace(SINGLE_LINE_COMMENT_RE, "")
+      .replace(MULTI_LINE_COMMENT_RE, "");
   }
   return ESM_RE.test(code);
 }
@@ -54,7 +57,9 @@ export function hasCJSSyntax(
   opts: DetectSyntaxOptions = {},
 ): boolean {
   if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+    code = code
+      .replace(SINGLE_LINE_COMMENT_RE, "")
+      .replace(MULTI_LINE_COMMENT_RE, "");
   }
   return CJS_RE.test(code);
 }
@@ -68,7 +73,9 @@ export function hasCJSSyntax(
  */
 export function detectSyntax(code: string, opts: DetectSyntaxOptions = {}) {
   if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+    code = code
+      .replace(SINGLE_LINE_COMMENT_RE, "")
+      .replace(MULTI_LINE_COMMENT_RE, "");
   }
   // We strip comments once hence not passing opts down to hasESMSyntax and hasCJSSyntax
   const hasESM = hasESMSyntax(code, {});
