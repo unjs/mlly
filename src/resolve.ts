@@ -38,7 +38,7 @@ function _tryModuleResolve(
   conditions: any,
 ): URL | undefined {
   try {
-    return moduleResolve(id, url, conditions);
+    return moduleResolve(id, url, conditions) as URL;
   } catch (error: any) {
     if (!NOT_FOUND_ERRORS.has(error?.code)) {
       throw error;
