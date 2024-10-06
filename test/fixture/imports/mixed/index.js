@@ -3,7 +3,7 @@ export const isCrtAvailable = () => {
     if (
       typeof require === "function" &&
       typeof module !== "undefined" &&
-      require("aws-crt")
+      require("aws-crt") // eslint-disable-line @typescript-eslint/no-require-imports
     ) {
       return ["md/crt-avail"];
     }
