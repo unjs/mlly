@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.2
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.7.1...v1.7.2)
+
+### 🩹 Fixes
+
+- **resolver:** Avoid double slashes when joining id with `/index` ([#278](https://github.com/unjs/mlly/pull/278))
+
+### 🏡 Chore
+
+- Lint ([20d8f95](https://github.com/unjs/mlly/commit/20d8f95))
+- Update dependencies ([c8973ec](https://github.com/unjs/mlly/commit/c8973ec))
+- Fix internal type issue ([0450f3f](https://github.com/unjs/mlly/commit/0450f3f))
+- Update lockfile ([00160e9](https://github.com/unjs/mlly/commit/00160e9))
+
+### ❤️ Contributors
+
+- Jan-Henrik Damaschke <jdamaschke@outlook.de>
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.7.1
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.7.0...v1.7.1)
