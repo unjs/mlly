@@ -122,7 +122,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     for (const prefix of ["", "/index"]) {
       for (const extension of options.extensions || DEFAULT_EXTENSIONS) {
         resolved = _tryModuleResolve(
-          id + prefix + extension,
+          joinURL(id, prefix) + extension,
           url,
           conditionsSet,
         );
