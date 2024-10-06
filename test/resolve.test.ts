@@ -15,44 +15,6 @@ const tests = [
   { input: "/non/existent", action: "throws" },
 ] as const;
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
-const { mockedResolve } = await vi.hoisted(async () => {
-  const importMetaResolve = await vi.importActual<
-    Record<string, (...args: unknown[]) => unknown>
-  >("import-meta-resolve");
-  return {
-    mockedResolve: vi.fn((id, url, conditions) => {
-      return importMetaResolve.moduleResolve(id, url, conditions);
-    }),
-  };
-});
-
-vi.mock("import-meta-resolve", () => {
-  return {
-    moduleResolve: mockedResolve,
-  };
-});
-
-describe("tryModuleResolve", () => {
-  it("should create correct url", () => {
-    expect(() =>
-      resolvePathSync("tslib/", {
-        url: import.meta.url.replace(
-          parseFilename(import.meta.url, { strict: false }) || "",
-          "",
-        ),
-      }),
-    ).toThrow();
-    expect(mockedResolve).toHaveBeenCalled();
-    expect(
-      mockedResolve.mock.calls.some((call) => call[0].includes("//")),
-    ).toBe(false);
-  });
-});
-
 describe("resolveSync", () => {
   for (const test of tests) {
     it(`${test.input} should ${test.action}`, () => {
@@ -119,4 +81,42 @@ describe("resolvePathSync", () => {
       }
     });
   }
+});
+
+// https://github.com/unjs/mlly/pull/278
+describe("tryModuleResolve", async () => {
+  const { mockedResolve } = await vi.hoisted(async () => {
+    const importMetaResolve = await vi.importActual<
+      Record<string, (...args: unknown[]) => unknown>
+    >("import-meta-resolve");
+    return {
+      mockedResolve: vi.fn((id, url, conditions) => {
+        return importMetaResolve.moduleResolve(id, url, conditions);
+      }),
+    };
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("should create correct url", () => {
+    vi.mock("import-meta-resolve", () => {
+      return {
+        moduleResolve: mockedResolve,
+      };
+    });
+    expect(() =>
+      resolvePathSync("tslib/", {
+        url: import.meta.url.replace(
+          parseFilename(import.meta.url, { strict: false }) || "",
+          "",
+        ),
+      }),
+    ).toThrow();
+    expect(mockedResolve).toHaveBeenCalled();
+    expect(
+      mockedResolve.mock.calls.some((call) => call[0].includes("//")),
+    ).toBe(false);
+  });
 });
