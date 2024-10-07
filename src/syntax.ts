@@ -1,4 +1,5 @@
 import { promises as fsp } from "node:fs";
+import { parse } from "acorn";
 import { extname } from "pathe";
 import { readPackageJSON } from "pkg-types";
 import { ResolveOptions, resolvePath } from "./resolve";
@@ -9,9 +10,6 @@ const ESM_RE =
 
 const CJS_RE =
   /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
-
-const MULTI_LINE_COMMENT_RE = /\/\*.+?\*\//gs;
-const SINGLE_LINE_COMMENT_RE = /\/\/.*/g;
 
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
@@ -26,6 +24,38 @@ export type DetectSyntaxOptions = {
   stripComments?: boolean;
 };
 
+interface TokenLocation {
+  start: number;
+  end: number;
+}
+
+function _getCommentLocations(code: string) {
+  const locations: TokenLocation[] = [];
+  parse(code, {
+    ecmaVersion: "latest",
+    allowHashBang: true,
+    allowAwaitOutsideFunction: true,
+    allowImportExportEverywhere: true,
+    onComment(_isBlock, _text, start, end) {
+      locations.push({ start, end });
+    },
+  });
+  return locations;
+}
+
+/**
+ * Strip comments from a string of source code
+ *
+ * @param code - The source code to remove comments from.
+ */
+export function stripComments(code: string) {
+  const locations = _getCommentLocations(code);
+  for (const location of locations.reverse()) {
+    code = code.slice(0, location.start) + code.slice(location.end);
+  }
+  return code;
+}
+
 /**
  * Determines if a given code string contains ECMAScript module syntax.
  *
@@ -38,9 +68,7 @@ export function hasESMSyntax(
   opts: DetectSyntaxOptions = {},
 ): boolean {
   if (opts.stripComments) {
-    code = code
-      .replace(SINGLE_LINE_COMMENT_RE, "")
-      .replace(MULTI_LINE_COMMENT_RE, "");
+    code = stripComments(code);
   }
   return ESM_RE.test(code);
 }
@@ -57,9 +85,7 @@ export function hasCJSSyntax(
   opts: DetectSyntaxOptions = {},
 ): boolean {
   if (opts.stripComments) {
-    code = code
-      .replace(SINGLE_LINE_COMMENT_RE, "")
-      .replace(MULTI_LINE_COMMENT_RE, "");
+    code = stripComments(code);
   }
   return CJS_RE.test(code);
 }
@@ -73,9 +99,7 @@ export function hasCJSSyntax(
  */
 export function detectSyntax(code: string, opts: DetectSyntaxOptions = {}) {
   if (opts.stripComments) {
-    code = code
-      .replace(SINGLE_LINE_COMMENT_RE, "")
-      .replace(MULTI_LINE_COMMENT_RE, "");
+    code = stripComments(code);
   }
   // We strip comments once hence not passing opts down to hasESMSyntax and hasCJSSyntax
   const hasESM = hasESMSyntax(code, {});
