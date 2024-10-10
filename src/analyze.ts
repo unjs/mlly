@@ -1,5 +1,5 @@
 import { tokenizer } from "acorn";
-import { matchAll, clearImports, getImportNames } from "./_utils";
+import { matchAll, clearImports, getImportNames, type RegExpWithGroups } from "./_utils";
 import { resolvePath, type ResolveOptions } from "./resolve";
 import { loadURL } from "./utils";
 
@@ -98,7 +98,7 @@ export interface TypeImport extends Omit<ESMImport, "type"> {
   /**
    * Specifies that this is a type import.
    */
-  type: "type";
+  type: "type" | "static";
 
   /**
    * Contains the entire type import statement as a string, excluding the module specifier.
@@ -170,7 +170,7 @@ export interface ESMExport {
   /**
    * An array of names to export, applicable to named and destructured exports.
    */
-  names: string[];
+  names?: string[];
 
   /**
    * The module specifier, if any, from which exports are being re-exported.
@@ -218,7 +218,7 @@ export interface NamedExport extends ESMExport {
   /**
    * An array of names to export.
    */
-  names: string[];
+  names?: string[];
 
   /**
    * The module specifier, if any, from which exports are being re-exported.
@@ -243,39 +243,39 @@ export interface DefaultExport extends ESMExport {
  * @example `import { foo, bar as baz } from 'module'`
  */
 export const ESM_STATIC_IMPORT_RE =
-  /(?<=\s|^|;|\})import\s*([\s"']*(?<imports>[\p{L}\p{M}\w\t\n\r $*,/{}@.]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gmu;
+  /(?<=\s|^|;|\})import\s*([\s"']*(?<imports>[\p{L}\p{M}\w\t\n\r $*,/{}@.]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gmu as RegExpWithGroups<"imports" | "specifier">;
 
 /**
  * Regular expression to match dynamic import statements in JavaScript/TypeScript code.
  * @example `import('module')`
  */
 export const DYNAMIC_IMPORT_RE =
-  /import\s*\((?<expression>(?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)/gm;
+  /import\s*\((?<expression>(?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)/gm as RegExpWithGroups<"expression">;
 const IMPORT_NAMED_TYPE_RE =
-  /(?<=\s|^|;|})import\s*type\s+([\s"']*(?<imports>[\w\t\n\r $*,/{}]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gm;
+  /(?<=\s|^|;|})import\s*type\s+([\s"']*(?<imports>[\w\t\n\r $*,/{}]+)from\s*)?["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][\s;]*/gm as RegExpWithGroups<"imports" | "specifier">;
 
 /**
  * Regular expression to match various types of export declarations including variables, functions, and classes.
  * @example `export const num = 1, str = 'hello'; export class Example {}`
  */
 export const EXPORT_DECAL_RE =
-  /\bexport\s+(?<declaration>(async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,\s*[\s\w:[\]{}]*[\w$\]}]+)*/g;
+  /\bexport\s+(?<declaration>(async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,\s*[\s\w:[\]{}]*[\w$\]}]+)*/g as RegExpWithGroups<"declaration" | "name" | "extraNames">;
 /**
  * Regular expression to match export declarations specifically for types, interfaces, and type aliases in TypeScript.
  * @example `export type Result = { success: boolean; }; export interface User { name: string; age: number; };`
  */
 export const EXPORT_DECAL_TYPE_RE =
-  /\bexport\s+(?<declaration>(interface|type|declare (async function|function|let|const enum|const|enum|var|class)))\s+(?<name>[\w$]+)/g;
+  /\bexport\s+(?<declaration>(interface|type|declare (async function|function|let|const enum|const|enum|var|class)))\s+(?<name>[\w$]+)/g as RegExpWithGroups<"declaration" | "name">;
 const EXPORT_NAMED_RE =
-  /\bexport\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
+  /\bexport\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g as RegExpWithGroups<"exports" | "specifier">;
 const EXPORT_NAMED_TYPE_RE =
-  /\bexport\s+type\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
+  /\bexport\s+type\s+{(?<exports>[^}]+?)[\s,]*}(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g as RegExpWithGroups<"exports" | "specifier">;
 const EXPORT_NAMED_DESTRUCT =
-  /\bexport\s+(let|var|const)\s+(?:{(?<exports1>[^}]+?)[\s,]*}|\[(?<exports2>[^\]]+?)[\s,]*])\s+=/gm;
+  /\bexport\s+(let|var|const)\s+(?:{(?<exports1>[^}]+?)[\s,]*}|\[(?<exports2>[^\]]+?)[\s,]*])\s+=/gm as RegExpWithGroups<"exports1" | "exports2">;
 const EXPORT_STAR_RE =
-  /\bexport\s*(\*)(\s*as\s+(?<name>[\w$]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g;
+  /\bexport\s*(\*)(\s*as\s+(?<name>[\w$]+)\s+)?\s*(\s*from\s*["']\s*(?<specifier>(?<="\s*)[^"]*[^\s"](?=\s*")|(?<='\s*)[^']*[^\s'](?=\s*'))\s*["'][^\n;]*)?/g as RegExpWithGroups<"name" | "specifier">;
 const EXPORT_DEFAULT_RE =
-  /\bexport\s+default\s+(async function|function|class|true|false|\W|\d)|\bexport\s+default\s+(?<defaultName>.*)/g;
+  /\bexport\s+default\s+(async function|function|class|true|false|\W|\d)|\bexport\s+default\s+(?<defaultName>.*)/g as RegExpWithGroups<"defaultName">;
 const TYPE_RE = /^\s*?type\s/;
 
 /**
@@ -309,6 +309,7 @@ export function findDynamicImports(code: string): DynamicImport[] {
  * @returns {TypeImport[]} An array of {@link TypeImport} objects representing each type import found.
  */
 export function findTypeImports(code: string): TypeImport[] {
+  // @ts-expect-error: ts is not yet able to preserve the literal type of the type
   return [
     ...matchAll(IMPORT_NAMED_TYPE_RE, code, { type: "type" }),
     ...matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(
@@ -403,7 +404,7 @@ export function findExports(code: string): ESMExport[] {
       | undefined;
     if (extraNamesStr) {
       const extraNames = matchAll(
-        /({.*?})|(\[.*?])|(,\s*(?<name>\w+))/g,
+        /({.*?})|(\[.*?])|(,\s*(?<name>\w+))/g as RegExpWithGroups<"name">,
         extraNamesStr,
         {},
       )
@@ -421,13 +422,12 @@ export function findExports(code: string): ESMExport[] {
     }),
   );
 
-  const destructuredExports: NamedExport[] = matchAll(
+  const destructuredExports: (Omit<NamedExport, 'exports'> & { exports1: string, exports2: string, exports?: string })[] = matchAll(
     EXPORT_NAMED_DESTRUCT,
     code,
     { type: "named" },
   );
   for (const namedExport of destructuredExports) {
-    // @ts-expect-error groups
     namedExport.exports = namedExport.exports1 || namedExport.exports2;
     namedExport.names = namedExport.exports
       .replace(/^\r?\n?/, "")
@@ -453,7 +453,6 @@ export function findExports(code: string): ESMExport[] {
   });
 
   // Merge and normalize exports
-
   const exports: ESMExport[] = normalizeExports([
     ...declaredExports,
     ...namedExports,
@@ -582,7 +581,7 @@ function normalizeNamedExports(namedExports: NamedExport[]) {
  */
 export function findExportNames(code: string): string[] {
   return findExports(code)
-    .flatMap((exp) => exp.names)
+    .flatMap((exp) => exp.names ?? [])
     .filter(Boolean);
 }
 
@@ -604,7 +603,7 @@ export async function resolveModuleExportNames(
 
   // Explicit named exports
   const exportNames = new Set(
-    exports.flatMap((exp) => exp.names).filter(Boolean),
+    exports.flatMap((exp) => exp.names ?? []).filter(Boolean),
   );
 
   // Recursive * exports
