@@ -256,6 +256,14 @@ describe("findExportNames", () => {
         "default",
       ]
     `);
+    expect(
+      findExportNames(`export{a as globalMiddleware,d as namedMiddleware};`),
+    ).toMatchInlineSnapshot(`
+      [
+        "globalMiddleware",
+        "namedMiddleware",
+      ]
+    `);
   });
 });
 
