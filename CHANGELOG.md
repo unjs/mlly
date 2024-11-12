@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.3
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.7.2...v1.7.3)
+
+### 🩹 Fixes
+
+- **findExportNames:** Do not require space before named exports ([#285](https://github.com/unjs/mlly/pull/285))
+
+### 🏡 Chore
+
+- Update deps ([8dc1790](https://github.com/unjs/mlly/commit/8dc1790))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v1.7.2
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.7.1...v1.7.2)
