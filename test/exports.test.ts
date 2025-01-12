@@ -272,13 +272,12 @@ describe("resolveModuleExportNames", () => {
     expect(await resolveModuleExportNames("pathe")).toMatchInlineSnapshot(`
       [
         "basename",
-        "default",
-        "delimiter",
         "dirname",
         "extname",
         "format",
         "isAbsolute",
         "join",
+        "matchesGlob",
         "normalize",
         "normalizeString",
         "parse",
@@ -286,6 +285,10 @@ describe("resolveModuleExportNames", () => {
         "resolve",
         "sep",
         "toNamespacedPath",
+        "default",
+        "delimiter",
+        "posix",
+        "win32",
       ]
     `);
   });
@@ -300,13 +303,12 @@ describe("resolveModuleExportNames", () => {
         "foo",
         "_resolve",
         "basename",
-        "default",
-        "delimiter",
         "dirname",
         "extname",
         "format",
         "isAbsolute",
         "join",
+        "matchesGlob",
         "normalize",
         "normalizeString",
         "parse",
@@ -314,6 +316,10 @@ describe("resolveModuleExportNames", () => {
         "resolve",
         "sep",
         "toNamespacedPath",
+        "default",
+        "delimiter",
+        "posix",
+        "win32",
       ]
     `);
   });
