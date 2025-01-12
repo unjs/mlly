@@ -29,4 +29,4 @@ jobs:
       - run: pnpm build
         if: matrix.os == 'ubuntu-latest'
       - run: pnpm vitest --coverage
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
