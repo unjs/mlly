@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.4
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.7.3...v1.7.4)
+
+### 🏡 Chore
+
+- Apply automated lint fixes ([651cf6d](https://github.com/unjs/mlly/commit/651cf6d))
+- Update pathe to v2 ([8963236](https://github.com/unjs/mlly/commit/8963236))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.7.3
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.7.2...v1.7.3)
