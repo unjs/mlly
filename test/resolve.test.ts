@@ -132,7 +132,9 @@ describe("normalized parent urls", () => {
     );
 
   const commonCases = [
-    [[undefined, false] as unknown, [url.pathToFileURL("./")]],
+    [[undefined, false, 123] as unknown, [url.pathToFileURL("./")]],
+    [import.meta.url, [import.meta.url]],
+    [new URL(import.meta.url), [import.meta.url]],
     [__filename, [url.pathToFileURL(__filename)]],
     [__dirname, [url.pathToFileURL(__dirname) + "/"]],
   ];
