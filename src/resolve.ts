@@ -105,7 +105,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     if (typeof input !== "string") {
       continue;
     }
-    if (/(node|data|http|https|file):/.test(input)) {
+    if (/^(?:node|data|http|https|file):/.test(input)) {
       urls.push(new URL(input));
       continue;
     }
