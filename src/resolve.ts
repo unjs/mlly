@@ -105,22 +105,24 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     if (typeof input !== "string") {
       continue;
     }
-    try {
-      urls.push(new URL(input));
-      continue;
-    } catch {
+    if (/(node|data|http|https|file):/.test(input)) {
       try {
-        if (input.endsWith("/") || statSync(input).isDirectory()) {
-          urls.push(url.pathToFileURL(input + "/"));
-        } else {
-          urls.push(url.pathToFileURL(input));
-        }
+        urls.push(new URL(input));
       } catch {
-        // We can't know, so assume it is dir or file
-        urls.push(url.pathToFileURL(input + "/"));
-        urls.push(url.pathToFileURL(input));
+        // invalid url
       }
       continue;
+    }
+    try {
+      if (input.endsWith("/") || statSync(input).isDirectory()) {
+        urls.push(url.pathToFileURL(input + "/"));
+      } else {
+        urls.push(url.pathToFileURL(input));
+      }
+    } catch {
+      // We can't know, so assume it is dir or file
+      urls.push(url.pathToFileURL(input + "/"));
+      urls.push(url.pathToFileURL(input));
     }
   }
   if (urls.length === 0) {
