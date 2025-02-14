@@ -106,11 +106,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
       continue;
     }
     if (/(node|data|http|https|file):/.test(input)) {
-      try {
-        urls.push(new URL(input));
-      } catch {
-        // invalid url
-      }
+      urls.push(new URL(input));
       continue;
     }
     try {
