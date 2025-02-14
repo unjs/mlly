@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import url from "node:url";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
@@ -118,5 +119,36 @@ describe("tryModuleResolve", async () => {
     expect(
       mockedResolve.mock.calls.some((call) => call[0].includes("//")),
     ).toBe(false);
+  });
+
+  describe("normalized parent urls", () => {
+    const cannotResolveError = (id: string, urls: (string | URL)[]) =>
+      Object.assign(
+        new Error(
+          `Cannot resolve module "${id}".\nImported from:\n${urls.map((u) => ` - ${u}`).join("\n")}`,
+        ),
+        { code: "ERR_MODULE_NOT_FOUND" },
+      );
+
+    const cases = [
+      // empty (~> cwd)
+      [[undefined, false] as unknown, [url.pathToFileURL("./")]],
+      // file://
+      ["file:///project/index.js", ["file:///project/index.js"]],
+      ["file:///project/", ["file:///project/"]],
+      ["file:///project", ["file:///project"]],
+      // path
+      [__filename, [url.pathToFileURL(__filename)]],
+      [__dirname, [url.pathToFileURL(__dirname) + "/"]],
+      ["/non/existent", ["file:///non/existent/", "file:///non/existent"]],
+    ] as Array<[string | string[], string[]]>;
+
+    for (const [input, expected] of cases) {
+      it(JSON.stringify(input), () => {
+        expect(() => resolvePathSync("xyz", { url: input })).toThrow(
+          cannotResolveError("xyz", expected),
+        );
+      });
+    }
   });
 });

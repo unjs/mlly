@@ -91,40 +91,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     : DEFAULT_CONDITIONS_SET;
 
   // Search paths
-  const urls: URL[] = [];
-  for (const input of Array.isArray(options.url)
-    ? options.url
-    : [options.url]) {
-    if (!input) {
-      continue;
-    }
-    if (input instanceof URL) {
-      urls.push(input);
-      continue;
-    }
-    if (typeof input !== "string") {
-      continue;
-    }
-    if (/^(?:node|data|http|https|file):/.test(input)) {
-      urls.push(new URL(input));
-      continue;
-    }
-    try {
-      if (input.endsWith("/") || statSync(input).isDirectory()) {
-        urls.push(url.pathToFileURL(input + "/"));
-      } else {
-        urls.push(url.pathToFileURL(input));
-      }
-    } catch {
-      // We can't know, so assume it is dir or file
-      urls.push(url.pathToFileURL(input + "/"));
-      urls.push(url.pathToFileURL(input));
-    }
-  }
-  if (urls.length === 0) {
-    urls.push(url.pathToFileURL("./"));
-  }
-
+  const urls: URL[] = _normalizeResolveParents(options.url);
   let resolved: URL | undefined;
   for (const url of urls) {
     // Try simple resolve
@@ -156,7 +123,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   // Throw error if not found
   if (!resolved) {
     const error = new Error(
-      `Cannot find module ${id} imported from ${urls.join(", ")}`,
+      `Cannot resolve module "${id}".\nImported from:\n${urls.map((u) => ` - ${u}`).join("\n")}`,
     );
     // @ts-ignore
     error.code = "ERR_MODULE_NOT_FOUND";
@@ -286,6 +253,39 @@ export async function lookupNodeModuleSubpath(
 }
 
 // --- Internal ---
+
+function _normalizeResolveParents(inputs: unknown): URL[] {
+  const urls = (Array.isArray(inputs) ? inputs : [inputs]).flatMap((input) =>
+    _normalizeResolveParent(input),
+  );
+  if (urls.length === 0) {
+    return [url.pathToFileURL("./")];
+  }
+  return urls;
+}
+
+function _normalizeResolveParent(input: unknown): URL | URL[] {
+  if (!input) {
+    return [];
+  }
+  if (input instanceof URL) {
+    return [input];
+  }
+  if (typeof input !== "string") {
+    return [];
+  }
+  if (/^(?:node|data|http|https|file):/.test(input)) {
+    return new URL(input);
+  }
+  try {
+    if (input.endsWith("/") || statSync(input).isDirectory()) {
+      return url.pathToFileURL(input + "/");
+    }
+    return url.pathToFileURL(input);
+  } catch {
+    return [url.pathToFileURL(input + "/"), url.pathToFileURL(input)];
+  }
+}
 
 function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
   if (typeof exports === "string") {
