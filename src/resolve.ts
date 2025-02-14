@@ -1,6 +1,5 @@
 import { statSync } from "node:fs";
 import url from "node:url";
-import path from "node:path";
 import { joinURL } from "ufo";
 import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
@@ -99,11 +98,11 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     }
     if (typeof input === "string") {
       if (input.startsWith("file://")) {
-        input = new URL(input)
+        input = new URL(input);
       } else {
         try {
           if (statSync(input).isDirectory()) {
-            urls.push(new URL("_index.js", url.pathToFileURL(input + "/")))
+            urls.push(new URL("_index.js", url.pathToFileURL(input + "/")));
           } else {
             urls.push(url.pathToFileURL(input));
           }
@@ -112,7 +111,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
           urls.push(new URL("_index.js", url.pathToFileURL(input + "/")));
           urls.push(url.pathToFileURL(input));
         }
-        continue
+        continue;
       }
     }
     if (!(input instanceof URL)) {
@@ -125,9 +124,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     }
   }
   if (urls.length === 0) {
-    urls.push(
-      new URL("_index.js", url.pathToFileURL("./")),
-    );
+    urls.push(new URL("_index.js", url.pathToFileURL("./")));
   }
 
   let resolved: URL | undefined;
