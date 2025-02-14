@@ -101,7 +101,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
         input = new URL(input);
       } else {
         try {
-          if (input.endsWith('/') || statSync(input).isDirectory()) {
+          if (input.endsWith("/") || statSync(input).isDirectory()) {
             urls.push(new URL("_index.js", url.pathToFileURL(input + "/")));
           } else {
             urls.push(url.pathToFileURL(input));
