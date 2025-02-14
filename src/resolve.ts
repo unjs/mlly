@@ -1,9 +1,11 @@
 import { statSync } from "node:fs";
+import url from "node:url";
+import path from "node:path";
 import { joinURL } from "ufo";
 import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
 import { PackageJson, readPackageJSON } from "pkg-types";
-import { fileURLToPath, pathToFileURL, normalizeid } from "./utils";
+import { fileURLToPath, pathToFileURL } from "./utils";
 import { BUILTIN_MODULES } from "./_utils";
 
 const DEFAULT_CONDITIONS_SET = new Set(["node", "import"]);
@@ -90,25 +92,27 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     : DEFAULT_CONDITIONS_SET;
 
   // Search paths
-  const _urls: URL[] = (
-    (Array.isArray(options.url) ? options.url : [options.url]) as URL[]
-  )
-    .filter(Boolean)
-    .map((url) => new URL(normalizeid(url.toString())));
-  if (_urls.length === 0) {
-    _urls.push(new URL(pathToFileURL(process.cwd())));
-  }
-  const urls = [..._urls];
-  for (const url of _urls) {
-    if (url.protocol === "file:") {
-      urls.push(
-        new URL("./", url),
-        // If url is directory
-        new URL(joinURL(url.pathname, "_index.js"), url),
-        // TODO: Remove in next major version?
-        new URL("node_modules", url),
-      );
+  const urls: URL[] = []
+  for (let input of Array.isArray(options.url) ? options.url : [options.url]) {
+    if (!input) {
+      continue
     }
+    if (typeof input === "string") {
+      input = input.startsWith("file://") ? new URL(input) : new URL(url.pathToFileURL(input));
+    }
+    if (!(input instanceof URL)) {
+      continue // warn?
+    }
+    if (input.pathname.endsWith('/')) {
+      urls.push(new URL("_index.js", input))
+    } else {
+      urls.push(input);
+      // If user wrongly passing dir as url...
+      urls.push(new URL('_index.js', input + '/'));
+    }
+  }
+  if (urls.length === 0) {
+    urls.push(new URL("_index.js", url.pathToFileURL(path.join(process.cwd(), '/'))));
   }
 
   let resolved: URL | undefined;
