@@ -92,27 +92,31 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     : DEFAULT_CONDITIONS_SET;
 
   // Search paths
-  const urls: URL[] = []
+  const urls: URL[] = [];
   for (let input of Array.isArray(options.url) ? options.url : [options.url]) {
     if (!input) {
-      continue
+      continue;
     }
     if (typeof input === "string") {
-      input = input.startsWith("file://") ? new URL(input) : new URL(url.pathToFileURL(input));
+      input = input.startsWith("file://")
+        ? new URL(input)
+        : new URL(url.pathToFileURL(input));
     }
     if (!(input instanceof URL)) {
-      continue // warn?
+      continue; // warn?
     }
-    if (input.pathname.endsWith('/')) {
-      urls.push(new URL("_index.js", input))
+    if (input.pathname.endsWith("/")) {
+      urls.push(new URL("_index.js", input));
     } else {
       urls.push(input);
       // If user wrongly passing dir as url...
-      urls.push(new URL('_index.js', input + '/'));
+      urls.push(new URL("_index.js", input + "/"));
     }
   }
   if (urls.length === 0) {
-    urls.push(new URL("_index.js", url.pathToFileURL(path.join(process.cwd(), '/'))));
+    urls.push(
+      new URL("_index.js", url.pathToFileURL(path.join(process.cwd(), "/"))),
+    );
   }
 
   let resolved: URL | undefined;
