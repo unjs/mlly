@@ -98,9 +98,22 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
       continue;
     }
     if (typeof input === "string") {
-      input = input.startsWith("file://")
-        ? new URL(input)
-        : new URL(url.pathToFileURL(input));
+      if (input.startsWith("file://")) {
+        input = new URL(input)
+      } else {
+        try {
+          if (statSync(input).isDirectory()) {
+            urls.push(new URL("_index.js", url.pathToFileURL(input + "/")))
+          } else {
+            urls.push(url.pathToFileURL(input));
+          }
+        } catch {
+          // We can't know, so assume it is dir or file
+          urls.push(new URL("_index.js", url.pathToFileURL(input + "/")));
+          urls.push(url.pathToFileURL(input));
+        }
+        continue
+      }
     }
     if (!(input instanceof URL)) {
       continue; // warn?
@@ -109,13 +122,11 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
       urls.push(new URL("_index.js", input));
     } else {
       urls.push(input);
-      // If user wrongly passing dir as url...
-      urls.push(new URL("_index.js", input + "/"));
     }
   }
   if (urls.length === 0) {
     urls.push(
-      new URL("_index.js", url.pathToFileURL(path.join(process.cwd(), "/"))),
+      new URL("_index.js", url.pathToFileURL("./")),
     );
   }
 
