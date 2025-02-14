@@ -4,6 +4,8 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
 
+const isWindows = process.platform === "win32";
+
 const tests = [
   // Resolve to path
   { input: "ufo", action: "resolves" },
@@ -120,35 +122,40 @@ describe("tryModuleResolve", async () => {
       mockedResolve.mock.calls.some((call) => call[0].includes("//")),
     ).toBe(false);
   });
+});
 
-  describe("normalized parent urls", () => {
-    const cannotResolveError = (id: string, urls: (string | URL)[]) =>
-      Object.assign(
-        new Error(
-          `Cannot resolve module "${id}".\nImported from:\n${urls.map((u) => ` - ${u}`).join("\n")}`,
-        ),
-        { code: "ERR_MODULE_NOT_FOUND" },
+describe("normalized parent urls", () => {
+  const cannotResolveError = (id: string, urls: (string | URL)[]) =>
+    Object.assign(
+      new Error(
+        `Cannot resolve module "${id}".\nImported from:\n${urls.map((u) => ` - ${u}`).join("\n")}`,
+      ),
+      { code: "ERR_MODULE_NOT_FOUND" },
+    );
+
+  const cases = [
+    // empty (~> cwd)
+    [[undefined, false] as unknown, [url.pathToFileURL("./")]],
+    // file://
+    ["file:///project/index.js", ["file:///project/index.js"]],
+    ["file:///project/", ["file:///project/"]],
+    ["file:///project", ["file:///project"]],
+    // path
+    [__filename, [url.pathToFileURL(__filename)]],
+    [__dirname, [url.pathToFileURL(__dirname) + "/"]],
+    isWindows
+      ? [
+          String.raw`C:\non\existent`,
+          ["file:///C:/non/existent/", "file:///C:/non/existent"],
+        ]
+      : ["/non/existent", ["file:///non/existent/", "file:///non/existent"]],
+  ] as Array<[string | string[], string[]]>;
+
+  for (const [input, expected] of cases) {
+    it(JSON.stringify(input), () => {
+      expect(() => resolvePathSync("xyz", { url: input })).toThrow(
+        cannotResolveError("xyz", expected),
       );
-
-    const cases = [
-      // empty (~> cwd)
-      [[undefined, false] as unknown, [url.pathToFileURL("./")]],
-      // file://
-      ["file:///project/index.js", ["file:///project/index.js"]],
-      ["file:///project/", ["file:///project/"]],
-      ["file:///project", ["file:///project"]],
-      // path
-      [__filename, [url.pathToFileURL(__filename)]],
-      [__dirname, [url.pathToFileURL(__dirname) + "/"]],
-      ["/non/existent", ["file:///non/existent/", "file:///non/existent"]],
-    ] as Array<[string | string[], string[]]>;
-
-    for (const [input, expected] of cases) {
-      it(JSON.stringify(input), () => {
-        expect(() => resolvePathSync("xyz", { url: input })).toThrow(
-          cannotResolveError("xyz", expected),
-        );
-      });
-    }
-  });
+    });
+  }
 });
