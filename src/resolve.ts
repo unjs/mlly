@@ -92,39 +92,39 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
 
   // Search paths
   const urls: URL[] = [];
-  for (let input of Array.isArray(options.url) ? options.url : [options.url]) {
+  for (const input of Array.isArray(options.url)
+    ? options.url
+    : [options.url]) {
     if (!input) {
       continue;
     }
-    if (typeof input === "string") {
-      if (input.startsWith("file://")) {
-        input = new URL(input);
-      } else {
-        try {
-          if (input.endsWith("/") || statSync(input).isDirectory()) {
-            urls.push(new URL("_index.js", url.pathToFileURL(input + "/")));
-          } else {
-            urls.push(url.pathToFileURL(input));
-          }
-        } catch {
-          // We can't know, so assume it is dir or file
-          urls.push(new URL("_index.js", url.pathToFileURL(input + "/")));
+    if (input instanceof URL) {
+      urls.push(input);
+      continue;
+    }
+    if (typeof input !== "string") {
+      continue;
+    }
+    try {
+      urls.push(new URL(input));
+      continue;
+    } catch {
+      try {
+        if (input.endsWith("/") || statSync(input).isDirectory()) {
+          urls.push(url.pathToFileURL(input + "/"));
+        } else {
           urls.push(url.pathToFileURL(input));
         }
-        continue;
+      } catch {
+        // We can't know, so assume it is dir or file
+        urls.push(url.pathToFileURL(input + "/"));
+        urls.push(url.pathToFileURL(input));
       }
-    }
-    if (!(input instanceof URL)) {
-      continue; // warn?
-    }
-    if (input.pathname.endsWith("/")) {
-      urls.push(new URL("_index.js", input));
-    } else {
-      urls.push(input);
+      continue;
     }
   }
   if (urls.length === 0) {
-    urls.push(new URL("_index.js", url.pathToFileURL("./")));
+    urls.push(url.pathToFileURL("./"));
   }
 
   let resolved: URL | undefined;
