@@ -4,8 +4,6 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
 
-const isWindows = process.platform === "win32";
-
 const tests = [
   // Resolve to path
   { input: "ufo", action: "resolves" },
@@ -133,25 +131,32 @@ describe("normalized parent urls", () => {
       { code: "ERR_MODULE_NOT_FOUND" },
     );
 
-  const cases = [
-    // empty (~> cwd)
+  const commonCases = [
     [[undefined, false] as unknown, [url.pathToFileURL("./")]],
-    // file://
+    [__filename, [url.pathToFileURL(__filename)]],
+    [__dirname, [url.pathToFileURL(__dirname) + "/"]],
+  ];
+
+  const posixCases = [
     ["file:///project/index.js", ["file:///project/index.js"]],
     ["file:///project/", ["file:///project/"]],
     ["file:///project", ["file:///project"]],
-    // path
-    [__filename, [url.pathToFileURL(__filename)]],
-    [__dirname, [url.pathToFileURL(__dirname) + "/"]],
-    isWindows
-      ? [
-          String.raw`C:\non\existent`,
-          ["file:///C:/non/existent/", "file:///C:/non/existent"],
-        ]
-      : ["/non/existent", ["file:///non/existent/", "file:///non/existent"]],
+    ["/non/existent", ["file:///non/existent/", "file:///non/existent"]],
+  ];
+
+  const windowsCases = [
+    [
+      String.raw`C:\non\existent`,
+      ["file:///C:/non/existent/", "file:///C:/non/existent"],
+    ],
+  ];
+
+  const testCases = [
+    ...commonCases,
+    ...(process.platform === "win32" ? windowsCases : posixCases),
   ] as Array<[string | string[], string[]]>;
 
-  for (const [input, expected] of cases) {
+  for (const [input, expected] of testCases) {
     it(JSON.stringify(input), () => {
       expect(() => resolvePathSync("xyz", { url: input })).toThrow(
         cannotResolveError("xyz", expected),
