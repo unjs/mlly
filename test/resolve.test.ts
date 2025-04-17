@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
+import { resolve as nodeResolve } from "node:path";
 
 const tests = [
   // Resolve to path
@@ -47,6 +48,13 @@ describe("resolveSync", () => {
       url: import.meta.url,
     });
     expect(fileURLToPath(resolved2)).match(/fixture\/test.txt$/);
+
+    const absolutePath = nodeResolve(
+      process.cwd(),
+      "./test/fixture/hello.link.mjs",
+    );
+    const resolved3 = resolveSync(absolutePath);
+    expect(fileURLToPath(resolved3)).match(/fixture\/hello\.mjs$/);
   });
 
   it("resolves node built-ints", () => {

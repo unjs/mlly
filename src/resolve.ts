@@ -1,4 +1,4 @@
-import { statSync } from "node:fs";
+import { realpathSync, statSync } from "node:fs";
 import { joinURL } from "ufo";
 import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
@@ -73,6 +73,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   // Skip resolve for absolute paths (fast path)
   if (isAbsolute(id)) {
     try {
+      id = realpathSync(id);
       const stat = statSync(id);
       if (stat.isFile()) {
         return pathToFileURL(id);
