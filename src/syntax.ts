@@ -5,10 +5,10 @@ import { ResolveOptions, resolvePath } from "./resolve";
 import { isNodeBuiltin, getProtocol } from "./utils";
 
 const ESM_RE =
-  /([\s;]|^)(import[\s\w*,{}]*from|import\s*["'*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m;
+  /(?:[\s;]|^)(?:import[\s\w*,{}]*from|import\s*["'*{]|export\b\s*(?:[*{]|default|class|type|function|const|var|let|async function)|import\.meta\b)/m;
 
 const CJS_RE =
-  /([\s;]|^)(module.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
+  /(?:[\s;]|^)(?:module\.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 
 const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
 
@@ -150,7 +150,7 @@ export async function isValidNodeImport(
     return true;
   }
 
-  if (/\.(\w+-)?esm?(-\w+)?\.js$|\/(esm?)\//.test(resolvedPath)) {
+  if (/\.(?:\w+-)?esm?(?:-\w+)?\.js$|\/esm?\//.test(resolvedPath)) {
     return false;
   }
 
