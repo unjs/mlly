@@ -1,9 +1,10 @@
 import { statSync } from "node:fs";
+import url from "node:url";
 import { joinURL } from "ufo";
 import { isAbsolute, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
 import { PackageJson, readPackageJSON } from "pkg-types";
-import { fileURLToPath, pathToFileURL, normalizeid } from "./utils";
+import { fileURLToPath, pathToFileURL } from "./utils";
 import { BUILTIN_MODULES } from "./_utils";
 
 const DEFAULT_CONDITIONS_SET = new Set(["node", "import"]);
@@ -90,27 +91,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     : DEFAULT_CONDITIONS_SET;
 
   // Search paths
-  const _urls: URL[] = (
-    (Array.isArray(options.url) ? options.url : [options.url]) as URL[]
-  )
-    .filter(Boolean)
-    .map((url) => new URL(normalizeid(url.toString())));
-  if (_urls.length === 0) {
-    _urls.push(new URL(pathToFileURL(process.cwd())));
-  }
-  const urls = [..._urls];
-  for (const url of _urls) {
-    if (url.protocol === "file:") {
-      urls.push(
-        new URL("./", url),
-        // If url is directory
-        new URL(joinURL(url.pathname, "_index.js"), url),
-        // TODO: Remove in next major version?
-        new URL("node_modules", url),
-      );
-    }
-  }
-
+  const urls: URL[] = _normalizeResolveParents(options.url);
   let resolved: URL | undefined;
   for (const url of urls) {
     // Try simple resolve
@@ -142,7 +123,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   // Throw error if not found
   if (!resolved) {
     const error = new Error(
-      `Cannot find module ${id} imported from ${urls.join(", ")}`,
+      `Cannot resolve module "${id}".\nImported from:\n${urls.map((u) => ` - ${u}`).join("\n")}`,
     );
     // @ts-ignore
     error.code = "ERR_MODULE_NOT_FOUND";
@@ -272,6 +253,39 @@ export async function lookupNodeModuleSubpath(
 }
 
 // --- Internal ---
+
+function _normalizeResolveParents(inputs: unknown): URL[] {
+  const urls = (Array.isArray(inputs) ? inputs : [inputs]).flatMap((input) =>
+    _normalizeResolveParent(input),
+  );
+  if (urls.length === 0) {
+    return [url.pathToFileURL("./")];
+  }
+  return urls;
+}
+
+function _normalizeResolveParent(input: unknown): URL | URL[] {
+  if (!input) {
+    return [];
+  }
+  if (input instanceof URL) {
+    return [input];
+  }
+  if (typeof input !== "string") {
+    return [];
+  }
+  if (/^(?:node|data|http|https|file):/.test(input)) {
+    return new URL(input);
+  }
+  try {
+    if (input.endsWith("/") || statSync(input).isDirectory()) {
+      return url.pathToFileURL(input + "/");
+    }
+    return url.pathToFileURL(input);
+  } catch {
+    return [url.pathToFileURL(input + "/"), url.pathToFileURL(input)];
+  }
+}
 
 function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
   if (typeof exports === "string") {
