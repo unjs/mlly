@@ -56,7 +56,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   }
 
   // Skip if already has a protocol
-  if (/(node|data|http|https):/.test(id)) {
+  if (/(?:node|data|http|https):/.test(id)) {
     return id;
   }
 

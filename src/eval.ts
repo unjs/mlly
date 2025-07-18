@@ -14,7 +14,7 @@ export interface EvaluateOptions extends ResolveOptions {
 }
 
 const EVAL_ESM_IMPORT_RE =
-  /(?<=import .* from ["'])([^"']+)(?=["'])|(?<=export .* from ["'])([^"']+)(?=["'])|(?<=import\s*["'])([^"']+)(?=["'])|(?<=import\s*\(["'])([^"']+)(?=["']\))/g;
+  /(?<=import .* from ["'])[^"']+(?=["'])|(?<=export .* from ["'])[^"']+(?=["'])|(?<=import\s*["'])[^"']+(?=["'])|(?<=import\s*\(["'])[^"']+(?=["']\))/g;
 
 /**
  * Loads a module by resolving its identifier to a URL, fetching the module's code and evaluating it.
@@ -109,7 +109,7 @@ export async function resolveImports(
   );
 
   const re = new RegExp(
-    uniqueImports.map((index) => `(${index})`).join("|"),
+    uniqueImports.map((index) => `(?:${index})`).join("|"),
     "g",
   );
   return code.replace(re, (id) => resolved.get(id));

@@ -71,7 +71,7 @@ export function normalizeid(id: string): string {
     // @ts-ignore
     id = id.toString();
   }
-  if (/(node|data|http|https|file):/.test(id)) {
+  if (/(?:node|data|http|https|file):/.test(id)) {
     return id;
   }
   if (BUILTIN_MODULES.has(id)) {
@@ -110,7 +110,7 @@ export function toDataURL(code: string): string {
  */
 export function isNodeBuiltin(id = "") {
   // node:fs/promises => fs
-  id = id.replace(/^node:/, "").split("/")[0];
+  id = id.replace(/^node:/, "").split("/", 1)[0];
   return BUILTIN_MODULES.has(id);
 }
 
