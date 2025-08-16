@@ -400,7 +400,7 @@ export function findExports(code: string): ESMExport[] {
   for (const declaredExport of declaredExports) {
     // function declarations don't have extra names
     if (/^export\s+(?:async\s+)?function/.test(declaredExport.code)) {
-      continue
+      continue;
     }
     const extraNamesStr = (declaredExport as any).extraNames as
       | string
