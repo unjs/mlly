@@ -246,6 +246,38 @@ export { type AType, type B as BType, foo } from 'foo'
     expect(matches[0].names[0]).toEqual("foo");
     expect(matches[0].name).toEqual("foo");
   });
+
+  it("export default class", () => {
+    const code = `export default class Foo`;
+    const matches = findExports(code);
+    expect(matches).toMatchInlineSnapshot(`
+      [
+        {
+          "code": "export default class",
+          "defaultName": undefined,
+          "end": 20,
+          "name": "default",
+          "names": [
+            "default",
+          ],
+          "start": 0,
+          "type": "default",
+        },
+        {
+          "code": "export default class Foo",
+          "declaration": "class",
+          "declarationType": "class",
+          "end": 24,
+          "name": "Foo",
+          "names": [
+            "Foo",
+          ],
+          "start": 0,
+          "type": "declaration",
+        },
+      ]
+    `);
+  });
 });
 
 describe("findExportNames", () => {
