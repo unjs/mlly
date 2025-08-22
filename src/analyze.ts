@@ -398,6 +398,10 @@ export function findExports(code: string): ESMExport[] {
   });
   // Parse extra names (foo, bar)
   for (const declaredExport of declaredExports) {
+    // function declarations don't have extra names
+    if (/^export\s+(?:async\s+)?function/.test(declaredExport.code)) {
+      continue;
+    }
     const extraNamesStr = (declaredExport as any).extraNames as
       | string
       | undefined;
