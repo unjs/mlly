@@ -98,6 +98,14 @@ describe("findExports", () => {
       type: "declaration",
       names: ["foo", "baz"],
     },
+    "export function foo(a, b, c)": {
+      type: "declaration",
+      names: ["foo"],
+    },
+    "export async function foo(a, b, c)": {
+      type: "declaration",
+      names: ["foo"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
