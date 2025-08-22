@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.7.4...v1.8.0)
+
+### 🚀 Enhancements
+
+- Support export default class in declaration exports ([#320](https://github.com/unjs/mlly/pull/320))
+
+### 🔥 Performance
+
+- Improve regexp performance with non-capturing groups ([#314](https://github.com/unjs/mlly/pull/314))
+
+### 🩹 Fixes
+
+- **findExports:** Exclude parameter names from function declaration export names ([#319](https://github.com/unjs/mlly/pull/319))
+
+### 🏡 Chore
+
+- Update deps ([cdf60ab](https://github.com/unjs/mlly/commit/cdf60ab))
+- Update ci ([6bf5ad4](https://github.com/unjs/mlly/commit/6bf5ad4))
+- Update lockfile ([a3278d7](https://github.com/unjs/mlly/commit/a3278d7))
+
+### ❤️ Contributors
+
+- IlyaL ([@ilyaliao](https://github.com/ilyaliao))
+- 山吹色御守 ([@KazariEX](https://github.com/KazariEX))
+- Octavio Araiza ([@8ctavio](https://github.com/8ctavio))
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v1.7.4
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.7.3...v1.7.4)
