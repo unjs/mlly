@@ -1,6 +1,6 @@
 import { join } from "pathe";
 import { describe, it, expect } from "vitest";
-import { detectSyntax, isValidNodeImport } from "../src";
+import { detectSyntax, isValidNodeImport, stripComments } from "../src";
 
 const staticTests = {
   // ESM
@@ -92,6 +92,21 @@ const staticTests = {
 const staticTestsWithComments = {
   '// They\'re exposed using "export import" so that types are passed along as expected\nmodule.exports={};':
     { hasESM: false, hasCJS: true, isMixed: false },
+  "/* export * */": { hasESM: false, hasCJS: false, isMixed: false },
+  "/* \n export * \n */": { hasESM: false, hasCJS: false, isMixed: false },
+  "/* \n export * \n */ export * from 'foo' /* \n export * \n */": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+};
+
+const commentStrippingTests = {
+  '// They\'re exposed using "export import" so that types are passed along as expected\nmodule.exports={};':
+    "\nmodule.exports={};",
+  "/* export * */": "",
+  "/* \n export * \n */": "",
+  "/* \n export * \n */ export * from 'foo' /* \n export * \n */": ` export * from 'foo' `,
 };
 
 describe("detectSyntax", () => {
@@ -108,6 +123,14 @@ describe("detectSyntax (with comment)", () => {
       expect(detectSyntax(input, { stripComments: true })).to.deep.equal(
         result,
       );
+    });
+  }
+});
+
+describe("stripComments", () => {
+  for (const [input, result] of Object.entries(commentStrippingTests)) {
+    it(input, () => {
+      expect(stripComments(input)).to.deep.equal(result);
     });
   }
 });
