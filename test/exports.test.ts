@@ -253,9 +253,9 @@ export { type AType, type B as BType, foo } from 'foo'
     expect(matches).toMatchInlineSnapshot(`
       [
         {
-          "code": "export default class",
-          "defaultName": undefined,
-          "end": 20,
+          "code": "export default class Foo",
+          "defaultName": "Foo",
+          "end": 24,
           "name": "default",
           "names": [
             "default",
