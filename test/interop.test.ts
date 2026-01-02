@@ -17,8 +17,8 @@ const tests = [
     { named: 1, x: 2 },
   ],
   [
-    { default: null, x: 1 }, // eslint-disable-line unicorn/no-null
-    { default: null, x: 1 }, // eslint-disable-line unicorn/no-null
+    { default: null, x: 1 },
+    { default: null, x: 1 },
   ],
   [
     { default: undefined, x: 1 },

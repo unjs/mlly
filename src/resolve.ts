@@ -298,7 +298,7 @@ function _flattenExports(
       ? [key.slice(1), undefined]
       : ["", key];
     const _subPath = joinURL(parentSubpath, subpath);
-    // eslint-disable-next-line unicorn/prefer-ternary
+
     if (typeof value === "string") {
       return [{ subpath: _subPath, fsPath: value, condition }];
     } else {
