@@ -388,17 +388,19 @@ export function parseTypeImport(
 
 /**
  * Extracts extra variable names from a comma-separated declaration list,
- * ignoring commas nested inside parentheses, brackets, braces, or strings.
+ * ignoring commas nested inside parentheses, brackets, braces, generics, or strings.
  *
  * For `export const foo = fn('a', bar), baz = 2`, only `baz` should be
- * extracted — commas inside `fn(...)` are not declaration separators.
+ * extracted — commas inside `fn(...)` or `Handler<A, B>` are not declaration separators.
  * @param {string} extraNamesStr - The string containing the extra variable declarations to parse.
  * @returns {string[]} An array of variable names extracted from the declaration list.
  */
 function _extractExtraNames(extraNamesStr: string): string[] {
   const names: string[] = [];
   let depth = 0;
+  let angleDepth = 0;
   let inString: string | false = false;
+  let inTypeAnnotation = false;
 
   for (let i = 0; i < extraNamesStr.length; i++) {
     const char = extraNamesStr[i];
@@ -421,6 +423,23 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       continue;
     }
 
+    // Track type annotations (between `:` and `=` at depth 0) for generic angle brackets
+    if (char === ":" && depth === 0 && angleDepth === 0) {
+      inTypeAnnotation = true;
+      continue;
+    }
+    if (char === "=" && depth === 0 && angleDepth === 0) {
+      inTypeAnnotation = false;
+    }
+    if (inTypeAnnotation && char === "<") {
+      angleDepth++;
+      continue;
+    }
+    if (inTypeAnnotation && char === ">" && angleDepth > 0) {
+      angleDepth--;
+      continue;
+    }
+
     // Track bracket nesting
     if (char === "(" || char === "[" || char === "{") {
       depth++;
@@ -428,8 +447,8 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       depth--;
     }
 
-    // A comma at depth 0 is a real declaration separator
-    if (char === "," && depth === 0) {
+    // A comma at depth 0 (outside generics) is a real declaration separator
+    if (char === "," && depth === 0 && angleDepth === 0) {
       // Extract the identifier that follows this comma
       const rest = extraNamesStr.slice(i + 1);
       const match = rest.match(/^\s*([\w$]+)/);

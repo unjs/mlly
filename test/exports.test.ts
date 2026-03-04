@@ -126,6 +126,20 @@ describe("findExports", () => {
       type: "declaration",
       names: ["a", "b"],
     },
+    "export const foo: Handler<string, number> = function foo(){}": {
+      type: "declaration",
+      name: "foo",
+      names: ["foo"],
+    },
+    "export const foo: Map<string, Handler<number, boolean>> = {}": {
+      type: "declaration",
+      name: "foo",
+      names: ["foo"],
+    },
+    "export const foo: Handler<string, number> = () => {}, bar = 1": {
+      type: "declaration",
+      names: ["foo", "bar"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
