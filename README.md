@@ -443,7 +443,7 @@ console.log(pathToFileURL("C:\\path"));
 Ensures id has either of `node:`, `data:`, `http:`, `https:` or `file:` protocols.
 
 ```js
-import { ensureProtocol } from "mlly";
+import { normalizeid } from "mlly";
 
 // file:///foo/bar.js
 console.log(normalizeid("/foo/bar.js"));
