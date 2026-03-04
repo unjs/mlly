@@ -387,6 +387,56 @@ export function parseTypeImport(
 }
 
 /**
+ * Extracts extra variable names from a comma-separated declaration list,
+ * ignoring commas nested inside parentheses, brackets, braces, or strings.
+ *
+ * For `export const foo = fn('a', bar), baz = 2`, only `baz` should be
+ * extracted — commas inside `fn(...)` are not declaration separators.
+ * @param {string} extraNamesStr - The string containing the extra variable declarations to parse.
+ * @returns {string[]} An array of variable names extracted from the declaration list.
+ */
+function _extractExtraNames(extraNamesStr: string): string[] {
+  const names: string[] = [];
+  let depth = 0;
+  let inString: string | false = false;
+
+  for (let i = 0; i < extraNamesStr.length; i++) {
+    const char = extraNamesStr[i];
+
+    // Handle string literals — skip their contents entirely
+    if (inString) {
+      if (char === inString && extraNamesStr[i - 1] !== "\\") {
+        inString = false;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      inString = char;
+      continue;
+    }
+
+    // Track bracket nesting
+    if (char === "(" || char === "[" || char === "{") {
+      depth++;
+    } else if (char === ")" || char === "]" || char === "}") {
+      depth--;
+    }
+
+    // A comma at depth 0 is a real declaration separator
+    if (char === "," && depth === 0) {
+      // Extract the identifier that follows this comma
+      const rest = extraNamesStr.slice(i + 1);
+      const match = rest.match(/^\s*([\w$]+)/);
+      if (match) {
+        names.push(match[1]);
+      }
+    }
+  }
+
+  return names;
+}
+
+/**
  * Identifies all export statements in the supplied source code and categorises them into different types such as declarations, named, default and star exports.
  * This function processes the code to capture different forms of export statements and normalise their representation for further processing.
  *
@@ -408,14 +458,10 @@ export function findExports(code: string): ESMExport[] {
       | string
       | undefined;
     if (extraNamesStr) {
-      const extraNames = matchAll(
-        /({.*?})|(\[.*?])|(,\s*(?<name>\w+))/g,
-        extraNamesStr,
-        {},
-      )
-        .map((m) => m.name)
-        .filter(Boolean);
-      declaredExport.names = [declaredExport.name, ...extraNames];
+      const extraNames = _extractExtraNames(extraNamesStr);
+      if (extraNames.length > 0) {
+        declaredExport.names = [declaredExport.name, ...extraNames];
+      }
     }
     delete (declaredExport as any).extraNames;
   }

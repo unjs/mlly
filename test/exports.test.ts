@@ -106,6 +106,22 @@ describe("findExports", () => {
       type: "declaration",
       names: ["foo"],
     },
+    "export const useSleep = () => useAsyncData('sleep', async () => { return null })":
+      {
+        type: "declaration",
+        name: "useSleep",
+        names: ["useSleep"],
+      },
+    "export const handler = async (req, res) => { }": {
+      type: "declaration",
+      name: "handler",
+      names: ["handler"],
+    },
+    "export const middleware = (cb) => async () => { }": {
+      type: "declaration",
+      name: "middleware",
+      names: ["middleware"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
