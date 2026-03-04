@@ -405,8 +405,14 @@ function _extractExtraNames(extraNamesStr: string): string[] {
 
     // Handle string literals — skip their contents entirely
     if (inString) {
-      if (char === inString && extraNamesStr[i - 1] !== "\\") {
-        inString = false;
+      if (char === inString) {
+        let backslashCount = 0;
+        for (let j = i - 1; j >= 0 && extraNamesStr[j] === "\\"; j--) {
+          backslashCount++;
+        }
+        if (backslashCount % 2 === 0) {
+          inString = false;
+        }
       }
       continue;
     }

@@ -122,6 +122,10 @@ describe("findExports", () => {
       name: "middleware",
       names: ["middleware"],
     },
+    'export const a = "x\\\\\\\\", b = 1': {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
