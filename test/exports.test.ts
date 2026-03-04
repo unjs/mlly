@@ -106,6 +106,45 @@ describe("findExports", () => {
       type: "declaration",
       names: ["foo"],
     },
+    "export const useSleep = () => useAsyncData('sleep', async () => { return null })":
+      {
+        type: "declaration",
+        name: "useSleep",
+        names: ["useSleep"],
+      },
+    "export const handler = async (req, res) => { }": {
+      type: "declaration",
+      name: "handler",
+      names: ["handler"],
+    },
+    "export const middleware = (cb) => async () => { }": {
+      type: "declaration",
+      name: "middleware",
+      names: ["middleware"],
+    },
+    'export const a = "x\\\\\\\\", b = 1': {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const foo: Handler<string, number> = function foo(){}": {
+      type: "declaration",
+      name: "foo",
+      names: ["foo"],
+    },
+    "export const foo: Map<string, Handler<number, boolean>> = {}": {
+      type: "declaration",
+      name: "foo",
+      names: ["foo"],
+    },
+    "export const foo: Handler<string, number> = () => {}, bar = 1": {
+      type: "declaration",
+      names: ["foo", "bar"],
+    },
+    "export const foo: (x: string) => Handler<string, number> = () => null": {
+      type: "declaration",
+      name: "foo",
+      names: ["foo"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {

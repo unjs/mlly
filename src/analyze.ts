@@ -387,6 +387,86 @@ export function parseTypeImport(
 }
 
 /**
+ * Extracts extra variable names from a comma-separated declaration list,
+ * ignoring commas nested inside parentheses, brackets, braces, generics, or strings.
+ *
+ * For `export const foo = fn('a', bar), baz = 2`, only `baz` should be
+ * extracted — commas inside `fn(...)` or `Handler<A, B>` are not declaration separators.
+ * @param {string} extraNamesStr - The string containing the extra variable declarations to parse.
+ * @returns {string[]} An array of variable names extracted from the declaration list.
+ */
+function _extractExtraNames(extraNamesStr: string): string[] {
+  const names: string[] = [];
+  let depth = 0;
+  let angleDepth = 0;
+  let inString: string | false = false;
+  let inTypeAnnotation = false;
+
+  for (let i = 0; i < extraNamesStr.length; i++) {
+    const char = extraNamesStr[i];
+
+    // Handle string literals — skip their contents entirely
+    if (inString) {
+      if (char === inString) {
+        let backslashCount = 0;
+        for (let j = i - 1; j >= 0 && extraNamesStr[j] === "\\"; j--) {
+          backslashCount++;
+        }
+        if (backslashCount % 2 === 0) {
+          inString = false;
+        }
+      }
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      inString = char;
+      continue;
+    }
+
+    // Track type annotations (between `:` and `=` at depth 0) for generic angle brackets
+    if (char === ":" && depth === 0 && angleDepth === 0) {
+      inTypeAnnotation = true;
+      continue;
+    }
+    if (
+      char === "=" &&
+      extraNamesStr[i + 1] !== ">" &&
+      depth === 0 &&
+      angleDepth === 0
+    ) {
+      inTypeAnnotation = false;
+    }
+    if (inTypeAnnotation && char === "<") {
+      angleDepth++;
+      continue;
+    }
+    if (inTypeAnnotation && char === ">" && angleDepth > 0) {
+      angleDepth--;
+      continue;
+    }
+
+    // Track bracket nesting
+    if (char === "(" || char === "[" || char === "{") {
+      depth++;
+    } else if (char === ")" || char === "]" || char === "}") {
+      depth--;
+    }
+
+    // A comma at depth 0 (outside generics) is a real declaration separator
+    if (char === "," && depth === 0 && angleDepth === 0) {
+      // Extract the identifier that follows this comma
+      const rest = extraNamesStr.slice(i + 1);
+      const match = rest.match(/^\s*([\w$]+)/);
+      if (match) {
+        names.push(match[1]);
+      }
+    }
+  }
+
+  return names;
+}
+
+/**
  * Identifies all export statements in the supplied source code and categorises them into different types such as declarations, named, default and star exports.
  * This function processes the code to capture different forms of export statements and normalise their representation for further processing.
  *
@@ -408,14 +488,10 @@ export function findExports(code: string): ESMExport[] {
       | string
       | undefined;
     if (extraNamesStr) {
-      const extraNames = matchAll(
-        /({.*?})|(\[.*?])|(,\s*(?<name>\w+))/g,
-        extraNamesStr,
-        {},
-      )
-        .map((m) => m.name)
-        .filter(Boolean);
-      declaredExport.names = [declaredExport.name, ...extraNames];
+      const extraNames = _extractExtraNames(extraNamesStr);
+      if (extraNames.length > 0) {
+        declaredExport.names = [declaredExport.name, ...extraNames];
+      }
     }
     delete (declaredExport as any).extraNames;
   }
