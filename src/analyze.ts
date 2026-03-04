@@ -428,7 +428,12 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       inTypeAnnotation = true;
       continue;
     }
-    if (char === "=" && depth === 0 && angleDepth === 0) {
+    if (
+      char === "=" &&
+      extraNamesStr[i + 1] !== ">" &&
+      depth === 0 &&
+      angleDepth === 0
+    ) {
       inTypeAnnotation = false;
     }
     if (inTypeAnnotation && char === "<") {

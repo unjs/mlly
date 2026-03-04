@@ -140,6 +140,11 @@ describe("findExports", () => {
       type: "declaration",
       names: ["foo", "bar"],
     },
+    "export const foo: (x: string) => Handler<string, number> = () => null": {
+      type: "declaration",
+      name: "foo",
+      names: ["foo"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
