@@ -328,6 +328,22 @@ export { type AType, type B as BType, foo } from 'foo'
     expect(matches[0].name).toEqual("foo");
   });
 
+  it("handles string literal export names (ES2022)", () => {
+    const matches = findExports('export { foo as "bar, baz" }');
+    expect(matches).toHaveLength(1);
+    expect(matches[0].type).toEqual("named");
+    expect(matches[0].names).toEqual(["bar, baz"]);
+  });
+
+  it("handles string literal export names with specifier", () => {
+    const matches = findExports(
+      'export { foo as "bar, baz" } from "./mod"',
+    );
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toEqual(["bar, baz"]);
+    expect(matches[0].specifier).toEqual("./mod");
+  });
+
   it("export default class", () => {
     const code = `export default class Foo {}`;
     const matches = findExports(code);
@@ -482,6 +498,18 @@ export default function Main() { return <p />; }
 });
 
 describe("findTypeExports", () => {
+  it("returns empty array when no type exports exist", () => {
+    const matches = findTypeExports("export const x = 1");
+    expect(matches).toEqual([]);
+  });
+
+  it("handles string literal type export names (ES2022)", () => {
+    const matches = findTypeExports('export type { Foo as "bar, baz" }');
+    expect(matches).toHaveLength(1);
+    expect(matches[0].type).toEqual("named");
+    expect(matches[0].names).toEqual(["bar, baz"]);
+  });
+
   it("finds type exports", () => {
     const matches = findTypeExports(
       `
