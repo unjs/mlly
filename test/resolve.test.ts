@@ -2,12 +2,24 @@ import { existsSync } from "node:fs";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
+import { resolve, dirname } from "node:path";
 
 const tests = [
   // Resolve to path
   { input: "ufo", action: "resolves" },
   { input: "./fixture/cjs.mjs", action: "resolves" },
   { input: "./fixture/foo", action: "resolves" },
+  {
+    input: resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      "./fixture/cjs.mjs",
+    ),
+    action: "resolves",
+  },
+  {
+    input: resolve(dirname(fileURLToPath(import.meta.url)), "./fixture/foo"),
+    action: "resolves",
+  },
   // Return same input as-is
   { input: "https://foo.com/a/b.js?a=1", action: "same" },
   // Throw error
