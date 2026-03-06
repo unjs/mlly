@@ -613,7 +613,10 @@ function _parseNamedExportsRe(exportsStr: string, keepTypes = false): string[] {
  * Batches multiple export code slices into a single parseSync call
  * and returns the parsed export names for each slice.
  */
-function _batchParseExportNames(codeSlices: string[], keepTypes = false): string[][] {
+function _batchParseExportNames(
+  codeSlices: string[],
+  keepTypes = false,
+): string[][] {
   const combined = codeSlices.join("\n");
   const { module } = parseSync("input.ts", combined, { sourceType: "module" });
   if (module.staticExports.length !== codeSlices.length) {
