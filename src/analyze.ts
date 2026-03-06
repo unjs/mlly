@@ -1,4 +1,5 @@
 import { tokenizer } from "acorn";
+import { parseSync } from "oxc-parser";
 import { matchAll, clearImports, getImportNames } from "./_utils";
 import { resolvePath, type ResolveOptions } from "./resolve";
 import { loadURL } from "./utils";
@@ -257,12 +258,14 @@ const IMPORT_NAMED_TYPE_RE =
 /**
  * Regular expression to match various types of export declarations including variables, functions, and classes.
  * @example `export const num = 1, str = 'hello'; export class Example {}`
+ * @deprecated Use `findExports()` instead, which now uses AST-based parsing.
  */
 export const EXPORT_DECAL_RE =
   /\bexport\s+(?<declaration>(?:async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,\s*[\s\w:[\]{}]*[\w$\]}]+)*/g;
 /**
  * Regular expression to match export declarations specifically for types, interfaces, and type aliases in TypeScript.
  * @example `export type Result = { success: boolean; }; export interface User { name: string; age: number; };`
+ * @deprecated Use `findTypeExports()` instead, which now uses AST-based parsing.
  */
 export const EXPORT_DECAL_TYPE_RE =
   /\bexport\s+(?<declaration>(?:interface|type|declare (?:async function|function|let|const enum|const|enum|var|class)))\s+(?<name>[\w$]+)/g;
@@ -279,6 +282,8 @@ const EXPORT_DEFAULT_RE =
 const EXPORT_DEFAULT_CLASS_RE =
   /\bexport\s+default\s+(?<declaration>class)\s+(?<name>[\w$]+)/g;
 const TYPE_RE = /^\s*?type\s/;
+const EXPORT_FUNCTION_RE = /^export\s+(?:async\s+)?function/;
+const EXPORT_STRING_LITERAL_RE = /['"]/;
 
 /**
  * Finds all static import statements within the given code string.
@@ -387,86 +392,6 @@ export function parseTypeImport(
 }
 
 /**
- * Extracts extra variable names from a comma-separated declaration list,
- * ignoring commas nested inside parentheses, brackets, braces, generics, or strings.
- *
- * For `export const foo = fn('a', bar), baz = 2`, only `baz` should be
- * extracted — commas inside `fn(...)` or `Handler<A, B>` are not declaration separators.
- * @param {string} extraNamesStr - The string containing the extra variable declarations to parse.
- * @returns {string[]} An array of variable names extracted from the declaration list.
- */
-function _extractExtraNames(extraNamesStr: string): string[] {
-  const names: string[] = [];
-  let depth = 0;
-  let angleDepth = 0;
-  let inString: string | false = false;
-  let inTypeAnnotation = false;
-
-  for (let i = 0; i < extraNamesStr.length; i++) {
-    const char = extraNamesStr[i];
-
-    // Handle string literals — skip their contents entirely
-    if (inString) {
-      if (char === inString) {
-        let backslashCount = 0;
-        for (let j = i - 1; j >= 0 && extraNamesStr[j] === "\\"; j--) {
-          backslashCount++;
-        }
-        if (backslashCount % 2 === 0) {
-          inString = false;
-        }
-      }
-      continue;
-    }
-    if (char === '"' || char === "'" || char === "`") {
-      inString = char;
-      continue;
-    }
-
-    // Track type annotations (between `:` and `=` at depth 0) for generic angle brackets
-    if (char === ":" && depth === 0 && angleDepth === 0) {
-      inTypeAnnotation = true;
-      continue;
-    }
-    if (
-      char === "=" &&
-      extraNamesStr[i + 1] !== ">" &&
-      depth === 0 &&
-      angleDepth === 0
-    ) {
-      inTypeAnnotation = false;
-    }
-    if (inTypeAnnotation && char === "<") {
-      angleDepth++;
-      continue;
-    }
-    if (inTypeAnnotation && char === ">" && angleDepth > 0) {
-      angleDepth--;
-      continue;
-    }
-
-    // Track bracket nesting
-    if (char === "(" || char === "[" || char === "{") {
-      depth++;
-    } else if (char === ")" || char === "]" || char === "}") {
-      depth--;
-    }
-
-    // A comma at depth 0 (outside generics) is a real declaration separator
-    if (char === "," && depth === 0 && angleDepth === 0) {
-      // Extract the identifier that follows this comma
-      const rest = extraNamesStr.slice(i + 1);
-      const match = rest.match(/^\s*([\w$]+)/);
-      if (match) {
-        names.push(match[1]);
-      }
-    }
-  }
-
-  return names;
-}
-
-/**
  * Identifies all export statements in the supplied source code and categorises them into different types such as declarations, named, default and star exports.
  * This function processes the code to capture different forms of export statements and normalise their representation for further processing.
  *
@@ -478,30 +403,11 @@ export function findExports(code: string): ESMExport[] {
   const declaredExports: DeclarationExport[] = matchAll(EXPORT_DECAL_RE, code, {
     type: "declaration",
   });
-  // Parse extra names (foo, bar)
-  for (const declaredExport of declaredExports) {
-    // function declarations don't have extra names
-    if (/^export\s+(?:async\s+)?function/.test(declaredExport.code)) {
-      continue;
-    }
-    const extraNamesStr = (declaredExport as any).extraNames as
-      | string
-      | undefined;
-    if (extraNamesStr) {
-      const extraNames = _extractExtraNames(extraNamesStr);
-      if (extraNames.length > 0) {
-        declaredExport.names = [declaredExport.name, ...extraNames];
-      }
-    }
-    delete (declaredExport as any).extraNames;
-  }
 
   // Find named exports
-  const namedExports: NamedExport[] = normalizeNamedExports(
-    matchAll(EXPORT_NAMED_RE, code, {
-      type: "named",
-    }),
-  );
+  const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_RE, code, {
+    type: "named",
+  });
 
   const destructuredExports: NamedExport[] = matchAll(
     EXPORT_NAMED_DESTRUCT,
@@ -511,16 +417,43 @@ export function findExports(code: string): ESMExport[] {
   for (const namedExport of destructuredExports) {
     // @ts-expect-error groups
     namedExport.exports = namedExport.exports1 || namedExport.exports2;
-    namedExport.names = namedExport.exports
-      .replace(/^\r?\n?/, "")
-      .split(/\s*,\s*/g)
-      .filter((name) => !TYPE_RE.test(name))
-      .map((name) =>
-        name
-          .replace(/^.*?\s*:\s*/, "")
-          .replace(/\s*=\s*.*$/, "")
-          .trim(),
-      );
+  }
+
+  // Collect all code slices that need AST parsing and batch them into a single parseSync call
+  const needsParse: ESMExport[] = [];
+
+  for (const declaredExport of declaredExports) {
+    const extraNamesStr = (declaredExport as any).extraNames as
+      | string
+      | undefined;
+    delete (declaredExport as any).extraNames;
+    if (!EXPORT_FUNCTION_RE.test(declaredExport.code) && extraNamesStr) {
+      // Extra names can contain commas inside values: `export const foo = [1, 2], bar = 3`,
+      // `export const foo = fn(a, b), bar = 3`, generics in type annotations, etc.
+      needsParse.push(declaredExport);
+    }
+  }
+
+  for (const namedExport of namedExports) {
+    // String literals in export names can contain commas: `export { foo as "bar, baz" }` (ES2022)
+    if (EXPORT_STRING_LITERAL_RE.test(namedExport.exports)) {
+      needsParse.push(namedExport);
+    } else {
+      namedExport.names = _parseNamedExportsRe(namedExport.exports);
+    }
+  }
+
+  // Default values in destructuring can contain commas: `export const { foo = fn(a, b) } = obj`
+  for (const destructuredExport of destructuredExports) {
+    needsParse.push(destructuredExport);
+  }
+
+  if (needsParse.length > 0) {
+    // Get the export names for each export
+    const parsedExports = _batchParseExportNames(needsParse.map((e) => e.code));
+    for (const [i, target] of needsParse.entries()) {
+      target.names = parsedExports[i];
+    }
   }
 
   // Find export default
@@ -591,11 +524,29 @@ export function findTypeExports(code: string): ESMExport[] {
   );
 
   // Find named exports
-  const namedExports: NamedExport[] = normalizeNamedExports(
-    matchAll(EXPORT_NAMED_TYPE_RE, code, {
-      type: "named",
-    }),
-  );
+  const namedExports: NamedExport[] = matchAll(EXPORT_NAMED_TYPE_RE, code, {
+    type: "named",
+  });
+
+  const needsParse: NamedExport[] = [];
+  for (const namedExport of namedExports) {
+    // String literals in export names can contain commas: `export { foo as "bar, baz" }` (ES2022)
+    if (EXPORT_STRING_LITERAL_RE.test(namedExport.exports)) {
+      needsParse.push(namedExport);
+    } else {
+      namedExport.names = _parseNamedExportsRe(namedExport.exports, true);
+    }
+  }
+
+  if (needsParse.length > 0) {
+    const names = _batchParseExportNames(
+      needsParse.map((e) => e.code),
+      true,
+    );
+    for (const [i, target] of needsParse.entries()) {
+      target.names = names[i];
+    }
+  }
 
   // Merge and normalize exports
   const exports: ESMExport[] = normalizeExports([
@@ -650,15 +601,35 @@ function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
   return exports;
 }
 
-function normalizeNamedExports(namedExports: NamedExport[]) {
-  for (const namedExport of namedExports) {
-    namedExport.names = namedExport.exports
-      .replace(/^\r?\n?/, "")
-      .split(/\s*,\s*/g)
-      .filter((name) => !TYPE_RE.test(name))
-      .map((name) => name.replace(/^.*?\sas\s/, "").trim());
+function _parseNamedExportsRe(exportsStr: string, keepTypes = false): string[] {
+  return exportsStr
+    .replace(/^\r?\n?/, "")
+    .split(/\s*,\s*/g)
+    .filter((name) => name && (keepTypes || !TYPE_RE.test(name)))
+    .map((name) => name.replace(/^.*?\sas\s/, "").trim());
+}
+
+/**
+ * Batches multiple export code slices into a single parseSync call
+ * and returns the parsed export names for each slice.
+ */
+function _batchParseExportNames(
+  codeSlices: string[],
+  keepTypes = false,
+): string[][] {
+  const combined = codeSlices.join("\n");
+  const { module } = parseSync("input.ts", combined, { sourceType: "module" });
+  if (module.staticExports.length !== codeSlices.length) {
+    throw new Error(
+      `Expected ${codeSlices.length} exports but parsed ${module.staticExports.length}`,
+    );
   }
-  return namedExports;
+  return module.staticExports.map((e) =>
+    e.entries
+      .filter((e) => keepTypes || !e.isType)
+      // safe to non-null assert because we don't parse bare star exports without specifiers `export * from 'module'`
+      .map((e) => e.exportName.name!),
+  );
 }
 
 /**
