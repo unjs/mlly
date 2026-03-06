@@ -336,9 +336,7 @@ export { type AType, type B as BType, foo } from 'foo'
   });
 
   it("handles string literal export names with specifier", () => {
-    const matches = findExports(
-      'export { foo as "bar, baz" } from "./mod"',
-    );
+    const matches = findExports('export { foo as "bar, baz" } from "./mod"');
     expect(matches).toHaveLength(1);
     expect(matches[0].names).toEqual(["bar, baz"]);
     expect(matches[0].specifier).toEqual("./mod");
