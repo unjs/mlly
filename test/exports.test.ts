@@ -79,9 +79,18 @@ describe("findExports", () => {
     },
     "export enum bar { a = 'xx' }": { type: "declaration", names: ["bar"] },
     "export const { a, b } = foo": { type: "named", names: ["a", "b"] },
+    "export const { a: b, c } = foo": { type: "named", names: ["b", "c"] },
     "export const [ a, b ] = foo": { type: "named", names: ["a", "b"] },
     "export const [\na\n, b ] = foo": { type: "named", names: ["a", "b"] },
-    "export const [ a:b,\nc = 1] = foo": { type: "named", names: ["b", "c"] },
+    "export const [ a,\nb = 1 ] = foo": { type: "named", names: ["a", "b"] },
+    "export const { foo = fn(a, b), bar } = obj": {
+      type: "named",
+      names: ["foo", "bar"],
+    },
+    "export const [a = fn(1, 2), b] = arr": {
+      type: "named",
+      names: ["a", "b"],
+    },
     "export const foo = 1, bar,baz=3;": {
       type: "declaration",
       names: ["foo", "bar", "baz"],
@@ -145,6 +154,15 @@ describe("findExports", () => {
       name: "foo",
       names: ["foo"],
     },
+    "export function* generatorFn() {}": {
+      type: "declaration",
+      names: ["generatorFn"],
+    },
+    "export const a: Record<string, string> = {}, b: Map<number, Set<string>> = new Map()":
+      {
+        type: "declaration",
+        names: ["a", "b"],
+      },
   };
 
   for (const [input, test] of Object.entries(tests)) {
@@ -169,6 +187,30 @@ describe("findExports", () => {
       }
     });
   }
+
+  it("doesn't treat generic arrow function params as extra exports", () => {
+    const code = `export const foo = <T extends Record<string, Ref>>(a: string, b?: Record<string, unknown>): (c?: string) => T => { return () => ({} as T) }, bar = false, baz = (x: string, y: string) => { return x };`;
+    const matches = findExports(code);
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toEqual(["foo", "bar", "baz"]);
+  });
+
+  // TODO: support nested destructuring
+  it.fails("export const { foo = { a: 1, b: 2 }, bar } = obj", () => {
+    const matches = findExports(
+      "export const { foo = { a: 1, b: 2 }, bar } = obj",
+    );
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toEqual(["foo", "bar"]);
+  });
+  it.fails("export const { foo, bar: { baz, qux } } = obj", () => {
+    const matches = findExports(
+      "export const { foo, bar: { baz, qux } } = obj",
+    );
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toEqual(["foo", "baz", "qux"]);
+  });
+
   it("handles multiple exports", () => {
     const matches = findExports(`
           export { useTestMe1 } from "@/test/foo1";
@@ -287,7 +329,7 @@ export { type AType, type B as BType, foo } from 'foo'
   });
 
   it("export default class", () => {
-    const code = `export default class Foo`;
+    const code = `export default class Foo {}`;
     const matches = findExports(code);
     expect(matches).toMatchInlineSnapshot(`
       [
@@ -423,6 +465,19 @@ export { foo } from 'foo1';export { bar } from 'foo2';export * as foobar from 'f
 `;
     const matches = findExports(code);
     expect(matches).to.have.lengthOf(3);
+  });
+
+  it("handles TSX code", () => {
+    const code = `
+export const App = () => <div>hello</div>;
+export function Wrapper() { return <span />; }
+export default function Main() { return <p />; }
+`;
+    const matches = findExports(code);
+    expect(matches).to.have.lengthOf(3);
+    expect(matches[0]).toMatchObject({ name: "App", type: "declaration" });
+    expect(matches[1]).toMatchObject({ name: "Wrapper", type: "declaration" });
+    expect(matches[2]).toMatchObject({ name: "default", type: "default" });
   });
 });
 
