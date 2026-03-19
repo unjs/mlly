@@ -446,7 +446,7 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       char === "<" &&
       depth === 0 &&
       i > 0 &&
-      /[\w$]/.test(extraNamesStr[i - 1])
+      _isIdentifierBeforeAngleBracket(extraNamesStr, i)
     ) {
       angleDepth++;
       continue;
@@ -774,4 +774,19 @@ function _getLocations(code: string, label: string) {
     }
   }
   return locations;
+}
+
+/**
+ * Check if `<` at position `i` is preceded by an identifier (not a bare number).
+ * `Map2<T>` → true (identifier ends with digit), `1<2` → false (bare number).
+ */
+function _isIdentifierBeforeAngleBracket(str: string, i: number): boolean {
+  let j = i - 1;
+  // Walk back over identifier characters [A-Za-z0-9_$]
+  while (j >= 0 && /[A-Za-z0-9_$]/.test(str[j])) {
+    j--;
+  }
+  // Must have consumed at least one char, and the first char of the word must be a letter/underscore/$
+  const wordStart = j + 1;
+  return wordStart < i && /[A-Za-z_$]/.test(str[wordStart]);
 }

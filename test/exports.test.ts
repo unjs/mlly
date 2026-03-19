@@ -169,6 +169,10 @@ describe("findExports", () => {
       name: "m",
       names: ["m"],
     },
+    "export const a = 1<2, b = 3": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
