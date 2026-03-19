@@ -451,7 +451,7 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       angleDepth++;
       continue;
     }
-    if (char === ">" && angleDepth > 0) {
+    if (char === ">" && angleDepth > 0 && extraNamesStr[i - 1] !== "=") {
       angleDepth--;
       continue;
     }

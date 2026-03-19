@@ -173,6 +173,18 @@ describe("findExports", () => {
       type: "declaration",
       names: ["a", "b"],
     },
+    "export const a: Map<string, (x: string) => void> = new Map(), b = 1": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a: Map<string, Map<string, (x: string) => void>> = new Map(), b = 1": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a: Map<(x: string) => void, string> = new Map(), b = 1": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
