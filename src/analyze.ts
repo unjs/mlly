@@ -446,7 +446,7 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       char === "<" &&
       depth === 0 &&
       i > 0 &&
-      /[A-Za-z_$]/.test(extraNamesStr[i - 1])
+      /[\w$]/.test(extraNamesStr[i - 1])
     ) {
       angleDepth++;
       continue;

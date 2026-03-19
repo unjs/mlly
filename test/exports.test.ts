@@ -159,6 +159,16 @@ describe("findExports", () => {
       type: "declaration",
       names: ["a", "b"],
     },
+    "export const nested = new Map<string, Handler<A, B>>()": {
+      type: "declaration",
+      name: "nested",
+      names: ["nested"],
+    },
+    "export const m = Map2<string, number>()": {
+      type: "declaration",
+      name: "m",
+      names: ["m"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
