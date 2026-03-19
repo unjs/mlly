@@ -145,6 +145,20 @@ describe("findExports", () => {
       name: "foo",
       names: ["foo"],
     },
+    "export const APP_MODE_MAP = new Map<string, IAppMode>()": {
+      type: "declaration",
+      name: "APP_MODE_MAP",
+      names: ["APP_MODE_MAP"],
+    },
+    "export const result = foo<Bar, Baz>(arg1, arg2)": {
+      type: "declaration",
+      name: "result",
+      names: ["result"],
+    },
+    "export const a = new Set<string>(), b = new Map<string, number>()": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
