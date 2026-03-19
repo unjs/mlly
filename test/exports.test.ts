@@ -145,6 +145,47 @@ describe("findExports", () => {
       name: "foo",
       names: ["foo"],
     },
+    "export const APP_MODE_MAP = new Map<string, IAppMode>()": {
+      type: "declaration",
+      name: "APP_MODE_MAP",
+      names: ["APP_MODE_MAP"],
+    },
+    "export const result = foo<Bar, Baz>(arg1, arg2)": {
+      type: "declaration",
+      name: "result",
+      names: ["result"],
+    },
+    "export const a = new Set<string>(), b = new Map<string, number>()": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const nested = new Map<string, Handler<A, B>>()": {
+      type: "declaration",
+      name: "nested",
+      names: ["nested"],
+    },
+    "export const m = Map2<string, number>()": {
+      type: "declaration",
+      name: "m",
+      names: ["m"],
+    },
+    "export const a = 1<2, b = 3": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a: Map<string, (x: string) => void> = new Map(), b = 1": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a: Map<string, Map<string, (x: string) => void>> = new Map(), b = 1":
+      {
+        type: "declaration",
+        names: ["a", "b"],
+      },
+    "export const a: Map<(x: string) => void, string> = new Map(), b = 1": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
