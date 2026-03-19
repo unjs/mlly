@@ -436,11 +436,16 @@ function _extractExtraNames(extraNamesStr: string): string[] {
     ) {
       inTypeAnnotation = false;
     }
+    // Track angle brackets for generics (`Map<T>` vs comparison `x < y`)
     if (inTypeAnnotation && char === "<") {
       angleDepth++;
       continue;
     }
-    if (inTypeAnnotation && char === ">" && angleDepth > 0) {
+    if (!inTypeAnnotation && char === "<" && depth === 0 && i > 0 && /[A-Za-z_$]/.test(extraNamesStr[i - 1])) {
+      angleDepth++;
+      continue;
+    }
+    if (char === ">" && angleDepth > 0) {
       angleDepth--;
       continue;
     }
