@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.2
+
+[compare changes](https://github.com/unjs/mlly/compare/v1.8.0...v1.8.2)
+
+### 🩹 Fixes
+
+- Extract variable names ignoring function calls ([#336](https://github.com/unjs/mlly/pull/336))
+- Generic angle bracket parsing ([#341](https://github.com/unjs/mlly/pull/341))
+
+### 📖 Documentation
+
+- Fix typo ([#333](https://github.com/unjs/mlly/pull/333))
+
+### 🏡 Chore
+
+- Update deps ([12913db](https://github.com/unjs/mlly/commit/12913db))
+- Lint ([33495f9](https://github.com/unjs/mlly/commit/33495f9))
+- **release:** V1.8.1 ([ed17783](https://github.com/unjs/mlly/commit/ed17783))
+- Update deps ([1b09363](https://github.com/unjs/mlly/commit/1b09363))
+
+### ❤️ Contributors
+
+- Florian Heuberger ([@Flo0806](https://github.com/Flo0806))
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- AngelHdz <angel.hernandez.12@live.com>
+- Daniel Roe ([@danielroe](https://github.com/danielroe))
+
 ## v1.8.1
 
 [compare changes](https://github.com/unjs/mlly/compare/v1.8.0...v1.8.1)
