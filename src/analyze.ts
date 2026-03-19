@@ -441,7 +441,13 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       angleDepth++;
       continue;
     }
-    if (!inTypeAnnotation && char === "<" && depth === 0 && i > 0 && /[A-Za-z_$]/.test(extraNamesStr[i - 1])) {
+    if (
+      !inTypeAnnotation &&
+      char === "<" &&
+      depth === 0 &&
+      i > 0 &&
+      /[A-Za-z_$]/.test(extraNamesStr[i - 1])
+    ) {
       angleDepth++;
       continue;
     }
