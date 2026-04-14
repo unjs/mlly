@@ -204,6 +204,10 @@ const dynamicTests = {
   },
   '// import("abc").then(r => r.default)': [],
   '/* import("abc").then(r => r.default) */': [],
+  // Member access should not be matched as a dynamic import (#288)
+  'Quill.import("blots/block/embed")': [],
+  'const foo = timport("foo")': [],
+  'obj?.import("x")': [],
 } as const;
 
 const TypeTests = {
