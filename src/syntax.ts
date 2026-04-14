@@ -10,7 +10,7 @@ const ESM_RE =
 const CJS_RE =
   /(?:[\s;]|^)(?:module\.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 
-const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
+const COMMENT_RE = /\/\*[\s\S]*?\*\/|\/\/.*(?=[nr])/g;
 
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
