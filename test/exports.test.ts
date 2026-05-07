@@ -465,6 +465,14 @@ export { foo } from 'foo1';export { bar } from 'foo2';export * as foobar from 'f
     const matches = findExports(code);
     expect(matches).to.have.lengthOf(3);
   });
+
+  // https://github.com/unjs/mlly/issues/303
+  it("does not pick up object property keys from multi-line object literals as extra export names", () => {
+    const code = `export const useStore = defineStore('id', {\n  state: () => ({}),\n  actions: { foo() {} }\n})`;
+    const matches = findExports(code);
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toEqual(["useStore"]);
+  });
 });
 
 describe("findTypeExports", () => {
