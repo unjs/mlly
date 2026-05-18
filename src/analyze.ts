@@ -258,8 +258,14 @@ const IMPORT_NAMED_TYPE_RE =
  * Regular expression to match various types of export declarations including variables, functions, and classes.
  * @example `export const num = 1, str = 'hello'; export class Example {}`
  */
+// EXPORT_DECAL_RE captures three groups: <declaration> (e.g. "const"), <name> (primary binding),
+// and <extraNames> for additional comma-separated siblings (e.g. `export const a = 1, b = 2`).
+// [^\S\n]* in extraNames intentionally allows only horizontal whitespace after each comma so the
+// group cannot cross a newline into a multi-line call argument. This means a sibling binding that
+// starts on the next line (`export const a = longFn(),\n  b = 1`) will not be captured — a known
+// limitation accepted to avoid false positives from object property keys (see unjs/mlly#303).
 export const EXPORT_DECAL_RE =
-  /\bexport\s+(?<declaration>(?:async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,\s*[\s\w:[\]{}]*[\w$\]}]+)*/g;
+  /\bexport\s+(?<declaration>(?:async function\s*\*?|function\s*\*?|let|const enum|const|enum|var|class))\s+\*?(?<name>[\w$]+)(?<extraNames>.*,[^\S\n]*[\w:[\]{}]*[\w$\]}]+)*/g;
 /**
  * Regular expression to match export declarations specifically for types, interfaces, and type aliases in TypeScript.
  * @example `export type Result = { success: boolean; }; export interface User { name: string; age: number; };`
