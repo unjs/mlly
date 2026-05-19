@@ -149,7 +149,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     throw error;
   }
 
-  return pathToFileURL(resolved);
+  return pathToFileURL(isAbsolute(resolved.href) ? resolved.href : resolved);
 }
 
 /**
