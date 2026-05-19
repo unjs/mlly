@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import url from "node:url";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
@@ -119,4 +120,49 @@ describe("tryModuleResolve", async () => {
       mockedResolve.mock.calls.some((call) => call[0].includes("//")),
     ).toBe(false);
   });
+});
+
+describe("normalized parent urls", () => {
+  const cannotResolveError = (id: string, urls: (string | URL)[]) =>
+    Object.assign(
+      new Error(
+        `Cannot resolve module "${id}".\nImported from:\n${urls.map((u) => ` - ${u}`).join("\n")}`,
+      ),
+      { code: "ERR_MODULE_NOT_FOUND" },
+    );
+
+  const commonCases = [
+    [[undefined, false, 123] as unknown, [url.pathToFileURL("./")]],
+    [import.meta.url, [import.meta.url]],
+    [new URL(import.meta.url), [import.meta.url]],
+    [__filename, [url.pathToFileURL(__filename)]],
+    [__dirname, [url.pathToFileURL(__dirname) + "/"]],
+  ];
+
+  const posixCases = [
+    ["file:///project/index.js", ["file:///project/index.js"]],
+    ["file:///project/", ["file:///project/"]],
+    ["file:///project", ["file:///project"]],
+    ["/non/existent", ["file:///non/existent/", "file:///non/existent"]],
+  ];
+
+  const windowsCases = [
+    [
+      String.raw`C:\non\existent`,
+      ["file:///C:/non/existent/", "file:///C:/non/existent"],
+    ],
+  ];
+
+  const testCases = [
+    ...commonCases,
+    ...(process.platform === "win32" ? windowsCases : posixCases),
+  ] as Array<[string | string[], string[]]>;
+
+  for (const [input, expected] of testCases) {
+    it(JSON.stringify(input), () => {
+      expect(() => resolvePathSync("xyz", { url: input })).toThrow(
+        cannotResolveError("xyz", expected),
+      );
+    });
+  }
 });
