@@ -41,7 +41,7 @@ export interface StaticImport extends ESMImport {
   /**
    * Contains the entire import statement as a string, excluding the module specifier.
    */
-  imports: string;
+  imports?: string;
 
   /**
    * The module specifier from which imports are being brought in.
