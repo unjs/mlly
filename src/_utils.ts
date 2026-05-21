@@ -24,7 +24,7 @@ export function matchAll(regex: RegExp, string: string, addition: any) {
   return matches;
 }
 
-export function clearImports(imports: string) {
+export function clearImports(imports?: string) {
   return (imports || "")
     .replace(/\/\/[^\n]*\n|\/\*.*\*\//g, "")
     .replace(/\s+/g, " ");
