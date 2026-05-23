@@ -22,40 +22,40 @@ importers:
         version: 1.6.4
     devDependencies:
       '@types/node':
-        specifier: ^25.8.0
+        specifier: 25.8.0
         version: 25.8.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.6
+        specifier: 4.1.6
         version: 4.1.6(vitest@4.1.6)
       changelogen:
-        specifier: ^0.6.2
+        specifier: 0.6.2
         version: 0.6.2(magicast@0.5.2)
       eslint:
-        specifier: ^10.4.0
+        specifier: 10.4.0
         version: 10.4.0(jiti@2.7.0)
       eslint-config-unjs:
-        specifier: ^0.6.2
+        specifier: 0.6.2
         version: 0.6.2(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3)
       import-meta-resolve:
-        specifier: ^4.2.0
+        specifier: 4.2.0
         version: 4.2.0
       jiti:
-        specifier: ^2.7.0
+        specifier: 2.7.0
         version: 2.7.0
       prettier:
-        specifier: ^3.8.3
+        specifier: 3.8.3
         version: 3.8.3
       std-env:
-        specifier: ^4.1.0
+        specifier: 4.1.0
         version: 4.1.0
       typescript:
-        specifier: ^5.9.3
+        specifier: 5.9.3
         version: 5.9.3
       unbuild:
-        specifier: ^3.6.1
+        specifier: 3.6.1
         version: 3.6.1(typescript@5.9.3)
       vitest:
-        specifier: ^4.1.6
+        specifier: 4.1.6
         version: 4.1.6(@types/node@25.8.0)(@vitest/coverage-v8@4.1.6)(vite@8.0.1(@types/node@25.8.0)(jiti@2.7.0))
 
 packages:
