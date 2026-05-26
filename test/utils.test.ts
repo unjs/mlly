@@ -8,6 +8,7 @@ import {
   lookupNodeModuleSubpath,
   fileURLToPath,
   pathToFileURL,
+  normalizeid,
 } from "../src";
 
 describe("isNodeBuiltin", () => {
@@ -174,6 +175,44 @@ describe("fileURLToPath", () => {
       expect(fileURLToPath(input)).toBe(output);
     });
   }
+
+  it("handles plain string paths without file:// protocol", () => {
+    expect(fileURLToPath("/foo/bar")).toBe("/foo/bar");
+    expect(fileURLToPath("data:text/plain,hello")).toBe(
+      "data:text/plain,hello",
+    );
+  });
+
+  it("handles empty string", () => {
+    expect(fileURLToPath("")).toBe("");
+  });
+
+  it("handles URL object", () => {
+    expect(fileURLToPath(new URL("file:///foo/bar"))).toBe("/foo/bar");
+  });
+});
+
+describe("normalizeid", () => {
+  it("adds node: prefix for built-in modules", () => {
+    expect(normalizeid("fs")).toBe("node:fs");
+    expect(normalizeid("fs/promises")).toBe("node:fs/promises");
+  });
+
+  it("preserves existing protocols", () => {
+    expect(normalizeid("node:fs")).toBe("node:fs");
+    expect(normalizeid("data:text/plain,hello")).toBe("data:text/plain,hello");
+    expect(normalizeid("http://example.com")).toBe("http://example.com");
+    expect(normalizeid("https://example.com")).toBe("https://example.com");
+    expect(normalizeid("file:///foo/bar")).toBe("file:///foo/bar");
+  });
+
+  it("adds file:// prefix for plain paths", () => {
+    expect(normalizeid("/foo/bar")).toBe("file:///foo/bar");
+  });
+
+  it("handles empty string", () => {
+    expect(normalizeid("")).toBe("file://");
+  });
 });
 
 describe("pathToFileURL", () => {
