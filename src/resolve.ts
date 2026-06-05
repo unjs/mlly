@@ -290,14 +290,22 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
 }
 
 function _flattenExports(
-  exports: Exclude<PackageJson["exports"], string> = {},
+  exports: Exclude<PackageJson["exports"], string> | null = {},
   parentSubpath = "./",
 ): { subpath: string; fsPath: string; condition?: string }[] {
+  if (exports === null) {
+    return [];
+  }
+
   return Object.entries(exports).flatMap(([key, value]) => {
     const [subpath, condition] = key.startsWith(".")
       ? [key.slice(1), undefined]
       : ["", key];
     const _subPath = joinURL(parentSubpath, subpath);
+
+    if (value === null) {
+      return [];
+    }
 
     if (typeof value === "string") {
       return [{ subpath: _subPath, fsPath: value, condition }];
