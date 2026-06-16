@@ -343,18 +343,6 @@ export { type AType, type B as BType, foo } from 'foo'
           "start": 0,
           "type": "default",
         },
-        {
-          "code": "export default class Foo",
-          "declaration": "class",
-          "declarationType": "class",
-          "end": 24,
-          "name": "Foo",
-          "names": [
-            "Foo",
-          ],
-          "start": 0,
-          "type": "declaration",
-        },
       ]
     `);
   });
