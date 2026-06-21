@@ -70,6 +70,14 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     id = fileURLToPath(id);
   }
 
+  // Strip query string (e.g. cache-busting `?v=123`) before filesystem resolution.
+  // The query has no meaning for local file paths and causes resolution to fail
+  // because no file named `foo.js?v=123` exists on disk.
+  const queryIndex = id.indexOf("?");
+  if (queryIndex !== -1) {
+    id = id.slice(0, queryIndex);
+  }
+
   // Skip resolve for absolute paths (fast path)
   if (isAbsolute(id)) {
     try {

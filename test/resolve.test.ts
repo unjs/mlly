@@ -83,6 +83,48 @@ describe("resolvePathSync", () => {
   }
 });
 
+describe("query string stripping", () => {
+  it("strips query string from relative path before resolution", () => {
+    // ./fixture/cjs.mjs?v=123 should resolve the same as ./fixture/cjs.mjs
+    const withQuery = resolveSync("./fixture/cjs.mjs?v=123", {
+      url: import.meta.url,
+    });
+    const withoutQuery = resolveSync("./fixture/cjs.mjs", {
+      url: import.meta.url,
+    });
+    expect(existsSync(fileURLToPath(withQuery))).toBe(true);
+    expect(withQuery).toBe(withoutQuery);
+  });
+
+  it("strips query string from absolute file URL before resolution", () => {
+    const withoutQuery = resolveSync("./fixture/cjs.mjs", {
+      url: import.meta.url,
+    });
+    // Turn the resolved file URL into a file:// URL with a query appended
+    const withQuery = resolveSync(withoutQuery + "?t=456", {
+      url: import.meta.url,
+    });
+    expect(existsSync(fileURLToPath(withQuery))).toBe(true);
+    expect(withQuery).toBe(withoutQuery);
+  });
+
+  it("strips query string when resolving bare package specifier path", () => {
+    // ufo/index.js?hash=abc — hash/query must be stripped before node resolution
+    const withQuery = resolveSync("ufo?hash=abc", { url: import.meta.url });
+    const withoutQuery = resolveSync("ufo", { url: import.meta.url });
+    expect(existsSync(fileURLToPath(withQuery))).toBe(true);
+    expect(withQuery).toBe(withoutQuery);
+  });
+
+  it("resolvePathSync strips query string and returns a real filesystem path", () => {
+    const resolved = resolvePathSync("./fixture/cjs.mjs?bust=1", {
+      url: import.meta.url,
+    });
+    expect(existsSync(resolved)).toBe(true);
+    expect(resolved).not.toContain("?");
+  });
+});
+
 // https://github.com/unjs/mlly/pull/278
 describe("tryModuleResolve", async () => {
   const { mockedResolve } = await vi.hoisted(async () => {
