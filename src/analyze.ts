@@ -496,8 +496,7 @@ export function findExports(code: string): ESMExport[] {
       continue;
     }
     const extraNamesStr = (declaredExport as any).extraNames as
-      | string
-      | undefined;
+      string | undefined;
     if (extraNamesStr) {
       const extraNames = _extractExtraNames(extraNamesStr);
       if (extraNames.length > 0) {
