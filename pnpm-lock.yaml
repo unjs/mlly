@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      acorn:
-        specifier: ^8.16.0
-        version: 8.16.0
+      js-tokens:
+        specifier: ^10.0.0
+        version: 10.0.0
       pathe:
         specifier: ^2.0.3
         version: 2.0.3
