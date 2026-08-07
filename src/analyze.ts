@@ -1,4 +1,4 @@
-import { tokenizer } from "acorn";
+import jsTokens from "js-tokens";
 import { matchAll, clearImports, getImportNames } from "./_utils";
 import { resolvePath, type ResolveOptions } from "./resolve";
 import { loadURL } from "./utils";
@@ -287,7 +287,7 @@ const TYPE_RE = /^\s*?type\s/;
  */
 export function findStaticImports(code: string): StaticImport[] {
   return _filterStatement(
-    _tryGetLocations(code, "import"),
+    _getLocations(code, "import"),
     matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }),
   );
 }
@@ -299,7 +299,7 @@ export function findStaticImports(code: string): StaticImport[] {
  */
 export function findDynamicImports(code: string): DynamicImport[] {
   return _filterStatement(
-    _tryGetLocations(code, "import"),
+    _getLocations(code, "import"),
     matchAll(DYNAMIC_IMPORT_RE, code, { type: "dynamic" }),
   );
 }
@@ -565,7 +565,7 @@ export function findExports(code: string): ESMExport[] {
   if (exports.length === 0) {
     return [];
   }
-  const exportLocations = _tryGetLocations(code, "export");
+  const exportLocations = _getLocations(code, "export");
   if (exportLocations && exportLocations.length === 0) {
     return [];
   }
@@ -618,7 +618,7 @@ export function findTypeExports(code: string): ESMExport[] {
   if (exports.length === 0) {
     return [];
   }
-  const exportLocations = _tryGetLocations(code, "export");
+  const exportLocations = _getLocations(code, "export");
   if (exportLocations && exportLocations.length === 0) {
     return [];
   }
@@ -748,29 +748,14 @@ function _filterStatement<T extends TokenLocation>(
   });
 }
 
-function _tryGetLocations(code: string, label: string) {
-  try {
-    return _getLocations(code, label);
-  } catch {
-    // Ignore error
-  }
-}
-
 function _getLocations(code: string, label: string) {
-  const tokens = tokenizer(code, {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    allowHashBang: true,
-    allowAwaitOutsideFunction: true,
-    allowImportExportEverywhere: true,
-  });
   const locations: TokenLocation[] = [];
-  for (const token of tokens) {
-    if (token.type.label === label) {
-      locations.push({
-        start: token.start,
-        end: token.end,
-      });
+  let offset = 0;
+  for (const token of jsTokens(code)) {
+    const start = offset;
+    offset += token.value.length;
+    if (token.type === "IdentifierName" && token.value === label) {
+      locations.push({ start, end: offset });
     }
   }
   return locations;

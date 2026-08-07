@@ -316,6 +316,16 @@ export default function useMain() {}
     expect(matches2).toEqual(matches1);
   });
 
+  it("filters commented out exports in non-parseable (TypeScript) code", () => {
+    const code = `
+// export const commented: string = "a"
+export const foo: Map<string, number> = new Map()
+`;
+    const matches = findExports(code);
+    expect(matches).toHaveLength(1);
+    expect(matches[0].name).toEqual("foo");
+  });
+
   it("ignore export type", () => {
     const code = `
 export { type AType, type B as BType, foo } from 'foo'
