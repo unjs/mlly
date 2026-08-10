@@ -282,6 +282,14 @@ describe("findStaticImports", () => {
       }
     });
   }
+
+  it("side effect import has no import clause", () => {
+    const [match] = findStaticImports('import "styles.css";');
+    expect(match.specifier).to.equal("styles.css");
+    // A side effect import has no import clause, so `imports` is `undefined`.
+    expect(match.imports).toBeUndefined();
+    expect(parseStaticImport(match).namedImports).to.eql({});
+  });
 });
 
 describe("findDynamicImports", () => {
