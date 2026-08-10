@@ -40,8 +40,10 @@ export interface StaticImport extends ESMImport {
 
   /**
    * Contains the entire import statement as a string, excluding the module specifier.
+   * `undefined` for side effect imports such as `import "styles.css"`, which have no
+   * import clause.
    */
-  imports: string;
+  imports?: string;
 
   /**
    * The module specifier from which imports are being brought in.
@@ -102,8 +104,10 @@ export interface TypeImport extends Omit<ESMImport, "type"> {
 
   /**
    * Contains the entire type import statement as a string, excluding the module specifier.
+   * `undefined` for side effect imports such as `import "styles.css"`, which have no
+   * import clause.
    */
-  imports: string;
+  imports?: string;
 
   /**
    * The module specifier from which to import types.
@@ -314,7 +318,7 @@ export function findTypeImports(code: string): TypeImport[] {
   return [
     ...matchAll(IMPORT_NAMED_TYPE_RE, code, { type: "type" }),
     ...matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }).filter(
-      (match) => /[^A-Za-z]type\s/.test(match.imports),
+      (match) => /[^A-Za-z]type\s/.test(match.imports ?? ""),
     ),
   ];
 }
