@@ -444,6 +444,13 @@ describe("resolveModuleExportNames", () => {
     `);
   });
 
+  it("handles circular star exports", async () => {
+    const names = await resolveModuleExportNames(
+      new URL("fixture/circular/a.mjs", import.meta.url).toString(),
+    );
+    expect(names.sort()).toEqual(["a", "b"]);
+  });
+
   it("star exports with package", async () => {
     expect(
       await resolveModuleExportNames(
