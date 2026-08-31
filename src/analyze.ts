@@ -697,7 +697,20 @@ export async function resolveModuleExportNames(
   id: string,
   options?: ResolveOptions,
 ): Promise<string[]> {
+  return _resolveModuleExportNames(id, options, new Set());
+}
+
+async function _resolveModuleExportNames(
+  id: string,
+  options: ResolveOptions | undefined,
+  visited: Set<string>,
+): Promise<string[]> {
   const url = await resolvePath(id, options);
+  if (visited.has(url)) {
+    return [];
+  }
+  visited.add(url);
+
   const code = await loadURL(url);
   const exports = findExports(code);
 
@@ -711,10 +724,14 @@ export async function resolveModuleExportNames(
     if (exp.type !== "star" || !exp.specifier) {
       continue;
     }
-    const subExports = await resolveModuleExportNames(exp.specifier, {
-      ...options,
-      url,
-    });
+    const subExports = await _resolveModuleExportNames(
+      exp.specifier,
+      {
+        ...options,
+        url,
+      },
+      visited,
+    );
     for (const subExport of subExports) {
       exportNames.add(subExport);
     }
