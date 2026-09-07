@@ -6,5 +6,5 @@ export default defineBuildConfig({
     emitCJS: true,
     inlineDependencies: true,
   },
-  entries: ["src/index"],
+  entries: ["src/index", "src/resolver"],
 });
