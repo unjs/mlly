@@ -10,7 +10,9 @@ const ESM_RE =
 const CJS_RE =
   /(?:[\s;]|^)(?:module\.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 
-const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
+// `[\S\s]` (instead of `.`) lets a block comment span newlines, and a line
+// comment runs to the end of its line (`.` already stops at a line break).
+const COMMENT_RE = /\/\*[\S\s]*?\*\/|\/\/.*/g;
 
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 

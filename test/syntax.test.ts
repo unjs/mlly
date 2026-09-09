@@ -92,6 +92,29 @@ const staticTests = {
 const staticTestsWithComments = {
   '// They\'re exposed using "export import" so that types are passed along as expected\nmodule.exports={};':
     { hasESM: false, hasCJS: true, isMixed: false },
+  "/* export * */": { hasESM: false, hasCJS: false, isMixed: false },
+  "/*\n  export *\n*/": { hasESM: false, hasCJS: false, isMixed: false },
+  "/*\n  module.exports = {}\n*/\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  "// export * from './file.mjs'": {
+    hasESM: false,
+    hasCJS: false,
+    isMixed: false,
+  },
+  "// module.exports = {}\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // Code outside of a comment must survive stripping
+  "/* a */ export const a = 1 /* b */": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
 };
 
 describe("detectSyntax", () => {
