@@ -115,6 +115,41 @@ const staticTestsWithComments = {
     hasCJS: false,
     isMixed: false,
   },
+  // `//` and `/*` inside a string literal are not comments
+  'const url = "https://example.test"; export const a = 1': {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  "const url = 'https://example.test'\nmodule.exports = {}": {
+    hasESM: false,
+    hasCJS: true,
+    isMixed: false,
+  },
+  "const url = `https://example.test`\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  'const s = "/* not a comment"; export const a = 1': {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // An escaped quote must not end the literal early
+  'const s = "a \\" // b"; export const a = 1': {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // An apostrophe in a line comment must not start a string literal
+  "// it's fine\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // A comment must not glue the surrounding tokens together
+  "export/* c */const a = 1": { hasESM: true, hasCJS: false, isMixed: false },
 };
 
 describe("detectSyntax", () => {
