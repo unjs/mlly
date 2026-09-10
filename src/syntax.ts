@@ -10,7 +10,109 @@ const ESM_RE =
 const CJS_RE =
   /(?:[\s;]|^)(?:module\.exports\b|exports\.\w|require\s*\(|global\.\w)/m;
 
-const COMMENT_RE = /\/\*.+?\*\/|\/\/.*(?=[nr])/g;
+const CHAR_SLASH = 47; // /
+const CHAR_STAR = 42; // *
+const CHAR_BACKSLASH = 92; // \
+const CHAR_LF = 10;
+const CHAR_CR = 13;
+const CHAR_DOUBLE_QUOTE = 34; // "
+const CHAR_SINGLE_QUOTE = 39; // '
+const CHAR_BACKTICK = 96; // `
+
+/**
+ * Skips over a string literal starting at `start` (the opening quote) and
+ * returns the index just past its closing quote. An unterminated single- or
+ * double-quoted literal ends at the line break, so a stray quote in the source
+ * cannot swallow the rest of the input.
+ */
+function skipString(code: string, start: number): number {
+  const quote = code.charCodeAt(start);
+  const isTemplate = quote === CHAR_BACKTICK;
+  for (let index = start + 1; index < code.length; index++) {
+    const char = code.charCodeAt(index);
+    if (char === CHAR_BACKSLASH) {
+      index++; // Skip the escaped character.
+      continue;
+    }
+    if (char === quote) {
+      return index + 1;
+    }
+    if (!isTemplate && (char === CHAR_LF || char === CHAR_CR)) {
+      return index; // Unterminated literal: stop at the line break.
+    }
+  }
+  return code.length;
+}
+
+/**
+ * Removes line and block comments from `code` while leaving `//` and `/* *\/`
+ * sequences that appear inside string or template literals untouched.
+ *
+ * Each comment is replaced by a space, or by a line break when it spanned one,
+ * so that neighbouring tokens are not glued together and the line structure the
+ * syntax patterns rely on is preserved.
+ */
+function stripComments(code: string): string {
+  if (!code.includes("/")) {
+    return code;
+  }
+
+  let result = "";
+  let chunkStart = 0;
+  let index = 0;
+
+  while (index < code.length) {
+    const char = code.charCodeAt(index);
+
+    if (char === CHAR_DOUBLE_QUOTE || char === CHAR_SINGLE_QUOTE) {
+      index = skipString(code, index);
+      continue;
+    }
+
+    if (char === CHAR_BACKTICK) {
+      // A template literal may embed `${...}` expressions containing comments,
+      // but skipping the whole literal keeps the scanner simple and can only
+      // leave a comment in place, never remove real code.
+      index = skipString(code, index);
+      continue;
+    }
+
+    if (char !== CHAR_SLASH) {
+      index++;
+      continue;
+    }
+
+    const next = code.charCodeAt(index + 1);
+
+    if (next === CHAR_SLASH) {
+      result += code.slice(chunkStart, index) + " ";
+      index += 2;
+      while (index < code.length) {
+        const inner = code.charCodeAt(index);
+        if (inner === CHAR_LF || inner === CHAR_CR) {
+          break;
+        }
+        index++;
+      }
+      chunkStart = index;
+      continue;
+    }
+
+    if (next === CHAR_STAR) {
+      const end = code.indexOf("*/", index + 2);
+      const stop = end === -1 ? code.length : end + 2;
+      const spansLines = /[\n\r]/.test(code.slice(index + 2, stop));
+      result += code.slice(chunkStart, index) + (spansLines ? "\n" : " ");
+      index = stop;
+      chunkStart = index;
+      continue;
+    }
+
+    index++;
+  }
+
+  return result + code.slice(chunkStart);
+}
 
 const BUILTIN_EXTENSIONS = new Set([".mjs", ".cjs", ".node", ".wasm"]);
 
@@ -37,7 +139,7 @@ export function hasESMSyntax(
   opts: DetectSyntaxOptions = {},
 ): boolean {
   if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+    code = stripComments(code);
   }
   return ESM_RE.test(code);
 }
@@ -54,7 +156,7 @@ export function hasCJSSyntax(
   opts: DetectSyntaxOptions = {},
 ): boolean {
   if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+    code = stripComments(code);
   }
   return CJS_RE.test(code);
 }
@@ -68,7 +170,7 @@ export function hasCJSSyntax(
  */
 export function detectSyntax(code: string, opts: DetectSyntaxOptions = {}) {
   if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+    code = stripComments(code);
   }
   // We strip comments once hence not passing opts down to hasESMSyntax and hasCJSSyntax
   const hasESM = hasESMSyntax(code, {});

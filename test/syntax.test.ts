@@ -92,6 +92,64 @@ const staticTests = {
 const staticTestsWithComments = {
   '// They\'re exposed using "export import" so that types are passed along as expected\nmodule.exports={};':
     { hasESM: false, hasCJS: true, isMixed: false },
+  "/* export * */": { hasESM: false, hasCJS: false, isMixed: false },
+  "/*\n  export *\n*/": { hasESM: false, hasCJS: false, isMixed: false },
+  "/*\n  module.exports = {}\n*/\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  "// export * from './file.mjs'": {
+    hasESM: false,
+    hasCJS: false,
+    isMixed: false,
+  },
+  "// module.exports = {}\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // Code outside of a comment must survive stripping
+  "/* a */ export const a = 1 /* b */": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // `//` and `/*` inside a string literal are not comments
+  'const url = "https://example.test"; export const a = 1': {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  "const url = 'https://example.test'\nmodule.exports = {}": {
+    hasESM: false,
+    hasCJS: true,
+    isMixed: false,
+  },
+  "const url = `https://example.test`\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  'const s = "/* not a comment"; export const a = 1': {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // An escaped quote must not end the literal early
+  'const s = "a \\" // b"; export const a = 1': {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // An apostrophe in a line comment must not start a string literal
+  "// it's fine\nexport const a = 1": {
+    hasESM: true,
+    hasCJS: false,
+    isMixed: false,
+  },
+  // A comment must not glue the surrounding tokens together
+  "export/* c */const a = 1": { hasESM: true, hasCJS: false, isMixed: false },
 };
 
 describe("detectSyntax", () => {
