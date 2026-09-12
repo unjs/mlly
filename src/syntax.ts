@@ -1,4 +1,5 @@
 import { promises as fsp } from "node:fs";
+import { tokenizer } from "acorn";
 import { extname } from "pathe";
 import { readPackageJSON } from "pkg-types";
 import { ResolveOptions, resolvePath } from "./resolve";
@@ -36,10 +37,72 @@ export function hasESMSyntax(
   code: string,
   opts: DetectSyntaxOptions = {},
 ): boolean {
-  if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
+  if (!/\b(?:import|export)\b/.test(code)) {
+    return false;
   }
-  return ESM_RE.test(code);
+
+  let commentMatch = false;
+  try {
+    const tokens = tokenizer(code, {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      allowHashBang: true,
+      allowAwaitOutsideFunction: true,
+      allowImportExportEverywhere: true,
+      onComment(_block, _text, start, end) {
+        if (!opts.stripComments) {
+          commentMatch ||= ESM_RE.test(code.slice(start, end));
+        }
+      },
+    });
+    let previousLabel: string | undefined;
+    for (const token of tokens) {
+      if (commentMatch) {
+        return true;
+      }
+      const label = token.type.label;
+      const memberAccess = previousLabel === "." || previousLabel === "?.";
+      previousLabel = label;
+      if (memberAccess) {
+        continue;
+      }
+      if (label === "import") {
+        let next = tokens.getToken();
+        if (["string", "*", "{"].includes(next.type.label)) {
+          return true;
+        }
+        if (next.type.label === ".") {
+          const property = tokens.getToken();
+          if (code.slice(property.start, property.end) === "meta") return true;
+        }
+        while (["name", "*", ",", "{", "}"].includes(next.type.label)) {
+          if (code.slice(next.start, next.end) === "from") {
+            return true;
+          }
+          next = tokens.getToken();
+        }
+      } else if (label === "export") {
+        const next = tokens.getToken();
+        if (
+          ["*", "{", "default", "class", "function", "const", "var"].includes(
+            next.type.label,
+          ) ||
+          (next.type.label === "name" &&
+            ["let", "type"].includes(code.slice(next.start, next.end))) ||
+          (code.slice(next.start, next.end) === "async" &&
+            tokens.getToken().type.label === "function")
+        ) {
+          return true;
+        }
+      }
+    }
+    return commentMatch;
+  } catch {
+    // Preserve heuristic detection for syntax the tokenizer cannot read.
+    return ESM_RE.test(
+      opts.stripComments ? code.replace(COMMENT_RE, "") : code,
+    );
+  }
 }
 
 /**
@@ -67,12 +130,8 @@ export function hasCJSSyntax(
  * @returns {object} An object indicating the presence of ESM syntax (`hasESM`), CJS syntax (`hasCJS`) and whether both syntaxes are present (`isMixed`).
  */
 export function detectSyntax(code: string, opts: DetectSyntaxOptions = {}) {
-  if (opts.stripComments) {
-    code = code.replace(COMMENT_RE, "");
-  }
-  // We strip comments once hence not passing opts down to hasESMSyntax and hasCJSSyntax
-  const hasESM = hasESMSyntax(code, {});
-  const hasCJS = hasCJSSyntax(code, {});
+  const hasESM = hasESMSyntax(code, opts);
+  const hasCJS = hasCJSSyntax(code, opts);
 
   return {
     hasESM,
