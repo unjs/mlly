@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.8.0",
-    "@vitest/coverage-v8": "^4.1.6",
+    "@vitest/coverage-v8": "^5.0.0",
     "changelogen": "^0.6.2",
     "eslint": "^10.4.0",
     "eslint-config-unjs": "^0.6.2",
