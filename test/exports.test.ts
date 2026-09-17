@@ -228,6 +228,14 @@ describe("findExports", () => {
     const matches = findExports(code);
     expect(matches).to.have.lengthOf(3);
   });
+  it("does not skip declarations following single-line array export (#371)", () => {
+    const code = `export const P = [25, 50]\nexport const OBJ = { a: 1 }\nexport const OBJ2 = { b: 2 }\n`;
+    const matches = findExports(code);
+    expect(matches).to.have.lengthOf(3);
+    expect(matches.map((m) => m.name)).toEqual(["P", "OBJ", "OBJ2"]);
+    expect(findExportNames(code)).toEqual(["P", "OBJ", "OBJ2"]);
+  });
+
 
   it("the commented out export should be filtered out", () => {
     const code = `
