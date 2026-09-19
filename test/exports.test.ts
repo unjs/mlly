@@ -219,6 +219,15 @@ describe("findExports", () => {
     expect(matches.length).to.eql(3);
   });
 
+  it("does not swallow the next declaration when a const initializer is a single-line array", () => {
+    const code = `export const P = [25, 50]
+export const OBJ = { a: 1 }
+export const OBJ2 = { b: 2 }
+`;
+    const matches = findExports(code);
+    expect(matches.map((m) => m.name)).to.eql(["P", "OBJ", "OBJ2"]);
+  });
+
   it("works with multiple named exports", () => {
     const code = `
   export { foo } from 'foo1';
