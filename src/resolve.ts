@@ -96,7 +96,9 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     .filter(Boolean)
     .map((url) => new URL(normalizeid(url.toString())));
   if (_urls.length === 0) {
-    _urls.push(new URL(pathToFileURL(process.cwd())));
+    // Trailing slash makes cwd a directory URL, so resolution starts in cwd, not its parent
+    const cwdURL = pathToFileURL(process.cwd());
+    _urls.push(new URL(cwdURL.endsWith("/") ? cwdURL : cwdURL + "/"));
   }
   const urls = [..._urls];
   for (const url of _urls) {
@@ -112,7 +114,13 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   }
 
   let resolved: URL | undefined;
+  const tried = new Set<string>();
   for (const url of urls) {
+    // Skip duplicate search URLs (e.g. a directory URL and its "./")
+    if (tried.has(url.href)) {
+      continue;
+    }
+    tried.add(url.href);
     // Try simple resolve
     resolved = _tryModuleResolve(id, url, conditionsSet);
     if (resolved) {
