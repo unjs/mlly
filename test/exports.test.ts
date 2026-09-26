@@ -468,6 +468,21 @@ export { foo } from 'foo1';export { bar } from 'foo2';export * as foobar from 'f
 });
 
 describe("findTypeExports", () => {
+  it("includes inline type specifiers from mixed re-exports", () => {
+    const code =
+      'export { cva, type VariantProps as Props, type Theme } from "class-variance-authority";';
+    const matches = findTypeExports(code);
+    expect(matches).toHaveLength(1);
+    expect(matches[0].names).toEqual(["Props", "Theme"]);
+    expect(matches[0].specifier).toBe("class-variance-authority");
+    expect(findExports(code)[0].names).toEqual(["cva"]);
+    expect(findTypeExports('export { cva } from "pkg"')).toEqual([]);
+    expect(findExports('export { type Foo } from "pkg"')).toEqual([]);
+    expect(findTypeExports('export { type Foo } from "pkg"')[0].names).toEqual([
+      "Foo",
+    ]);
+  });
+
   it("finds type exports", () => {
     const matches = findTypeExports(
       `
