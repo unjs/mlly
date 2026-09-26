@@ -1,4 +1,13 @@
-import { existsSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
@@ -118,5 +127,102 @@ describe("tryModuleResolve", async () => {
     expect(
       mockedResolve.mock.calls.some((call) => call[0].includes("//")),
     ).toBe(false);
+  });
+
+  it("does not try the same search URL twice", () => {
+    vi.spyOn(process, "cwd").mockReturnValue(
+      fileURLToPath(new URL("fixture", import.meta.url)),
+    );
+    mockedResolve.mockClear();
+    expect(() =>
+      resolvePathSync("missing-pkg-for-dedupe", { extensions: [] }),
+    ).toThrow();
+    const seen = mockedResolve.mock.calls.map(
+      (call) => `${call[0]} ${call[1].toString()}`,
+    );
+    expect(seen.length).toBeGreaterThan(0);
+    expect(new Set(seen).size).toBe(seen.length);
+    expect(mockedResolve.mock.calls[0][1].toString()).toMatch(/\/fixture\/$/);
+  });
+});
+
+describe("resolve against process.cwd() (no url option)", () => {
+  let root: string;
+
+  function writePkg(dir: string, name: string) {
+    const pkgDir = join(dir, "node_modules", name);
+    mkdirSync(pkgDir, { recursive: true });
+    writeFileSync(
+      join(pkgDir, "package.json"),
+      JSON.stringify({ name, main: "index.js" }),
+    );
+    writeFileSync(join(pkgDir, "index.js"), "module.exports = 1;");
+  }
+
+  function useCwd(dir: string) {
+    vi.spyOn(process, "cwd").mockReturnValue(dir);
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (root) {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  function setup(childName = "child") {
+    root = realpathSync(mkdtempSync(join(tmpdir(), "mlly-cwd-")));
+    const child = join(root, childName);
+    mkdirSync(child, { recursive: true });
+    return child;
+  }
+
+  it("prefers cwd node_modules over the parent directory", () => {
+    const child = setup();
+    writePkg(root, "dup-pkg");
+    writePkg(child, "dup-pkg");
+    useCwd(child);
+    expect(resolvePathSync("dup-pkg")).toBe(
+      fileURLToPath(join(child, "node_modules/dup-pkg/index.js")),
+    );
+  });
+
+  it("resolves relative ids against cwd, not its parent", () => {
+    const child = setup();
+    writeFileSync(join(root, "entry.mjs"), "");
+    writeFileSync(join(child, "entry.mjs"), "");
+    useCwd(child);
+    expect(resolvePathSync("./entry.mjs")).toBe(
+      fileURLToPath(join(child, "entry.mjs")),
+    );
+  });
+
+  it("still finds packages installed only in a parent directory", () => {
+    const child = setup();
+    writePkg(root, "parent-only");
+    useCwd(child);
+    expect(resolvePathSync("parent-only")).toBe(
+      fileURLToPath(join(root, "node_modules/parent-only/index.js")),
+    );
+  });
+
+  it("handles cwd with a trailing separator", () => {
+    const child = setup();
+    writePkg(root, "dup-pkg");
+    writePkg(child, "dup-pkg");
+    useCwd(child + (process.platform === "win32" ? "\\" : "/"));
+    expect(resolvePathSync("dup-pkg")).toBe(
+      fileURLToPath(join(child, "node_modules/dup-pkg/index.js")),
+    );
+  });
+
+  it("handles cwd with spaces and non-ASCII characters", () => {
+    const child = setup("한글 dir #1");
+    writePkg(root, "dup-pkg");
+    writePkg(child, "dup-pkg");
+    useCwd(child);
+    expect(resolvePathSync("dup-pkg")).toBe(
+      fileURLToPath(join(child, "node_modules/dup-pkg/index.js")),
+    );
   });
 });
