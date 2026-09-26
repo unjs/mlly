@@ -512,7 +512,7 @@ export function findExports(code: string): ESMExport[] {
     matchAll(EXPORT_NAMED_RE, code, {
       type: "named",
     }),
-  );
+  ).filter((exp) => exp.names.length > 0);
 
   const destructuredExports: NamedExport[] = matchAll(
     EXPORT_NAMED_DESTRUCT,
@@ -602,11 +602,15 @@ export function findTypeExports(code: string): ESMExport[] {
   );
 
   // Find named exports
-  const namedExports: NamedExport[] = normalizeNamedExports(
-    matchAll(EXPORT_NAMED_TYPE_RE, code, {
-      type: "named",
-    }),
-  );
+  const namedExports: NamedExport[] = [
+    ...normalizeNamedExports(
+      matchAll(EXPORT_NAMED_TYPE_RE, code, { type: "named" }),
+    ),
+    ...normalizeNamedExports(
+      matchAll(EXPORT_NAMED_RE, code, { type: "named" }),
+      true,
+    ).filter((exp) => exp.names.length > 0),
+  ];
 
   // Merge and normalize exports
   const exports: ESMExport[] = normalizeExports([
@@ -661,13 +665,18 @@ function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
   return exports;
 }
 
-function normalizeNamedExports(namedExports: NamedExport[]) {
+function normalizeNamedExports(namedExports: NamedExport[], typesOnly = false) {
   for (const namedExport of namedExports) {
     namedExport.names = namedExport.exports
       .replace(/^\r?\n?/, "")
       .split(/\s*,\s*/g)
-      .filter((name) => !TYPE_RE.test(name))
-      .map((name) => name.replace(/^.*?\sas\s/, "").trim());
+      .filter((name) => (typesOnly ? TYPE_RE.test(name) : !TYPE_RE.test(name)))
+      .map((name) =>
+        name
+          .replace(/^.*?\sas\s/, "")
+          .replace(TYPE_RE, "")
+          .trim(),
+      );
   }
   return namedExports;
 }
