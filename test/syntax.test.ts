@@ -166,6 +166,8 @@ describe.each([{}, { stripComments: true }])(
 
 describe("ESM comments", () => {
   it.each([
+    "//export default example\nmodule.exports = {};",
+    "/*export default example*/module.exports = {};",
     "// export default example\nmodule.exports = {};",
     "/*\n export default example\n*/\nmodule.exports = {};",
     "module.exports = `text ${ /* export default example */ 1 }`;",

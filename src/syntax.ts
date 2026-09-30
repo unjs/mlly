@@ -49,9 +49,9 @@ export function hasESMSyntax(
       allowHashBang: true,
       allowAwaitOutsideFunction: true,
       allowImportExportEverywhere: true,
-      onComment(_block, _text, start, end) {
+      onComment(_block, text) {
         if (!opts.stripComments) {
-          commentMatch ||= ESM_RE.test(code.slice(start, end));
+          commentMatch ||= ESM_RE.test(text);
         }
       },
     });
@@ -99,6 +99,7 @@ export function hasESMSyntax(
     return commentMatch;
   } catch {
     // Preserve heuristic detection for syntax the tokenizer cannot read.
+    // Unsupported syntax can still match ESM-like text inside literals.
     return ESM_RE.test(
       opts.stripComments ? code.replace(COMMENT_RE, "") : code,
     );
