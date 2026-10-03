@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { isWindows } from "std-env";
 import {
   isNodeBuiltin,
@@ -121,6 +124,11 @@ describe("lookupNodeModuleSubpath", () => {
       output: "./subpath",
     },
     {
+      name: "resolves types target alongside null runtime conditions",
+      input: r("fixture/package/node_modules/subpaths/dist/types/index.d.ts"),
+      output: "./types",
+    },
+    {
       name: "resolves with exports field (with conditions)",
       input: r("fixture/package/node_modules/postgres/src/index.js"),
       output: "./",
@@ -153,6 +161,81 @@ describe("lookupNodeModuleSubpath", () => {
     it(t.name, async () => {
       const result = await lookupNodeModuleSubpath(t.input);
       expect(result).toBe(t.output);
+    });
+  }
+
+  const nullTargetTests = [
+    {
+      name: "ignores null subpath targets before valid exports",
+      exports: { "./disabled": null, "./feature": "./dist/feature.mjs" },
+      output: "./feature",
+    },
+    {
+      name: "ignores null root conditions before a valid target",
+      exports: { import: null, require: null, default: "./dist/feature.mjs" },
+      output: "./",
+    },
+    {
+      name: "ignores null conditions nested within subpath conditions",
+      exports: {
+        "./feature": {
+          node: { import: null, default: "./dist/feature.mjs" },
+          browser: null,
+        },
+      },
+      output: "./feature",
+    },
+    {
+      name: "ignores null entries in export target arrays",
+      exports: { "./feature": [null, "./dist/feature.mjs", null] },
+      output: "./feature",
+    },
+    {
+      name: "falls back when all subpath targets are null",
+      exports: { "./disabled": null },
+      output: "./dist/feature.mjs",
+    },
+    {
+      name: "falls back when all conditions are null",
+      exports: { "./feature": { import: null, require: null } },
+      output: "./dist/feature.mjs",
+    },
+    {
+      name: "falls back when all array targets are null",
+      exports: { "./feature": [null, null] },
+      output: "./dist/feature.mjs",
+    },
+    {
+      name: "falls back when the exports field is null",
+      exports: null,
+      output: "./dist/feature.mjs",
+    },
+  ];
+
+  for (const t of nullTargetTests) {
+    it(t.name, async () => {
+      const directory = await mkdtemp(join(tmpdir(), "mlly-null-exports-"));
+      try {
+        const packageDirectory = join(
+          directory,
+          "node_modules",
+          "null-targets",
+        );
+
+        await mkdir(packageDirectory, { recursive: true });
+        await writeFile(
+          join(packageDirectory, "package.json"),
+          JSON.stringify({ name: "null-targets", exports: t.exports }),
+        );
+
+        await expect(
+          lookupNodeModuleSubpath(
+            join(packageDirectory, "dist", "feature.mjs"),
+          ),
+        ).resolves.toBe(t.output);
+      } finally {
+        await rm(directory, { recursive: true, force: true });
+      }
     });
   }
 });
