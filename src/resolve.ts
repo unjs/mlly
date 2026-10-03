@@ -289,15 +289,31 @@ function _findSubpath(subpath: string, exports: PackageJson["exports"]) {
   return _flattenExports(exports).find((p) => p.fsPath === subpath)?.subpath;
 }
 
+/**
+ * Flattens export subpaths, conditions, and target arrays for reverse lookup,
+ * omitting null targets that disable an export.
+ *
+ * @param exports - The export map, condition object, or target array to flatten.
+ * @param parentSubpath - The subpath prefix inherited from the parent export.
+ * @returns Export subpaths paired with their file targets and leaf conditions.
+ */
 function _flattenExports(
-  exports: Exclude<PackageJson["exports"], string> = {},
+  exports: Exclude<PackageJson["exports"], string> | null = {},
   parentSubpath = "./",
 ): { subpath: string; fsPath: string; condition?: string }[] {
+  if (exports === null) {
+    return [];
+  }
+
   return Object.entries(exports).flatMap(([key, value]) => {
     const [subpath, condition] = key.startsWith(".")
       ? [key.slice(1), undefined]
       : ["", key];
     const _subPath = joinURL(parentSubpath, subpath);
+
+    if (value === null) {
+      return [];
+    }
 
     if (typeof value === "string") {
       return [{ subpath: _subPath, fsPath: value, condition }];
