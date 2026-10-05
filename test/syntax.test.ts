@@ -130,6 +130,7 @@ const nodeImportTests = {
   [join(import.meta.url, "../fixture/imports/js-esm")]: false,
   [join(import.meta.url, "../fixture/imports/js-esm/es/index.mjs")]: true,
   [join(import.meta.url, "../fixture/imports/js-esm/es/index.js")]: false,
+  [join(import.meta.url, "../fixture/es/node_modules/cjs/index.js")]: true,
   [join(import.meta.url, "../fixture/imports/mixed")]: false,
 };
 
