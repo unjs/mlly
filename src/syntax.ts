@@ -152,7 +152,7 @@ export async function isValidNodeImport(
 
   if (
     /\.(?:\w+-)?esm?(?:-\w+)?\.js$|\/esm?\//.test(
-      `/${resolvedPath.split("node_modules/").pop()!}`,
+      `/${resolvedPath.split("/node_modules/").pop()!}`,
     )
   ) {
     return false;
