@@ -150,7 +150,11 @@ export async function isValidNodeImport(
     return true;
   }
 
-  if (/\.(?:\w+-)?esm?(?:-\w+)?\.js$|\/esm?\//.test(resolvedPath)) {
+  if (
+    /\.(?:\w+-)?esm?(?:-\w+)?\.js$|\/esm?\//.test(
+      `/${resolvedPath.split("/node_modules/").pop()!}`,
+    )
+  ) {
     return false;
   }
 

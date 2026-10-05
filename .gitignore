@@ -1,4 +1,5 @@
 node_modules
 !test/fixture/package/node_modules
+!test/fixture/es/node_modules
 dist
 *.log
