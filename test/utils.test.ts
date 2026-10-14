@@ -125,6 +125,11 @@ describe("lookupNodeModuleSubpath", () => {
       input: r("fixture/package/node_modules/postgres/src/index.js"),
       output: "./",
     },
+    {
+      name: "resolves with exports field (nested package.json marker)",
+      input: r("fixture/package/node_modules/nested-marker/esm/feature.js"),
+      output: "./feature",
+    },
     // Fallbacks
     {
       name: "resolves with fallback (non resolved module)",

@@ -254,13 +254,17 @@ export async function lookupNodeModuleSubpath(
   path: string,
 ): Promise<string | undefined> {
   path = normalize(fileURLToPath(path));
-  const { name, subpath } = parseNodeModulePath(path);
+  const { dir, name, subpath } = parseNodeModulePath(path);
 
   if (!name || !subpath) {
     return subpath;
   }
 
-  const { exports } = (await readPackageJSON(path).catch(() => {})) || {};
+  const pkgPath = dir ? dir + name : path;
+  const { exports } =
+    (await readPackageJSON(pkgPath).catch(() => {})) ||
+    (await readPackageJSON(path).catch(() => {})) ||
+    {};
   if (exports) {
     const resolvedSubpath = _findSubpath(subpath, exports);
     if (resolvedSubpath) {
