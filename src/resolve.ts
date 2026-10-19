@@ -74,7 +74,13 @@ function _findAbsoluteFile(
     return path;
   }
 
-  const base = path.replace(/[/\\]+$/, "");
+  // Keep the trailing separator of a root path (e.g. "/" or "C:\"), otherwise
+  // the probes below would be relative to the working directory instead.
+  const trimmed = path.replace(/[/\\]+$/, "");
+  const base =
+    trimmed === "" || /^[A-Za-z]:$/.test(trimmed)
+      ? trimmed + path.slice(-1)
+      : trimmed;
   for (const prefix of ["", "index"]) {
     for (const extension of extensions || DEFAULT_EXTENSIONS) {
       const candidate = prefix
