@@ -54,6 +54,20 @@ describe("resolveSync", () => {
     expect(resolveSync("fs")).toBe("node:fs");
     expect(resolveSync("node:foo")).toBe("node:foo");
   });
+
+  it("resolves absolute paths with extensions", () => {
+    // https://github.com/unjs/mlly/issues/297
+    const absolute = fileURLToPath(new URL("fixture/hello", import.meta.url));
+    expect(resolveSync(absolute)).toMatch(/fixture\/hello\.mjs$/);
+    expect(resolvePathSync(absolute)).toMatch(/fixture\/hello\.mjs$/);
+  });
+
+  it("throws for unknown absolute paths", () => {
+    const absolute = fileURLToPath(
+      new URL("fixture/does-not-exist", import.meta.url),
+    );
+    expect(() => resolveSync(absolute)).toThrow(/Cannot find module/);
+  });
 });
 
 describe("resolvePathSync", () => {
