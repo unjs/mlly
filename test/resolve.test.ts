@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { existsSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "pathe";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
@@ -53,6 +54,37 @@ describe("resolveSync", () => {
     expect(resolveSync("node:fs")).toBe("node:fs");
     expect(resolveSync("fs")).toBe("node:fs");
     expect(resolveSync("node:foo")).toBe("node:foo");
+  });
+
+  it("resolves absolute paths with extensions", () => {
+    // https://github.com/unjs/mlly/issues/297
+    const absolute = fileURLToPath(new URL("fixture/hello", import.meta.url));
+    expect(resolveSync(absolute)).toMatch(/fixture\/hello\.mjs$/);
+    expect(resolvePathSync(absolute)).toMatch(/fixture\/hello\.mjs$/);
+  });
+
+  it("throws for unknown absolute paths", () => {
+    const absolute = fileURLToPath(
+      new URL("fixture/does-not-exist", import.meta.url),
+    );
+    expect(() => resolveSync(absolute)).toThrow(/Cannot find module/);
+  });
+
+  it("does not resolve root paths against the working directory", () => {
+    // "/" has to be probed at the file system root, never in process.cwd():
+    // a stray index.mjs in the working directory must never be picked up
+    const stray = join(process.cwd(), "index.mjs");
+    const existed = existsSync(stray);
+    if (!existed) {
+      writeFileSync(stray, "");
+    }
+    try {
+      expect(() => resolveSync("/")).toThrow(/Cannot find module/);
+    } finally {
+      if (!existed) {
+        rmSync(stray, { force: true });
+      }
+    }
   });
 });
 

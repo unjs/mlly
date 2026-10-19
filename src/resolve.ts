@@ -1,6 +1,6 @@
 import { statSync } from "node:fs";
 import { joinURL } from "ufo";
-import { isAbsolute, normalize } from "pathe";
+import { isAbsolute, join, normalize } from "pathe";
 import { moduleResolve } from "import-meta-resolve";
 import { PackageJson, readPackageJSON } from "pkg-types";
 import { fileURLToPath, pathToFileURL, normalizeid } from "./utils";
@@ -46,6 +46,53 @@ function _tryModuleResolve(
   }
 }
 
+/**
+ * Finds the file an absolute path points to, trying the given extensions and
+ * `index` files the same way the module resolver loop does.
+ *
+ * Absolute paths are resolved against the file system directly because the
+ * ESM resolver only accepts `file:` URLs as absolute specifiers, which makes
+ * it throw `The URL must be of scheme file` for Windows paths such as
+ * `C:\\path\\to\\module`.
+ */
+function _findAbsoluteFile(
+  path: string,
+  extensions?: string[],
+): string | undefined {
+  const isFile = (file: string) => {
+    try {
+      return statSync(file).isFile();
+    } catch (error: any) {
+      if (error?.code !== "ENOENT" && error?.code !== "ENOTDIR") {
+        throw error;
+      }
+      return false;
+    }
+  };
+
+  if (isFile(path)) {
+    return path;
+  }
+
+  // Keep the trailing separator of a root path (e.g. "/" or "C:\"), otherwise
+  // the probes below would be relative to the working directory instead.
+  const trimmed = path.replace(/[/\\]+$/, "");
+  const base =
+    trimmed === "" || /^[A-Za-z]:$/.test(trimmed)
+      ? trimmed + path.slice(-1)
+      : trimmed;
+  for (const prefix of ["", "index"]) {
+    for (const extension of extensions || DEFAULT_EXTENSIONS) {
+      const candidate = prefix
+        ? join(base, prefix + extension)
+        : base + extension;
+      if (isFile(candidate)) {
+        return candidate;
+      }
+    }
+  }
+}
+
 function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   if (typeof id !== "string") {
     if (id instanceof URL) {
@@ -71,17 +118,15 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   }
 
   // Skip resolve for absolute paths (fast path)
+  let isUnresolvedAbsolutePath = false;
   if (isAbsolute(id)) {
-    try {
-      const stat = statSync(id);
-      if (stat.isFile()) {
-        return pathToFileURL(id);
-      }
-    } catch (error: any) {
-      if (error?.code !== "ENOENT") {
-        throw error;
-      }
+    const absoluteFile = _findAbsoluteFile(id, options.extensions);
+    if (absoluteFile) {
+      return pathToFileURL(absoluteFile);
     }
+    // Absolute paths are fully determined by the file system, so there is
+    // nothing left for the module resolver to try.
+    isUnresolvedAbsolutePath = true;
   }
 
   // Condition set
@@ -112,7 +157,9 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
   }
 
   let resolved: URL | undefined;
-  for (const url of urls) {
+  // An unresolved absolute path has already been looked up on the file system.
+  const searchURLs = isUnresolvedAbsolutePath ? [] : urls;
+  for (const url of searchURLs) {
     // Try simple resolve
     resolved = _tryModuleResolve(id, url, conditionsSet);
     if (resolved) {
