@@ -637,4 +637,18 @@ describe("findTypeExports", () => {
       ]
     `);
   });
+
+  it("finds inline type specifiers in mixed exports", () => {
+    const matches = findTypeExports(
+      'export { cva, type VariantProps } from "class-variance-authority";',
+    );
+    expect(matches).toMatchObject([
+      {
+        names: ["VariantProps"],
+        name: "VariantProps",
+        specifier: "class-variance-authority",
+        type: "named",
+      },
+    ]);
+  });
 });

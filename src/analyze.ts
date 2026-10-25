@@ -608,10 +608,19 @@ export function findTypeExports(code: string): ESMExport[] {
     }),
   );
 
+  // Find inline type specifiers in mixed named exports
+  const mixedNamedExports: NamedExport[] = normalizeNamedExports(
+    matchAll(EXPORT_NAMED_RE, code, {
+      type: "named",
+    }),
+    true,
+  );
+
   // Merge and normalize exports
   const exports: ESMExport[] = normalizeExports([
     ...declaredExports,
     ...namedExports,
+    ...mixedNamedExports,
   ]);
 
   // Return early when there is no  export statement
@@ -661,15 +670,22 @@ function normalizeExports(exports: (ESMExport & { declaration?: string })[]) {
   return exports;
 }
 
-function normalizeNamedExports(namedExports: NamedExport[]) {
+function normalizeNamedExports(namedExports: NamedExport[], isType = false) {
   for (const namedExport of namedExports) {
     namedExport.names = namedExport.exports
       .replace(/^\r?\n?/, "")
       .split(/\s*,\s*/g)
-      .filter((name) => !TYPE_RE.test(name))
-      .map((name) => name.replace(/^.*?\sas\s/, "").trim());
+      .filter((name) => (isType ? TYPE_RE.test(name) : !TYPE_RE.test(name)))
+      .map((name) =>
+        name
+          .replace(TYPE_RE, "")
+          .replace(/^.*?\sas\s/, "")
+          .trim(),
+      );
   }
-  return namedExports;
+  return isType
+    ? namedExports.filter((namedExport) => namedExport.names.length > 0)
+    : namedExports;
 }
 
 /**
