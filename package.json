@@ -33,7 +33,7 @@
     "ufo": "^1.6.4"
   },
   "devDependencies": {
-    "@types/node": "^25.8.0",
+    "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^4.1.6",
     "changelogen": "^0.6.2",
     "eslint": "^10.4.0",
