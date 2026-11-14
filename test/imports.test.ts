@@ -282,6 +282,107 @@ describe("findStaticImports", () => {
       }
     });
   }
+
+  it("ignores strings containing import keywords (#225)", () => {
+    const code = `
+// Examples of strings (backticks and single quote)
+const a = \`// Empty comment\n import Nodes from "\\$\\{v\\}";\`
+const b = '// Empty comment\n import myString from "module-string";'
+
+// Code from "highlight.js" qml language
+var main = {
+  keyword: ' import',
+  dn: '',
+};
+`;
+    expect(findStaticImports(code)).toEqual([]);
+  });
+
+  it("preserves real static imports after strings containing import words", () => {
+    const singleQuoteBeforeImport = `var main = {\n  keyword: ' import',\n};\nimport foo from 'bar';`;
+    const matches1 = findStaticImports(singleQuoteBeforeImport);
+    expect(matches1).toHaveLength(1);
+    expect(matches1[0]).toMatchObject({
+      type: "static",
+      imports: "foo ",
+      specifier: "bar",
+      code: "import foo from 'bar';",
+    });
+    expect(
+      singleQuoteBeforeImport.slice(matches1[0].start, matches1[0].end),
+    ).toBe("import foo from 'bar';");
+    expect(parseStaticImport(matches1[0]).defaultImport).toBe("foo");
+
+    const noSemicolonBeforeImport = `const msg = "Please use import"\nimport foo from "bar"`;
+    const matches2 = findStaticImports(noSemicolonBeforeImport);
+    expect(matches2).toHaveLength(1);
+    expect(matches2[0]).toMatchObject({
+      type: "static",
+      imports: "foo ",
+      specifier: "bar",
+      code: 'import foo from "bar"',
+    });
+    expect(parseStaticImport(matches2[0]).defaultImport).toBe("foo");
+  });
+
+  it("handles import.meta, member access, dynamic imports, and keyword specifiers", () => {
+    const code = [
+      "const url = import.meta.url",
+      "const a = obj.import",
+      "const b = obj?.import",
+      "const c = obj.\n  import",
+      'const d = import("dyn-mod")',
+      'import { import as imp } from "pkg-a"',
+      "import broken",
+      'import { real } from "pkg-b"',
+    ].join("\n");
+
+    const matches = findStaticImports(code);
+    expect(matches).toHaveLength(2);
+    expect(parseStaticImport(matches[0])).toMatchObject({
+      specifier: "pkg-a",
+      namedImports: { import: "imp" },
+    });
+    expect(parseStaticImport(matches[1])).toMatchObject({
+      specifier: "pkg-b",
+      namedImports: { real: "real" },
+    });
+  });
+
+  it("ignores strings, templates, comments, and regexes when acorn fallback scanner runs", () => {
+    const tsAndJsxCode = [
+      "#!/usr/bin/env node",
+      'import { type Config } from "./config";',
+      "// import fakeComment from 'comment'",
+      "/* import fakeBlock from 'block' */",
+      String.raw`const escaped = 'don\'t import fakeEscaped from "escaped"';`,
+      "const emoji = \"🚀 import fakeEmoji from 'emoji'\";",
+      String.raw`const re = /['"/] import fakeRegex from "regex"/gi;`,
+      "const ratio = a! / b! + 10 / 2;",
+      "const inc = idx++ / 2;",
+      "const opt = obj?.import;",
+      String.raw`const arrowRe = () => /a\/b import fakeArrow from 'arrow'/;`,
+      "const multilineDiv = +\n  1;",
+      "const tpl = `head ${",
+      '  { nested: `inner ${1 + 2} import fakeInner from "inner"` }',
+      '} ${"mid"} tail import fakeOuter from "outer"`;',
+      "const view = () => <Comp prop={1}>hi</Comp>;",
+      'import realDefault from "./real";',
+      "// trailing comment",
+    ].join("\n");
+
+    const matches = findStaticImports(tsAndJsxCode);
+    expect(matches).toHaveLength(2);
+    expect(matches[0].specifier).toBe("./config");
+    expect(tsAndJsxCode.slice(matches[0].start, matches[0].end)).toBe(
+      matches[0].code,
+    );
+    expect(matches[1].specifier).toBe("./real");
+    expect(tsAndJsxCode.slice(matches[1].start, matches[1].end)).toBe(
+      matches[1].code,
+    );
+    expect(parseStaticImport(matches[1]).defaultImport).toBe("realDefault");
+  });
 });
 
 describe("findDynamicImports", () => {
