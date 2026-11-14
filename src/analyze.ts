@@ -286,10 +286,44 @@ const TYPE_RE = /^\s*?type\s/;
  * @returns {StaticImport[]} An array of {@link StaticImport} objects representing each static import found.
  */
 export function findStaticImports(code: string): StaticImport[] {
-  return _filterStatement(
-    _tryGetLocations(code, "import"),
-    matchAll(ESM_STATIC_IMPORT_RE, code, { type: "static" }),
-  );
+  const locations = _tryGetLocations(code, "import");
+  if (locations.length === 0) {
+    return [];
+  }
+
+  const matches: StaticImport[] = [];
+  let lastMatchEnd = 0;
+  for (const [index, location] of locations.entries()) {
+    if (
+      location.start < lastMatchEnd ||
+      _isNonStaticImportAfterKeyword(code, location.end)
+    ) {
+      continue;
+    }
+    ESM_STATIC_IMPORT_STICKY_RE.lastIndex = location.start;
+    const match = ESM_STATIC_IMPORT_STICKY_RE.exec(code);
+    if (!match) {
+      continue;
+    }
+    const end = location.start + match[0].length;
+    const nextLocation = locations[index + 1];
+    if (
+      nextLocation &&
+      nextLocation.start < end &&
+      !_isInsideBraces(code, location.end, nextLocation.start)
+    ) {
+      continue;
+    }
+    matches.push({
+      type: "static",
+      ...(match.groups as { imports: string; specifier: string }),
+      code: match[0],
+      start: location.start,
+      end,
+    });
+    lastMatchEnd = end;
+  }
+  return matches;
 }
 
 /**
@@ -730,6 +764,56 @@ interface TokenLocation {
   end: number;
 }
 
+interface ScanToken {
+  type: "word" | "punct" | "other";
+  value: string;
+}
+
+const ESM_STATIC_IMPORT_STICKY_RE = new RegExp(
+  ESM_STATIC_IMPORT_RE.source,
+  "ymu",
+);
+const ID_START_RE = /[\p{ID_Start}$_]/u;
+const ID_CONTINUE_RE = /[\p{ID_Continue}$\u200C\u200D]/u;
+
+const REGEX_PRECEDING_KEYWORDS = new Set([
+  "await",
+  "case",
+  "delete",
+  "do",
+  "else",
+  "in",
+  "instanceof",
+  "new",
+  "of",
+  "return",
+  "throw",
+  "typeof",
+  "void",
+  "yield",
+]);
+
+const REGEX_PRECEDING_PUNCTUATORS = new Set([
+  "!",
+  "%",
+  "&",
+  "(",
+  "*",
+  "+",
+  ",",
+  "-",
+  ":",
+  ";",
+  "=",
+  "=>",
+  "?",
+  "[",
+  "^",
+  "{",
+  "|",
+  "~",
+]);
+
 function _filterStatement<T extends TokenLocation>(
   locations: TokenLocation[] | undefined,
   statements: T[],
@@ -748,11 +832,11 @@ function _filterStatement<T extends TokenLocation>(
   });
 }
 
-function _tryGetLocations(code: string, label: string) {
+function _tryGetLocations(code: string, label: string): TokenLocation[] {
   try {
     return _getLocations(code, label);
   } catch {
-    // Ignore error
+    return _scanKeywordLocations(code, label);
   }
 }
 
@@ -765,14 +849,323 @@ function _getLocations(code: string, label: string) {
     allowImportExportEverywhere: true,
   });
   const locations: TokenLocation[] = [];
+  let prevLabel = "";
   for (const token of tokens) {
-    if (token.type.label === label) {
+    if (token.type.label === label && prevLabel !== "." && prevLabel !== "?.") {
       locations.push({
         start: token.start,
         end: token.end,
       });
     }
+    prevLabel = token.type.label;
   }
+  return locations;
+}
+
+function _isNonStaticImportAfterKeyword(code: string, index: number): boolean {
+  const nextChar = code[_skipTrivia(code, index)];
+  return nextChar === "." || nextChar === "(";
+}
+
+function _isInsideBraces(code: string, start: number, target: number): boolean {
+  let depth = 0;
+  let i = start;
+  while (i < target) {
+    const next = _skipTrivia(code, i);
+    if (next > i) {
+      i = next;
+      continue;
+    }
+    if (code[i] === "{") {
+      depth++;
+    } else if (code[i] === "}" && depth > 0) {
+      depth--;
+    }
+    i++;
+  }
+  return depth > 0;
+}
+
+function _skipTrivia(code: string, start: number): number {
+  let i = start;
+  while (i < code.length) {
+    const char = code[i];
+    if (/\s/.test(char)) {
+      i++;
+      continue;
+    }
+    if (char === "/" && code[i + 1] === "/") {
+      i += 2;
+      while (i < code.length && code[i] !== "\n" && code[i] !== "\r") {
+        i++;
+      }
+      continue;
+    }
+    if (char === "/" && code[i + 1] === "*") {
+      const endComment = code.indexOf("*/", i + 2);
+      i = endComment === -1 ? code.length : endComment + 2;
+      continue;
+    }
+    break;
+  }
+  return i;
+}
+
+function _skipQuotedString(code: string, start: number, quote: string): number {
+  let i = start;
+  while (i < code.length) {
+    if (code[i] === "\\") {
+      i += 2;
+      continue;
+    }
+    if (code[i] === quote) {
+      return i + 1;
+    }
+    i++;
+  }
+  return code.length;
+}
+
+function _consumeTemplateChunk(
+  code: string,
+  start: number,
+): { index: number; openedExpr: boolean } {
+  let i = start;
+  while (i < code.length) {
+    if (code[i] === "\\") {
+      i += 2;
+      continue;
+    }
+    if (code[i] === "`") {
+      return { index: i + 1, openedExpr: false };
+    }
+    if (code[i] === "$" && code[i + 1] === "{") {
+      return { index: i + 2, openedExpr: true };
+    }
+    i++;
+  }
+  return { index: code.length, openedExpr: false };
+}
+
+function _canStartRegex(prevToken: ScanToken | undefined): boolean {
+  if (!prevToken) {
+    return true;
+  }
+  if (prevToken.type === "word") {
+    return REGEX_PRECEDING_KEYWORDS.has(prevToken.value);
+  }
+  if (prevToken.type === "punct") {
+    return REGEX_PRECEDING_PUNCTUATORS.has(prevToken.value);
+  }
+  return false;
+}
+
+function _tryConsumeRegex(code: string, start: number): number {
+  let i = start;
+  let inCharClass = false;
+  while (i < code.length) {
+    const char = code[i];
+    if (char === "\n" || char === "\r") {
+      return -1;
+    }
+    if (char === "\\") {
+      if (
+        i + 1 >= code.length ||
+        code[i + 1] === "\n" ||
+        code[i + 1] === "\r"
+      ) {
+        return -1;
+      }
+      i += 2;
+      continue;
+    }
+    if (char === "[") {
+      inCharClass = true;
+    } else if (char === "]") {
+      inCharClass = false;
+    } else if (char === "/" && !inCharClass) {
+      i++;
+      while (i < code.length && /[A-Za-z]/.test(code[i])) {
+        i++;
+      }
+      return i;
+    }
+    i++;
+  }
+  return -1;
+}
+
+function _isIdStart(cp: number, char: string): boolean {
+  return (
+    (cp >= 97 && cp <= 122) ||
+    (cp >= 65 && cp <= 90) ||
+    cp === 36 ||
+    cp === 95 ||
+    (cp > 127 && ID_START_RE.test(char))
+  );
+}
+
+function _isIdContinue(cp: number, char: string): boolean {
+  return (
+    _isIdStart(cp, char) ||
+    (cp >= 48 && cp <= 57) ||
+    (cp > 127 && ID_CONTINUE_RE.test(char))
+  );
+}
+
+function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
+  const locations: TokenLocation[] = [];
+  const templateBraceStack: number[] = [];
+  let prevToken: ScanToken | undefined;
+  let i = 0;
+
+  if (code.startsWith("#!")) {
+    while (i < code.length && code[i] !== "\n" && code[i] !== "\r") {
+      i++;
+    }
+  }
+
+  while (i < code.length) {
+    const nextAfterTrivia = _skipTrivia(code, i);
+    if (nextAfterTrivia > i) {
+      i = nextAfterTrivia;
+      continue;
+    }
+    if (i >= code.length) {
+      break;
+    }
+
+    const char = code[i];
+
+    if (char === "'" || char === '"') {
+      i = _skipQuotedString(code, i + 1, char);
+      prevToken = { type: "other", value: char };
+      continue;
+    }
+
+    if (char === "`") {
+      const next = _consumeTemplateChunk(code, i + 1);
+      i = next.index;
+      if (next.openedExpr) {
+        templateBraceStack.push(0);
+        prevToken = { type: "punct", value: "{" };
+      } else {
+        prevToken = { type: "other", value: "`" };
+      }
+      continue;
+    }
+
+    if (char === "{") {
+      if (templateBraceStack.length > 0) {
+        templateBraceStack[templateBraceStack.length - 1]++;
+      }
+      prevToken = { type: "punct", value: "{" };
+      i++;
+      continue;
+    }
+
+    if (char === "}") {
+      if (templateBraceStack.length > 0 && templateBraceStack.at(-1) === 0) {
+        templateBraceStack.pop();
+        const next = _consumeTemplateChunk(code, i + 1);
+        i = next.index;
+        if (next.openedExpr) {
+          templateBraceStack.push(0);
+          prevToken = { type: "punct", value: "{" };
+        } else {
+          prevToken = { type: "other", value: "`" };
+        }
+        continue;
+      }
+      if (templateBraceStack.length > 0) {
+        templateBraceStack[templateBraceStack.length - 1]--;
+      }
+      prevToken = { type: "punct", value: "}" };
+      i++;
+      continue;
+    }
+
+    if (char === "/" && code[i + 1] !== ">" && _canStartRegex(prevToken)) {
+      const regexEnd = _tryConsumeRegex(code, i + 1);
+      if (regexEnd !== -1) {
+        i = regexEnd;
+        prevToken = { type: "other", value: "/" };
+        continue;
+      }
+    }
+
+    if (char >= "0" && char <= "9") {
+      i++;
+      while (i < code.length && /[0-9A-Za-z._]/.test(code[i])) {
+        i++;
+      }
+      prevToken = { type: "other", value: "0" };
+      continue;
+    }
+
+    const cp = code.codePointAt(i)!;
+    const firstChar = cp > 65_535 ? String.fromCodePoint(cp) : char;
+    if (_isIdStart(cp, firstChar)) {
+      const wordStart = i;
+      i += firstChar.length;
+      while (i < code.length) {
+        const nextCp = code.codePointAt(i)!;
+        const nextChar =
+          nextCp > 65_535 ? String.fromCodePoint(nextCp) : code[i];
+        if (!_isIdContinue(nextCp, nextChar)) {
+          break;
+        }
+        i += nextChar.length;
+      }
+      const word = code.slice(wordStart, i);
+      if (
+        word === label &&
+        !(
+          prevToken?.type === "punct" &&
+          (prevToken.value === "." || prevToken.value === "?.")
+        )
+      ) {
+        locations.push({ start: wordStart, end: i });
+      }
+      prevToken = { type: "word", value: word };
+      continue;
+    }
+
+    const twoChar = code.slice(i, i + 2);
+    if (twoChar === "?." && !(code[i + 2] >= "0" && code[i + 2] <= "9")) {
+      prevToken = { type: "punct", value: "?." };
+      i += 2;
+      continue;
+    }
+    if (twoChar === "++" || twoChar === "--" || twoChar === "=>") {
+      prevToken = { type: "punct", value: twoChar };
+      i += 2;
+      continue;
+    }
+
+    if (
+      char === "!" &&
+      code[i + 1] !== "=" &&
+      prevToken &&
+      (prevToken.type === "other" ||
+        (prevToken.type === "word" &&
+          !REGEX_PRECEDING_KEYWORDS.has(prevToken.value)) ||
+        (prevToken.type === "punct" &&
+          (prevToken.value === ")" ||
+            prevToken.value === "]" ||
+            prevToken.value === "}" ||
+            prevToken.value === "++" ||
+            prevToken.value === "--")))
+    ) {
+      prevToken = { type: "punct", value: "ts-nonnull" };
+      i++;
+      continue;
+    }
+
+    prevToken = { type: "punct", value: char };
+    i++;
+  }
+
   return locations;
 }
 
