@@ -776,12 +776,21 @@ const ESM_STATIC_IMPORT_STICKY_RE = new RegExp(
 const ID_START_RE = /[\p{ID_Start}$_]/u;
 const ID_CONTINUE_RE = /[\p{ID_Continue}$\u200C\u200D]/u;
 
+const CONTROL_FLOW_PAREN_KEYWORDS = new Set([
+  "for",
+  "for-await",
+  "if",
+  "while",
+  "with",
+]);
+
 const REGEX_PRECEDING_KEYWORDS = new Set([
   "await",
   "case",
   "delete",
   "do",
   "else",
+  "for-await",
   "in",
   "instanceof",
   "new",
@@ -795,6 +804,7 @@ const REGEX_PRECEDING_KEYWORDS = new Set([
 
 const REGEX_PRECEDING_PUNCTUATORS = new Set([
   "!",
+  ")-control",
   "%",
   "&",
   "(",
@@ -1016,6 +1026,7 @@ function _isIdContinue(cp: number, char: string): boolean {
 function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
   const locations: TokenLocation[] = [];
   const templateBraceStack: number[] = [];
+  const parenStack: boolean[] = [];
   let prevToken: ScanToken | undefined;
   let i = 0;
 
@@ -1052,6 +1063,26 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
       } else {
         prevToken = { type: "other", value: "`" };
       }
+      continue;
+    }
+
+    if (char === "(") {
+      parenStack.push(
+        prevToken?.type === "word" &&
+          CONTROL_FLOW_PAREN_KEYWORDS.has(prevToken.value),
+      );
+      prevToken = { type: "punct", value: "(" };
+      i++;
+      continue;
+    }
+
+    if (char === ")") {
+      const closedControlParen = parenStack.pop() === true;
+      prevToken = {
+        type: "punct",
+        value: closedControlParen ? ")-control" : ")",
+      };
+      i++;
       continue;
     }
 
@@ -1118,16 +1149,23 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
         i += nextChar.length;
       }
       const word = code.slice(wordStart, i);
-      if (
-        word === label &&
-        !(
-          prevToken?.type === "punct" &&
-          (prevToken.value === "." || prevToken.value === "?.")
-        )
-      ) {
+      const isMemberAccess =
+        prevToken?.type === "punct" &&
+        (prevToken.value === "." || prevToken.value === "?.");
+      if (word === label && !isMemberAccess) {
         locations.push({ start: wordStart, end: i });
       }
-      prevToken = { type: "word", value: word };
+      prevToken = isMemberAccess
+        ? { type: "other", value: word }
+        : {
+            type: "word",
+            value:
+              word === "await" &&
+              prevToken?.type === "word" &&
+              prevToken.value === "for"
+                ? "for-await"
+                : word,
+          };
       continue;
     }
 

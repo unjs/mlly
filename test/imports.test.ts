@@ -383,6 +383,29 @@ var main = {
     );
     expect(parseStaticImport(matches[1]).defaultImport).toBe("realDefault");
   });
+
+  it("handles control-flow regexes and member-access keyword names in fallback scanner", () => {
+    const controlFlowCode = [
+      "@sealed class C {}",
+      'if (ok) / import fakeIf from "fake-if"/.test(text);',
+      'if ((a + b)) / import fakeNested from "fake-nested"/.test(text);',
+      'while (ok) / import fakeWhile from "fake-while"/.test(text);',
+      'for (const item of list) / import fakeFor from "fake-for"/.test(item);',
+      'for await (const item of stream) / import fakeForAwait from "fake-for-await"/.test(item);',
+      'const divAfterCall = fn(ok) / 2; import afterCall from "./after-call";',
+      'const ratio = obj.return / 2; import afterDot from "./g";',
+      'const optRatio = obj?.return / 2; import afterOpt from "./h";',
+      'const methodDiv = obj.if(ok) / 2; import afterMethod from "./i";',
+    ].join("\n");
+
+    const matches = findStaticImports(controlFlowCode);
+    expect(matches.map((m) => m.specifier)).toEqual([
+      "./after-call",
+      "./g",
+      "./h",
+      "./i",
+    ]);
+  });
 });
 
 describe("findDynamicImports", () => {
