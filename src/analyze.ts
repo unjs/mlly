@@ -446,7 +446,8 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       char === "<" &&
       depth === 0 &&
       i > 0 &&
-      _isIdentifierBeforeAngleBracket(extraNamesStr, i)
+      (_isIdentifierBeforeAngleBracket(extraNamesStr, i) ||
+        _isTypeParameterListStart(extraNamesStr, i))
     ) {
       angleDepth++;
       continue;
@@ -780,6 +781,12 @@ function _getLocations(code: string, label: string) {
  * Check if `<` at position `i` is preceded by an identifier (not a bare number).
  * `Map2<T>` → true (identifier ends with digit), `1<2` → false (bare number).
  */
+// `= <T, U>() => {}` and `= async <T, U>() => {}` open the type parameter list of a generic arrow function, as a comparison can't follow `=` or `async`
+function _isTypeParameterListStart(str: string, i: number): boolean {
+  const before = str.slice(0, i).trimEnd();
+  return /(?:^|[^=!<>])=$/.test(before) || /(?:^|[^\w$])async$/.test(before);
+}
+
 function _isIdentifierBeforeAngleBracket(str: string, i: number): boolean {
   let j = i - 1;
   // Walk back over identifier characters [A-Za-z0-9_$]
