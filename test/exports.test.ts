@@ -186,6 +186,33 @@ describe("findExports", () => {
       type: "declaration",
       names: ["a", "b"],
     },
+    "export const useApiQuery = <S, V extends AnyVariables = AnyVariables>(args: UseQueryArgs<S, V>) => args":
+      {
+        type: "declaration",
+        name: "useApiQuery",
+        names: ["useApiQuery"],
+      },
+    "export const useApiQuery = async <S, V>(args: S) => args": {
+      type: "declaration",
+      name: "useApiQuery",
+      names: ["useApiQuery"],
+    },
+    "export const a = <S, V>(args: S) => args, b = 1": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a = async < 2, b = 3": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a = obj.async < 2, b = 3": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
+    "export const a = async < 2, b = foo > (3)": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {
