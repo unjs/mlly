@@ -393,9 +393,10 @@ export function parseTypeImport(
  * For `export const foo = fn('a', bar), baz = 2`, only `baz` should be
  * extracted — commas inside `fn(...)` or `Handler<A, B>` are not declaration separators.
  * @param {string} extraNamesStr - The string containing the extra variable declarations to parse.
+ * @param {string} rest - The code following the declaration match.
  * @returns {string[]} An array of variable names extracted from the declaration list.
  */
-function _extractExtraNames(extraNamesStr: string): string[] {
+function _extractExtraNames(extraNamesStr: string, rest = ""): string[] {
   const names: string[] = [];
   let depth = 0;
   let angleDepth = 0;
@@ -447,7 +448,7 @@ function _extractExtraNames(extraNamesStr: string): string[] {
       depth === 0 &&
       i > 0 &&
       (_isIdentifierBeforeAngleBracket(extraNamesStr, i) ||
-        _isTypeParameterListStart(extraNamesStr, i))
+        _isTypeParameterListStart(extraNamesStr, i, rest))
     ) {
       angleDepth++;
       continue;
@@ -500,7 +501,10 @@ export function findExports(code: string): ESMExport[] {
       | string
       | undefined;
     if (extraNamesStr) {
-      const extraNames = _extractExtraNames(extraNamesStr);
+      const extraNames = _extractExtraNames(
+        extraNamesStr,
+        code.slice(declaredExport.end),
+      );
       if (extraNames.length > 0) {
         declaredExport.names = [declaredExport.name, ...extraNames];
       }
@@ -777,16 +781,37 @@ function _getLocations(code: string, label: string) {
   return locations;
 }
 
+// `= <T, U>() => {}` and `= async <T, U>() => {}` open the type parameter list of a generic arrow function.
+// A comparison can't follow `=`, but it can follow a binding named `async` (`async < 2`), so that case also needs the list to be followed by `(`.
+// `rest` is the code after the match, as `EXPORT_DECAL_RE` ends the match before the list closes.
+function _isTypeParameterListStart(
+  str: string,
+  i: number,
+  rest: string,
+): boolean {
+  const before = str.slice(0, i).trimEnd();
+  if (/(?:^|[^=!<>])=$/.test(before)) {
+    return true;
+  }
+  if (!/(?:^|[^\w$.])async$/.test(before)) {
+    return false;
+  }
+  const tail = str.slice(i) + rest;
+  let angleDepth = 0;
+  for (let j = 0; j < tail.length; j++) {
+    if (tail[j] === "<") {
+      angleDepth++;
+    } else if (tail[j] === ">" && tail[j - 1] !== "=" && --angleDepth === 0) {
+      return /^\s*\(/.test(tail.slice(j + 1));
+    }
+  }
+  return false;
+}
+
 /**
  * Check if `<` at position `i` is preceded by an identifier (not a bare number).
  * `Map2<T>` → true (identifier ends with digit), `1<2` → false (bare number).
  */
-// `= <T, U>() => {}` and `= async <T, U>() => {}` open the type parameter list of a generic arrow function, as a comparison can't follow `=` or `async`
-function _isTypeParameterListStart(str: string, i: number): boolean {
-  const before = str.slice(0, i).trimEnd();
-  return /(?:^|[^=!<>])=$/.test(before) || /(?:^|[^\w$])async$/.test(before);
-}
-
 function _isIdentifierBeforeAngleBracket(str: string, i: number): boolean {
   let j = i - 1;
   // Walk back over identifier characters [A-Za-z0-9_$]
