@@ -209,6 +209,10 @@ describe("findExports", () => {
       type: "declaration",
       names: ["a", "b"],
     },
+    "export const a = async < 2, b = foo > (3)": {
+      type: "declaration",
+      names: ["a", "b"],
+    },
   };
 
   for (const [input, test] of Object.entries(tests)) {

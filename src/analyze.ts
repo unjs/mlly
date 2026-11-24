@@ -782,7 +782,7 @@ function _getLocations(code: string, label: string) {
 }
 
 // `= <T, U>() => {}` and `= async <T, U>() => {}` open the type parameter list of a generic arrow function.
-// A comparison can't follow `=`, but it can follow a binding named `async` (`async < 2`), so that case also needs the list to be followed by `(`.
+// A comparison can't follow `=`, but it can follow a binding named `async` (`async < 2`), so that case also needs the list to start with a name and be followed by `(`.
 // `rest` is the code after the match, as `EXPORT_DECAL_RE` ends the match before the list closes.
 function _isTypeParameterListStart(
   str: string,
@@ -793,10 +793,10 @@ function _isTypeParameterListStart(
   if (/(?:^|[^=!<>])=$/.test(before)) {
     return true;
   }
-  if (!/(?:^|[^\w$.])async$/.test(before)) {
+  const tail = str.slice(i) + rest;
+  if (!/(?:^|[^\w$.])async$/.test(before) || !/^<\s*[A-Za-z_$]/.test(tail)) {
     return false;
   }
-  const tail = str.slice(i) + rest;
   let angleDepth = 0;
   for (let j = 0; j < tail.length; j++) {
     if (tail[j] === "<") {
