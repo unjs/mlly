@@ -1,4 +1,13 @@
-import { existsSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { resolveSync, resolvePathSync, fileURLToPath } from "../src";
 import { parseFilename } from "ufo";
@@ -118,5 +127,30 @@ describe("tryModuleResolve", async () => {
     expect(
       mockedResolve.mock.calls.some((call) => call[0].includes("//")),
     ).toBe(false);
+  });
+});
+
+// https://github.com/unjs/mlly/issues/374
+describe("resolve from process.cwd()", () => {
+  it("prefers node_modules in the working directory over its parent", () => {
+    const root = mkdtempSync(join(tmpdir(), "mlly-resolve-"));
+    const child = join(root, "child");
+    const parentPackage = join(root, "node_modules", "ambiguous");
+    const childPackage = join(child, "node_modules", "ambiguous");
+    mkdirSync(parentPackage, { recursive: true });
+    mkdirSync(childPackage, { recursive: true });
+    writeFileSync(join(parentPackage, "index.js"), "module.exports = 'parent'");
+    writeFileSync(join(childPackage, "index.js"), "module.exports = 'child'");
+
+    const cwd = process.cwd();
+    try {
+      process.chdir(child);
+      expect(resolvePathSync("ambiguous")).toBe(
+        realpathSync(join(childPackage, "index.js")),
+      );
+    } finally {
+      process.chdir(cwd);
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

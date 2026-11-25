@@ -96,18 +96,28 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     .filter(Boolean)
     .map((url) => new URL(normalizeid(url.toString())));
   if (_urls.length === 0) {
-    _urls.push(new URL(pathToFileURL(process.cwd())));
+    // Ensure the cwd is treated as a directory (with a trailing slash),
+    // otherwise module resolution starts from its parent directory.
+    _urls.push(new URL(pathToFileURL(process.cwd() + "/")));
   }
-  const urls = [..._urls];
+  const urls: URL[] = [];
+  const seenUrls = new Set<string>();
+  const addUrl = (url: URL) => {
+    if (!seenUrls.has(url.href)) {
+      seenUrls.add(url.href);
+      urls.push(url);
+    }
+  };
+  for (const url of _urls) {
+    addUrl(url);
+  }
   for (const url of _urls) {
     if (url.protocol === "file:") {
-      urls.push(
-        new URL("./", url),
-        // If url is directory
-        new URL(joinURL(url.pathname, "_index.js"), url),
-        // TODO: Remove in next major version?
-        new URL("node_modules", url),
-      );
+      addUrl(new URL("./", url));
+      // If url is directory
+      addUrl(new URL(joinURL(url.pathname, "_index.js"), url));
+      // TODO: Remove in next major version?
+      addUrl(new URL("node_modules", url));
     }
   }
 
