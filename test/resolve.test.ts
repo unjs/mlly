@@ -146,10 +146,29 @@ describe("resolve from process.cwd()", () => {
     try {
       process.chdir(child);
       expect(resolvePathSync("ambiguous")).toBe(
-        realpathSync(join(childPackage, "index.js")),
+        fileURLToPath(realpathSync(join(childPackage, "index.js"))),
       );
     } finally {
       process.chdir(cwd);
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("treats an explicit directory URL without a trailing slash as a directory", () => {
+    const root = mkdtempSync(join(tmpdir(), "mlly-resolve-"));
+    const child = join(root, "child");
+    const parentPackage = join(root, "node_modules", "ambiguous");
+    const childPackage = join(child, "node_modules", "ambiguous");
+    mkdirSync(parentPackage, { recursive: true });
+    mkdirSync(childPackage, { recursive: true });
+    writeFileSync(join(parentPackage, "index.js"), "module.exports = 'parent'");
+    writeFileSync(join(childPackage, "index.js"), "module.exports = 'child'");
+
+    try {
+      expect(resolvePathSync("ambiguous", { url: child })).toBe(
+        fileURLToPath(realpathSync(join(childPackage, "index.js"))),
+      );
+    } finally {
       rmSync(root, { recursive: true, force: true });
     }
   });

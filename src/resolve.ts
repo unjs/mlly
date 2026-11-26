@@ -32,6 +32,19 @@ export interface ResolveOptions {
   conditions?: string[];
 }
 
+function normalizeDirectoryUrl(url: URL): URL {
+  if (url.protocol === "file:" && !url.pathname.endsWith("/")) {
+    try {
+      if (statSync(fileURLToPath(url)).isDirectory()) {
+        url.pathname += "/";
+      }
+    } catch {
+      // Missing or unreadable paths keep the existing file URL semantics.
+    }
+  }
+  return url;
+}
+
 function _tryModuleResolve(
   id: string,
   url: URL,
@@ -94,7 +107,7 @@ function _resolve(id: string | URL, options: ResolveOptions = {}): string {
     (Array.isArray(options.url) ? options.url : [options.url]) as URL[]
   )
     .filter(Boolean)
-    .map((url) => new URL(normalizeid(url.toString())));
+    .map((url) => normalizeDirectoryUrl(new URL(normalizeid(url.toString()))));
   if (_urls.length === 0) {
     // Ensure the cwd is treated as a directory (with a trailing slash),
     // otherwise module resolution starts from its parent directory.
