@@ -406,6 +406,35 @@ var main = {
       "./i",
     ]);
   });
+
+  it("distinguishes identifier of from for...of in fallback scanner", () => {
+    const code = [
+      "@sealed class C {}",
+      "const of = 4;",
+      'const ratio = of / 2; import afterOfDiv from "./of-div";',
+      'const nonNullRatio = of! / 2; import afterOfNonNull from "./of-nonnull";',
+      'for (const x of / import fakeForOf from "fake-for-of"/.exec(text) ?? []) {}',
+      'for await (const x of / import fakeForAwaitOf from "fake-for-await-of"/.exec(text) ?? []) {}',
+      'for (const of of / import fakeOfOf from "fake-of-of"/.exec(text) ?? []) {}',
+      'for (obj.prop of / import fakeMemberOf from "fake-member-of"/.exec(text) ?? []) {}',
+      'for (const { a = of / 2 } of / import fakeDestr from "fake-destr"/.exec(text) ?? []) {}',
+      'for (const [b = of / 2] of / import fakeArr from "fake-arr"/.exec(text) ?? []) {}',
+      'for (let i = 0; i < of / 2; i++) {} import afterCStyle from "./c-style";',
+      'for (const x of of / 2 ? a : b) {} import afterForOfRhs from "./for-of-rhs";',
+      'for (const k in of / 2 ? a : b) {} import afterForInRhs from "./for-in-rhs";',
+      'for (of / 2; cond; ) {} import afterForInit from "./for-init";',
+    ].join("\n");
+
+    const matches = findStaticImports(code);
+    expect(matches.map((m) => m.specifier)).toEqual([
+      "./of-div",
+      "./of-nonnull",
+      "./c-style",
+      "./for-of-rhs",
+      "./for-in-rhs",
+      "./for-init",
+    ]);
+  });
 });
 
 describe("findDynamicImports", () => {

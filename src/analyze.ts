@@ -765,8 +765,17 @@ interface TokenLocation {
 }
 
 interface ScanToken {
-  type: "word" | "punct" | "other";
+  type: "word" | "member" | "punct" | "other";
   value: string;
+}
+
+interface ParenContext {
+  controlFlow: boolean;
+  forHeader: boolean;
+  forSeparatorAllowed: boolean;
+  braceDepth: number;
+  bracketDepth: number;
+  templateDepth: number;
 }
 
 const ESM_STATIC_IMPORT_STICKY_RE = new RegExp(
@@ -784,6 +793,8 @@ const CONTROL_FLOW_PAREN_KEYWORDS = new Set([
   "with",
 ]);
 
+const FOR_BINDING_KEYWORDS = new Set(["const", "let", "var"]);
+
 const REGEX_PRECEDING_KEYWORDS = new Set([
   "await",
   "case",
@@ -791,10 +802,10 @@ const REGEX_PRECEDING_KEYWORDS = new Set([
   "do",
   "else",
   "for-await",
+  "for-of",
   "in",
   "instanceof",
   "new",
-  "of",
   "return",
   "throw",
   "typeof",
@@ -1023,10 +1034,47 @@ function _isIdContinue(cp: number, char: string): boolean {
   );
 }
 
+function _canPrecedeForOf(prevToken: ScanToken | undefined): boolean {
+  if (!prevToken) {
+    return false;
+  }
+  if (prevToken.type === "member") {
+    return true;
+  }
+  if (prevToken.type === "word") {
+    return (
+      !FOR_BINDING_KEYWORDS.has(prevToken.value) &&
+      !REGEX_PRECEDING_KEYWORDS.has(prevToken.value)
+    );
+  }
+  if (prevToken.type === "punct") {
+    return (
+      prevToken.value === ")" ||
+      prevToken.value === "]" ||
+      prevToken.value === "}" ||
+      prevToken.value === "ts-nonnull"
+    );
+  }
+  return false;
+}
+
+function _isTopLevelForHeader(
+  paren: ParenContext | undefined,
+  templateDepth: number,
+): paren is ParenContext {
+  return Boolean(
+    paren?.forHeader &&
+    paren.forSeparatorAllowed &&
+    paren.braceDepth === 0 &&
+    paren.bracketDepth === 0 &&
+    paren.templateDepth === templateDepth,
+  );
+}
+
 function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
   const locations: TokenLocation[] = [];
   const templateBraceStack: number[] = [];
-  const parenStack: boolean[] = [];
+  const parenStack: ParenContext[] = [];
   let prevToken: ScanToken | undefined;
   let i = 0;
 
@@ -1067,20 +1115,30 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
     }
 
     if (char === "(") {
-      parenStack.push(
+      const isControlFlow =
         prevToken?.type === "word" &&
-          CONTROL_FLOW_PAREN_KEYWORDS.has(prevToken.value),
-      );
+        CONTROL_FLOW_PAREN_KEYWORDS.has(prevToken.value);
+      const isForHeader =
+        prevToken?.type === "word" &&
+        (prevToken.value === "for" || prevToken.value === "for-await");
+      parenStack.push({
+        controlFlow: isControlFlow,
+        forHeader: isForHeader,
+        forSeparatorAllowed: isForHeader,
+        braceDepth: 0,
+        bracketDepth: 0,
+        templateDepth: templateBraceStack.length,
+      });
       prevToken = { type: "punct", value: "(" };
       i++;
       continue;
     }
 
     if (char === ")") {
-      const closedControlParen = parenStack.pop() === true;
+      const closedParen = parenStack.pop();
       prevToken = {
         type: "punct",
-        value: closedControlParen ? ")-control" : ")",
+        value: closedParen?.controlFlow ? ")-control" : ")",
       };
       i++;
       continue;
@@ -1089,6 +1147,13 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
     if (char === "{") {
       if (templateBraceStack.length > 0) {
         templateBraceStack[templateBraceStack.length - 1]++;
+      }
+      const topParen = parenStack.at(-1);
+      if (
+        topParen?.forHeader &&
+        topParen.templateDepth === templateBraceStack.length
+      ) {
+        topParen.braceDepth++;
       }
       prevToken = { type: "punct", value: "{" };
       i++;
@@ -1110,6 +1175,14 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
       }
       if (templateBraceStack.length > 0) {
         templateBraceStack[templateBraceStack.length - 1]--;
+      }
+      const topParen = parenStack.at(-1);
+      if (
+        topParen?.forHeader &&
+        topParen.templateDepth === templateBraceStack.length &&
+        topParen.braceDepth > 0
+      ) {
+        topParen.braceDepth--;
       }
       prevToken = { type: "punct", value: "}" };
       i++;
@@ -1155,17 +1228,29 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
       if (word === label && !isMemberAccess) {
         locations.push({ start: wordStart, end: i });
       }
+      let tokenValue = word;
+      if (!isMemberAccess) {
+        if (
+          word === "await" &&
+          prevToken?.type === "word" &&
+          prevToken.value === "for"
+        ) {
+          tokenValue = "for-await";
+        } else {
+          const topParen = parenStack.at(-1);
+          if (_isTopLevelForHeader(topParen, templateBraceStack.length)) {
+            if (word === "in") {
+              topParen.forSeparatorAllowed = false;
+            } else if (word === "of" && _canPrecedeForOf(prevToken)) {
+              topParen.forSeparatorAllowed = false;
+              tokenValue = "for-of";
+            }
+          }
+        }
+      }
       prevToken = isMemberAccess
-        ? { type: "other", value: word }
-        : {
-            type: "word",
-            value:
-              word === "await" &&
-              prevToken?.type === "word" &&
-              prevToken.value === "for"
-                ? "for-await"
-                : word,
-          };
+        ? { type: "member", value: word }
+        : { type: "word", value: tokenValue };
       continue;
     }
 
@@ -1186,6 +1271,7 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
       code[i + 1] !== "=" &&
       prevToken &&
       (prevToken.type === "other" ||
+        prevToken.type === "member" ||
         (prevToken.type === "word" &&
           !REGEX_PRECEDING_KEYWORDS.has(prevToken.value)) ||
         (prevToken.type === "punct" &&
@@ -1198,6 +1284,38 @@ function _scanKeywordLocations(code: string, label: string): TokenLocation[] {
       prevToken = { type: "punct", value: "ts-nonnull" };
       i++;
       continue;
+    }
+
+    switch (char) {
+      case "[": {
+        const topParen = parenStack.at(-1);
+        if (
+          topParen?.forHeader &&
+          topParen.templateDepth === templateBraceStack.length
+        ) {
+          topParen.bracketDepth++;
+        }
+        break;
+      }
+      case "]": {
+        const topParen = parenStack.at(-1);
+        if (
+          topParen?.forHeader &&
+          topParen.templateDepth === templateBraceStack.length &&
+          topParen.bracketDepth > 0
+        ) {
+          topParen.bracketDepth--;
+        }
+        break;
+      }
+      case ";":
+      case "=": {
+        const topParen = parenStack.at(-1);
+        if (_isTopLevelForHeader(topParen, templateBraceStack.length)) {
+          topParen.forSeparatorAllowed = false;
+        }
+        break;
+      }
     }
 
     prevToken = { type: "punct", value: char };
